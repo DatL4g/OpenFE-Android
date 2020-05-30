@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="locationItemHeight">100dp</dimen>
+    <dimen name="locationCardRadius">10dp</dimen>
+    <dimen name="locationCardElevation">4dp</dimen>
+
+    <dimen name="actionItemSize">80dp</dimen>
+</resources>

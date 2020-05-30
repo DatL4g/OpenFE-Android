@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryColor">#db3236</color>
+    <color name="primaryLightColor">#ff6960</color>
+    <color name="primaryDarkColor">#a2000f</color>
+
+    <color name="defaultBackgroundColor">#ffffff</color>
+
+    <color name="overviewToolbarTextColor">#ffffff</color>
+    <color name="overviewStatusbarColor">@color/primaryColor</color>
+    <color name="overviewToolbarColor">@color/primaryColor</color>
+    <color name="overviewDrawerToggleColor">#ffffff</color>
+
+    <color name="locationCardDefaultColor">@color/primaryColor</color>
+    <color name="locationCardSelectedColor">@color/primaryLightColor</color>
+    <color name="locationCardTextColor">#ffffff</color>
+    <color name="locationCardProgressColor">#ffffff</color>
+
+    <color name="actionCardDefaultColor">@color/primaryColor</color>
+    <color name="actionCardSelectedColor">@color/primaryDarkColor</color>
+    <color name="actionCardIconTint">#ffffff</color>
+    <color name="actionCardTextColor">#ffffff</color>
+
+    <color name="appsActionStatusbarColor">#000000</color>
+    <color name="appsActionCardDefaultColor">#ffffff</color>
+    <color name="appsActionCardSelectedColor">#a9a9a9</color>
+    <color name="appsActionTextColor">#000000</color>
+
+    <color name="explorerIconTint">@color/primaryColor</color>
+</resources>

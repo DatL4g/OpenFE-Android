@@ -1,0 +1,145 @@
+package de.datlag.openfe.fragments
+
+import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionDeniedResponse
+import com.karumi.dexter.listener.PermissionGrantedResponse
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.single.PermissionListener
+import de.datlag.openfe.R
+import de.datlag.openfe.commons.*
+import de.datlag.openfe.extend.AdvancedActivity
+import de.datlag.openfe.interfaces.FragmentBackPressed
+import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
+import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
+import de.datlag.openfe.recycler.data.ActionItem
+import de.datlag.openfe.recycler.data.LocationItem
+import de.datlag.openfe.util.PermissionChecker
+import kotlinx.android.synthetic.main.fragment_overview.*
+
+class OverviewFragment : Fragment(), FragmentBackPressed {
+
+    lateinit var locationList: List<LocationItem>
+    lateinit var actionList: List<ActionItem>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        statusBarColor(getColor(R.color.overviewStatusbarColor))
+
+        locationList = getLocationItems()
+        actionList = getActionItems()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val contextThemeWrapper = ContextThemeWrapper(saveContext, R.style.OverviewFragmentTheme)
+        val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
+
+        saveContext.theme.applyStyle(R.style.OverviewFragmentTheme, true)
+        return clonedLayoutInflater.inflate(R.layout.fragment_overview, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        (activity as AdvancedActivity).setSupportActionBar(toolBar)
+        val toggle = ActionBarDrawerToggle(requireActivity(), drawer, toolBar, R.string.app_name, R.string.app_name)
+        toggle.drawerArrowDrawable.color = getColor(R.color.overviewDrawerToggleColor)
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
+
+        locationRecycler.isNestedScrollingEnabled = false
+        locationRecycler.layoutManager = LinearLayoutManager(saveContext)
+        locationRecycler.adapter = LocationRecyclerAdapter(saveContext, locationList).apply {
+            this.setClickListener(object: LocationRecyclerAdapter.ItemClickListener{
+                override fun onClick(view: View, position: Int) {
+                    checkReadPermission(locationList[position])
+                }
+            })
+        }
+
+
+        actionRecycler.isNestedScrollingEnabled = false
+        actionRecycler.layoutManager = GridLayoutManager(saveContext, if(saveContext.packageManager.isTelevision()) 5 else 3)
+        actionRecycler.adapter = ActionRecyclerAdapter(saveContext, actionList).apply {
+            this.setClickListener(object: ActionRecyclerAdapter.ItemClickListener{
+                override fun onClick(view: View, position: Int) {
+                    findNavController().navigate(actionList[position].actionId)
+                }
+            })
+        }
+    }
+
+    private fun getLocationItems(): List<LocationItem> {
+        val usageStats = saveContext.getStorageVolumes()
+        val locationList = mutableListOf<LocationItem>()
+
+        for (usageStat in usageStats) {
+            if(usageStat.max != 0L && usageStat.current != 0L) {
+                locationList.add(LocationItem(usageStat.file.getDisplayName(saveContext), usageStat))
+            }
+        }
+
+        return locationList.toList()
+    }
+
+    private fun getActionItems(): List<ActionItem> {
+        val actionList = mutableListOf<ActionItem>()
+
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_music_note_24dp), "Music", 0))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_image_24dp), "Images", 1))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_local_movies_24dp), "Videos", 2))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_insert_drive_file_24dp), "Documents", 3))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_archive_24dp), "Archives", 4))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_adb_24dp), "Apps", R.id.action_OverviewFragment_to_AppsActionFragment))
+
+        return actionList
+    }
+
+    private fun checkReadPermission(locationItem: LocationItem) {
+        PermissionChecker.checkReadStorage(saveContext, object: PermissionListener{
+            override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                val args = Bundle()
+                args.putString("filePath", locationItem.usage.file.absolutePath)
+                findNavController().navigate(R.id.action_OverviewFragment_to_ExplorerFragment, args)
+            }
+
+            override fun onPermissionRationaleShouldBeShown(
+                p0: PermissionRequest?,
+                p1: PermissionToken?
+            ) {
+
+            }
+
+            override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+
+            }
+
+        })
+    }
+
+    override fun onBackPressed(): Boolean {
+        return if(drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START)
+            false
+        } else {
+            true
+        }
+    }
+
+    companion object {
+        fun newInstance() = OverviewFragment()
+    }
+}

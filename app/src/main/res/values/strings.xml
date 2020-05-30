@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">OpenFE</string>
+    <string name="font_path" translatable="false">fonts/Poppins-Regular.ttf</string>
+
+    <string name="loading_apps">Loading Apps…</string>
+
+    <string name="default_explorer_path" translatable="false">/storage</string>
+</resources>

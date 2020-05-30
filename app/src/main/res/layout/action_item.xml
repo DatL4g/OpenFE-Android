@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:foregroundGravity="center"
+    app:layout_anchorGravity="center"
+    android:orientation="vertical"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
+    android:clickable="false">
+
+    <de.datlag.openfe.extend.ClickableCardView
+        android:id="@+id/actionCard"
+        android:layout_width="@dimen/actionItemSize"
+        android:layout_height="@dimen/actionItemSize"
+        android:layout_margin="8dp"
+        app:cardBackgroundSelector="@color/action_card_selector"
+        app:cardCornerRadius="5dp"
+        app:cardMaxElevation="4dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/actionCardDefaultColor"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:clickable="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:clickable="false">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/actionIcon"
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
+                android:padding="12dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/actionName"
+                app:tint="@color/actionCardIconTint"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:clickable="false"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/actionName"
+                fontPath="fonts/Poppins-Bold.ttf"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/actionCardTextColor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/actionIcon"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:clickable="false"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </de.datlag.openfe.extend.ClickableCardView>
+</androidx.appcompat.widget.LinearLayoutCompat>

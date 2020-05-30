@@ -1,0 +1,28 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/primaryLightColor</item>
+    </style>
+
+    <style name="AppTheme.Overlay" parent="AppTheme">
+        <item name="colorPrimary">@android:color/transparent</item>
+    </style>
+
+    <style name="OverviewFragmentTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@color/overviewStatusbarColor</item>
+        <item name="drawerArrowStyle">@style/OverviewDrawerArrowStyle</item>
+    </style>
+
+    <style name="OverviewDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/overviewDrawerToggleColor</item>
+    </style>
+
+    <declare-styleable name="ClickableCardView">
+        <attr name="cardBackgroundSelector" format="reference" />
+    </declare-styleable>
+
+</resources>

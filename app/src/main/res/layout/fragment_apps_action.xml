@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<de.datlag.openfe.extend.ReverseFrameLayout
+    android:id="@+id/appsActionFrame"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/defaultBackgroundColor"
+    android:animateLayoutChanges="true">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appsActionSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="@android:color/transparent"
+        android:theme="@style/AppTheme.Overlay"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"
+            android:background="@android:color/transparent"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp"
+            app:contentInsetEndWithActions="0dp"
+            app:popupTheme="@style/AppTheme.Overlay"
+            app:theme="@style/AppTheme.Overlay">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                app:cardBackgroundColor="#ffffff"
+                app:cardMaxElevation="6dp"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="10dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/appsActionSearchBack"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        app:layout_constraintDimensionRatio="h,1:1"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:srcCompat="@drawable/ic_arrow_back_24dp"
+                        android:scaleType="centerInside"/>
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/appsActionSearchEdit"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:background="@android:color/transparent"
+                        android:textColor="#000000"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:textColorHint="@android:color/transparent"
+                        android:visibility="visible"
+                        android:hint="Enter Application"
+                        app:layout_constraintHorizontal_weight="1"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/appsActionSearchBack"
+                        app:layout_constraintStart_toEndOf="@id/appsActionSearchBack"
+                        app:layout_constraintRight_toLeftOf="@id/appsActionSearchIcon"
+                        app:layout_constraintEnd_toStartOf="@id/appsActionSearchIcon"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/appsActionSearchIcon"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        app:layout_constraintDimensionRatio="h,1:1"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/appsActionSearchEdit"
+                        app:layout_constraintStart_toEndOf="@id/appsActionSearchEdit"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:srcCompat="@drawable/ic_search_24dp"
+                        android:scaleType="centerInside"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/loadingTextView"
+        fontPath="fonts/Poppins-Bold.ttf"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:text="@string/loading_apps"
+        android:textColor="@color/appsActionTextColor"
+        android:gravity="center"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMaxTextSize="24sp"
+        app:autoSizeMinTextSize="18sp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/appsActionLayoutWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/defaultBackgroundColor"
+        android:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/appsActionRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintVertical_weight="1"
+            android:background="@color/defaultBackgroundColor"
+            android:visibility="gone"
+            android:paddingTop="?attr/actionBarSize"
+            android:clipToPadding="false"
+            android:scrollbarStyle="outsideOverlay"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/appsActionBottomNavigation"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/appsActionBottomNavigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"
+            app:menu="@menu/apps_action_bottom_menu"
+            app:itemIconTint="#ffffff"
+            app:itemTextColor="#ffffff"
+            app:labelVisibilityMode="labeled"
+            app:layout_constraintTop_toBottomOf="@id/appsActionRecycler"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</de.datlag.openfe.extend.ReverseFrameLayout>
