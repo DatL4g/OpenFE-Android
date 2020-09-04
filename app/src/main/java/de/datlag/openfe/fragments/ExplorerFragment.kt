@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.interfaces.FragmentBackPressed
+import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.FileItem
 import kotlinx.android.synthetic.main.fragment_explorer.*
@@ -40,29 +41,27 @@ class ExplorerFragment : Fragment(), FragmentBackPressed {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerAdapter = ExplorerRecyclerAdapter(saveContext, mutableListOf()).apply {
-            this.setClickListener(object: ExplorerRecyclerAdapter.ItemClickListener{
-                override fun onClick(view: View, position: Int) {
-                    val file = fileList[position].file
+        recyclerAdapter = ExplorerRecyclerAdapter(mutableListOf()).apply {
+            clickListener = RecyclerAdapterItemClickListener { _, pos ->
+                val file = fileList[pos].file
 
-                    if(file.isDirectory) {
-                        moveToPath(file)
-                    } else {
-                        val intent = Intent(Intent.ACTION_VIEW)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        intent.setDataAndType(file.getProviderUri(saveContext) ?: file.getUri(), file.getMime(saveContext))
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            intent.addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
-                        }
-                        startActivity(intent)
+                if(file.isDirectory) {
+                    moveToPath(file)
+                } else {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    intent.setDataAndType(file.getProviderUri(saveContext) ?: file.getUri(), file.getMime(saveContext))
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                     }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        intent.addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
+                    }
+                    startActivity(intent)
                 }
-            })
+            }
         }
 
         val file = File(arguments?.getString("filePath") ?: getString(R.string.default_explorer_path))

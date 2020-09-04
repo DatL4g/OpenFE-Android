@@ -20,6 +20,7 @@ import de.datlag.openfe.R
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
+import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
@@ -62,23 +63,19 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
 
         locationRecycler.isNestedScrollingEnabled = false
         locationRecycler.layoutManager = LinearLayoutManager(saveContext)
-        locationRecycler.adapter = LocationRecyclerAdapter(saveContext, locationList).apply {
-            this.setClickListener(object: LocationRecyclerAdapter.ItemClickListener{
-                override fun onClick(view: View, position: Int) {
-                    checkReadPermission(locationList[position])
-                }
-            })
+        locationRecycler.adapter = LocationRecyclerAdapter(locationList).apply {
+            clickListener = RecyclerAdapterItemClickListener { _, position ->
+                checkReadPermission(locationList[position])
+            }
         }
 
 
         actionRecycler.isNestedScrollingEnabled = false
         actionRecycler.layoutManager = GridLayoutManager(saveContext, if(saveContext.packageManager.isTelevision()) 5 else 3)
-        actionRecycler.adapter = ActionRecyclerAdapter(saveContext, actionList).apply {
-            this.setClickListener(object: ActionRecyclerAdapter.ItemClickListener{
-                override fun onClick(view: View, position: Int) {
-                    findNavController().navigate(actionList[position].actionId)
-                }
-            })
+        actionRecycler.adapter = ActionRecyclerAdapter(actionList).apply {
+            clickListener = RecyclerAdapterItemClickListener { view, position ->
+                findNavController().navigate(actionList[position].actionId)
+            }
         }
     }
 

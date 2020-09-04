@@ -3,8 +3,10 @@ package de.datlag.openfe.extend
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 
+@AndroidEntryPoint
 abstract class AdvancedActivity : AppCompatActivity() {
 
     companion object {

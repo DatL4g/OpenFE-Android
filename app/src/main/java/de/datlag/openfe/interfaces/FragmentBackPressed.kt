@@ -1,5 +1,5 @@
 package de.datlag.openfe.interfaces
 
-interface FragmentBackPressed {
+fun interface FragmentBackPressed {
     fun onBackPressed(): Boolean
 }

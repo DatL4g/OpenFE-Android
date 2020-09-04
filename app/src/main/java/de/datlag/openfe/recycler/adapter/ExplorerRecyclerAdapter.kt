@@ -18,51 +18,56 @@ import de.datlag.openfe.R
 import de.datlag.openfe.commons.getAPKImage
 import de.datlag.openfe.commons.getUri
 import de.datlag.openfe.commons.isAPK
+import de.datlag.openfe.commons.tint
+import de.datlag.openfe.databinding.ExplorerItemBinding
+import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
 import de.datlag.openfe.recycler.data.FileItem
+import kotlinx.android.extensions.LayoutContainer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ExplorerRecyclerAdapter(val context: Context, var fileList: MutableList<FileItem>) : RecyclerView.Adapter<ExplorerRecyclerAdapter.ViewHolder>() {
+class ExplorerRecyclerAdapter(var fileList: MutableList<FileItem>) : RecyclerView.Adapter<ExplorerRecyclerAdapter.ViewHolder>() {
 
-    private val layoutInflater = LayoutInflater.from(context)
-    private var clickListener: ItemClickListener? = null
+    var clickListener: RecyclerAdapterItemClickListener? = null
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, LayoutContainer {
 
-        private val explorerRoot: ConstraintLayout = itemView.findViewById(R.id.explorerRoot) ?: (itemView as ConstraintLayout)
-        val explorerIcon: AppCompatImageView = itemView.findViewById(R.id.explorerIcon)
-        val explorerName: AppCompatTextView = itemView.findViewById(R.id.explorerName)
+        override val containerView: View?
+            get() = itemView
+
+        val binding = ExplorerItemBinding.bind(containerView ?: itemView)
+        val context: Context = containerView?.context ?: itemView.context
 
         init {
-            explorerRoot.setOnClickListener(this)
+            binding.explorerRoot.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
-            clickListener?.onClick(v ?: itemView, adapterPosition)
+            clickListener?.onClick(v ?: containerView ?: itemView, adapterPosition)
         }
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(layoutInflater.inflate(R.layout.explorer_item, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.explorer_item, parent, false))
     }
 
     override fun getItemCount(): Int {
         return fileList.size
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
         val file = fileList[position].file
-        val fallback = (if(file.isAPK()) ContextCompat.getDrawable(context, R.drawable.ic_adb_24dp) else ContextCompat.getDrawable(context, R.drawable.ic_baseline_insert_drive_file_24))?.apply { tint() }
+        val fallback = (if(file.isAPK()) ContextCompat.getDrawable(context, R.drawable.ic_adb_24dp) else ContextCompat.getDrawable(context, R.drawable.ic_baseline_insert_drive_file_24))?.apply { tint(context) }
 
         if(file.isDirectory) {
             Glide.with(context)
                 .load(
                     ContextCompat.getDrawable(context, R.drawable.ic_baseline_folder_24)
-                        ?.apply { tint() })
-                .into(holder.explorerIcon)
+                        ?.apply { tint(context) })
+                .into(binding.explorerIcon)
         } else if(file.isAPK()) {
             GlobalScope.launch(Dispatchers.IO) {
                 val icon = file.getAPKImage(context)
@@ -72,7 +77,7 @@ class ExplorerRecyclerAdapter(val context: Context, var fileList: MutableList<Fi
                         .fallback(fallback)
                         .placeholder(fallback)
                         .error(fallback)
-                        .into(holder.explorerIcon)
+                        .into(binding.explorerIcon)
                 }
             }
         } else {
@@ -81,22 +86,10 @@ class ExplorerRecyclerAdapter(val context: Context, var fileList: MutableList<Fi
                 .fallback(fallback)
                 .placeholder(fallback)
                 .error(fallback)
-                .into(holder.explorerIcon)
+                .into(binding.explorerIcon)
         }
 
-        holder.explorerName.text = fileList[position].name ?: file.name
-    }
-
-    private fun Drawable.tint(): Drawable {
-        var wrappedDrawable = this.mutate()
-        wrappedDrawable = DrawableCompat.wrap(wrappedDrawable)
-        DrawableCompat.setTint(wrappedDrawable, ContextCompat.getColor(context, R.color.explorerIconTint))
-        DrawableCompat.setTintMode(wrappedDrawable, PorterDuff.Mode.SRC_IN)
-        return wrappedDrawable
-    }
-
-    fun setClickListener(listener: ItemClickListener?) {
-        clickListener = listener
+        binding.explorerName.text = fileList[position].name ?: file.name
     }
 
     fun updateList(list: List<FileItem>) {
@@ -107,10 +100,6 @@ class ExplorerRecyclerAdapter(val context: Context, var fileList: MutableList<Fi
     fun addToList(file: FileItem) {
         fileList.add(file)
         notifyItemInserted(fileList.size-1)
-    }
-
-    interface ItemClickListener {
-        fun onClick(view: View, position: Int)
     }
 
 }

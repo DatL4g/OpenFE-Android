@@ -9,58 +9,51 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import de.datlag.openfe.R
+import de.datlag.openfe.databinding.LocationItemBinding
+import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.toHumanReadable
+import kotlinx.android.extensions.LayoutContainer
 
-class LocationRecyclerAdapter(context: Context, private val list: List<LocationItem>) : RecyclerView.Adapter<LocationRecyclerAdapter.ViewHolder>() {
+class LocationRecyclerAdapter(private val list: List<LocationItem>) : RecyclerView.Adapter<LocationRecyclerAdapter.ViewHolder>() {
 
-    private val layoutInflater = LayoutInflater.from(context)
-    private var clickListener: ItemClickListener? = null
+    var clickListener: RecyclerAdapterItemClickListener? = null
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, LayoutContainer {
 
-        private val card: CardView = itemView.findViewById(R.id.locationCard)
-        val progressBar: CircularProgressBar = itemView.findViewById(R.id.locationProgress)
-        val progressBarText: AppCompatTextView = itemView.findViewById(R.id.locationProgressText)
-        val name: AppCompatTextView = itemView.findViewById(R.id.locationName)
-        val usage: AppCompatTextView = itemView.findViewById(R.id.locationUsage)
+        override val containerView: View?
+            get() = itemView
+
+        val binding = LocationItemBinding.bind(containerView ?: itemView)
 
         init {
-            card.setOnClickListener(this)
+            binding.locationCard.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
-            clickListener?.onClick(v ?: itemView, adapterPosition)
+            clickListener?.onClick(v ?: containerView ?: itemView, adapterPosition)
         }
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(layoutInflater.inflate(R.layout.location_item, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.location_item, parent, false))
     }
 
     override fun getItemCount(): Int {
         return list.size
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.name.text = list[position].name
-        setUsage(holder, list[position])
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
+        binding.locationName.text = list[position].name
+        setUsage(binding, list[position])
     }
 
-    private fun setUsage(holder: ViewHolder, item: LocationItem) {
+    private fun setUsage(binding: LocationItemBinding, item: LocationItem) {
         val itemUsage = item.usage
-        holder.progressBar.progress = itemUsage.percentage
-        holder.progressBarText.text = "${itemUsage.percentage.toInt()}%"
-        holder.usage.text = "${itemUsage.current.toHumanReadable()} used / ${itemUsage.max.toHumanReadable()}"
-    }
-
-    fun setClickListener(listener: ItemClickListener?) {
-        clickListener = listener
-    }
-
-    interface ItemClickListener {
-        fun onClick(view: View, position: Int)
+        binding.locationProgress.progress = itemUsage.percentage
+        binding.locationProgressText.text = "${itemUsage.percentage.toInt()}%"
+        binding.locationUsage.text = "${itemUsage.current.toHumanReadable()} used / ${itemUsage.max.toHumanReadable()}"
     }
 
 }

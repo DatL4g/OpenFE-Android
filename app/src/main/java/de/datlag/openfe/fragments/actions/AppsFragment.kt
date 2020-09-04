@@ -18,6 +18,7 @@ import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.AppsActionInfoSheet
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.extend.AdvancedActivity
+import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
 import de.datlag.openfe.recycler.adapter.AppsActionRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
 import kotlinx.android.synthetic.main.fragment_apps_action.*
@@ -72,14 +73,12 @@ class AppsFragment : Fragment() {
 
     private fun initRecycler() {
         appsActionRecycler.layoutManager = GridLayoutManager(saveContext, if(saveContext.packageManager.isTelevision()) 5 else 3)
-        adapter = AppsActionRecyclerAdapter(saveContext, mutableListOf()).apply {
-            this.setClickListener(object: AppsActionRecyclerAdapter.ItemClickListener{
-                override fun onClick(view: View, position: Int) {
-                    appsActionBottomNavigation.visibility = View.VISIBLE
-                    selectedItem = position
-                    appsActionLayoutWrapper.requestLayout()
-                }
-            })
+        adapter = AppsActionRecyclerAdapter(mutableListOf()).apply {
+            clickListener = RecyclerAdapterItemClickListener { _, position ->
+                appsActionBottomNavigation.visibility = View.VISIBLE
+                selectedItem = position
+                appsActionLayoutWrapper.requestLayout()
+            }
         }
         appsActionRecycler.adapter = adapter
         appsActionRecycler.addOnScrollListener(object: RecyclerView.OnScrollListener(){
