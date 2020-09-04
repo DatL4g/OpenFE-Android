@@ -5,4 +5,7 @@
     <string name="loading_apps">Loading Apps…</string>
 
     <string name="default_explorer_path" translatable="false">/storage</string>
+
+    <string name="loading">Loading…</string>
+    <string name="search">Search</string>
 </resources>

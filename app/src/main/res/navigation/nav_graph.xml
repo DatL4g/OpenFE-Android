@@ -15,8 +15,12 @@
 
         <action
             android:id="@+id/action_OverviewFragment_to_ExplorerFragment"
-            app:destination="@+id/ExplorerFragment" />
+            app:destination="@+id/ExplorerFragment">
 
+            <argument android:name="filePath"
+                app:argType="string"
+                android:defaultValue="/storage" />
+        </action>
     </fragment>
     <fragment android:id="@+id/ExplorerFragment"
         android:name="de.datlag.openfe.fragments.ExplorerFragment"
@@ -24,12 +28,7 @@
 
         <action
             android:id="@+id/action_ExplorerFragment_to_OverviewFragment"
-            app:destination="@id/OverviewFragment">
-
-            <argument android:name="filePath"
-                app:argType="string"
-                android:defaultValue="/storage" />
-        </action>
+            app:destination="@id/OverviewFragment" />
     </fragment>
     <fragment android:id="@+id/AppsActionFragment"
         android:name="de.datlag.openfe.fragments.actions.AppsFragment"

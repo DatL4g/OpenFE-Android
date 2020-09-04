@@ -3,16 +3,28 @@ package de.datlag.openfe.recycler.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.datlag.openfe.R
 import de.datlag.openfe.databinding.ActionItemBinding
-import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
+import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import kotlinx.android.extensions.LayoutContainer
 
-class ActionRecyclerAdapter(private val list: List<ActionItem>) : RecyclerView.Adapter<ActionRecyclerAdapter.ViewHolder>() {
+class ActionRecyclerAdapter : ClickRecyclerAdapter<ActionRecyclerAdapter.ViewHolder>() {
 
-    var clickListener: RecyclerAdapterItemClickListener? = null
+    private val diffCallback = object: DiffUtil.ItemCallback<ActionItem>() {
+        override fun areItemsTheSame(oldItem: ActionItem, newItem: ActionItem): Boolean {
+            return oldItem.actionId == newItem.actionId
+        }
+
+        override fun areContentsTheSame(oldItem: ActionItem, newItem: ActionItem): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
+    }
+
+    val differ = AsyncListDiffer(this, diffCallback)
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, LayoutContainer {
 
@@ -26,7 +38,7 @@ class ActionRecyclerAdapter(private val list: List<ActionItem>) : RecyclerView.A
         }
 
         override fun onClick(v: View?) {
-            clickListener?.onClick(v ?: containerView ?: itemView, adapterPosition)
+            clickListener?.invoke(v ?: containerView ?: itemView, adapterPosition)
         }
 
     }
@@ -36,12 +48,16 @@ class ActionRecyclerAdapter(private val list: List<ActionItem>) : RecyclerView.A
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return differ.currentList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
-        binding.actionIcon.setImageDrawable(list[position].icon)
-        binding.actionName.text = list[position].name
+        val item = differ.currentList[position]
+
+        binding.actionIcon.setImageDrawable(item.icon)
+        binding.actionName.text = item.name
     }
+
+    fun submitList(list: List<ActionItem>) = differ.submitList(list)
 
 }

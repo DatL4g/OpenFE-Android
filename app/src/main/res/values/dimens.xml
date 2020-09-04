@@ -4,5 +4,5 @@
     <dimen name="locationCardRadius">10dp</dimen>
     <dimen name="locationCardElevation">4dp</dimen>
 
-    <dimen name="actionItemSize">80dp</dimen>
+    <dimen name="actionItemSize">100dp</dimen>
 </resources>

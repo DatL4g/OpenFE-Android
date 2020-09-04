@@ -11,7 +11,7 @@ open class ClickableCardView @JvmOverloads constructor(context: Context, attrs: 
     private var selectorStateList: ColorStateList? = null
 
     init {
-        attrs?.let { getAttributes(attrs, defStyleAttr) }
+        attrs?.let { getAttributes(it, defStyleAttr) }
     }
 
     protected open fun getAttributes(attrs: AttributeSet, defStyleAttr: Int) {

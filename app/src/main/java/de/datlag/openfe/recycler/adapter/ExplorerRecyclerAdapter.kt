@@ -1,26 +1,21 @@
 package de.datlag.openfe.recycler.adapter
 
 import android.content.Context
-import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.ViewCompat
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import de.datlag.openfe.R
-import de.datlag.openfe.commons.getAPKImage
-import de.datlag.openfe.commons.getUri
-import de.datlag.openfe.commons.isAPK
-import de.datlag.openfe.commons.tint
+import de.datlag.openfe.commons.*
 import de.datlag.openfe.databinding.ExplorerItemBinding
-import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
+import de.datlag.openfe.extend.ClickRecyclerAdapter
+import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.recycler.data.FileItem
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.coroutines.Dispatchers
@@ -28,11 +23,21 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ExplorerRecyclerAdapter(var fileList: MutableList<FileItem>) : RecyclerView.Adapter<ExplorerRecyclerAdapter.ViewHolder>() {
+class ExplorerRecyclerAdapter(var fileList: MutableList<ExplorerItem>) : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
 
-    var clickListener: RecyclerAdapterItemClickListener? = null
+    init {
+        setHasStableIds(true)
+    }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, LayoutContainer {
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener, LayoutContainer {
 
         override val containerView: View?
             get() = itemView
@@ -42,10 +47,17 @@ class ExplorerRecyclerAdapter(var fileList: MutableList<FileItem>) : RecyclerVie
 
         init {
             binding.explorerRoot.setOnClickListener(this)
+            binding.explorerRoot.setOnLongClickListener(this)
+            ViewCompat.setTranslationZ(binding.explorerIcon, 1F)
+            ViewCompat.setTranslationZ(binding.explorerAppIcon, 2F)
         }
 
         override fun onClick(v: View?) {
-            clickListener?.onClick(v ?: containerView ?: itemView, adapterPosition)
+            clickListener?.invoke(v ?: containerView ?: itemView, adapterPosition)
+        }
+
+        override fun onLongClick(p0: View?): Boolean {
+            return longClickListener?.invoke(p0 ?: containerView ?: itemView, adapterPosition) ?: true
         }
 
     }
@@ -59,47 +71,82 @@ class ExplorerRecyclerAdapter(var fileList: MutableList<FileItem>) : RecyclerVie
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
-        val file = fileList[position].file
-        val fallback = (if(file.isAPK()) ContextCompat.getDrawable(context, R.drawable.ic_adb_24dp) else ContextCompat.getDrawable(context, R.drawable.ic_baseline_insert_drive_file_24))?.apply { tint(context) }
-
-        if(file.isDirectory) {
-            Glide.with(context)
-                .load(
-                    ContextCompat.getDrawable(context, R.drawable.ic_baseline_folder_24)
-                        ?.apply { tint(context) })
-                .into(binding.explorerIcon)
-        } else if(file.isAPK()) {
-            GlobalScope.launch(Dispatchers.IO) {
-                val icon = file.getAPKImage(context)
-                withContext(Dispatchers.Main) {
-                    Glide.with(context)
-                        .load(icon)
-                        .fallback(fallback)
-                        .placeholder(fallback)
-                        .error(fallback)
-                        .into(binding.explorerIcon)
-                }
-            }
-        } else {
-            Glide.with(context)
-                .load(file.getUri())
-                .fallback(fallback)
-                .placeholder(fallback)
-                .error(fallback)
-                .into(binding.explorerIcon)
+        val item = fileList[position]
+        val file = item.fileItem.file
+        val fileIsApk = file.isAPK()
+        val fileName = item.fileItem.name ?: file.name
+        val fallback = (if (fileIsApk) ContextCompat.getDrawable(context, R.drawable.ic_adb_24dp) else ContextCompat.getDrawable(context, R.drawable.ic_baseline_insert_drive_file_24))?.apply {
+            tint(ContextCompat.getColor(context, R.color.explorerIconTint))
         }
 
-        binding.explorerName.text = fileList[position].name ?: file.name
+        when {
+            file.isDirectory -> {
+                Glide.with(context)
+                    .load(ContextCompat.getDrawable(context, R.drawable.ic_baseline_folder_24)?.apply { tint(ContextCompat.getColor(context, R.color.explorerIconTint)) })
+                    .into(binding.explorerIcon)
+
+                Glide.with(context)
+                    .asBitmap()
+                    .load(item.appIcon?.toBitmap()?.fillTransparent()?.applyBorder(10F))
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(binding.explorerAppIcon)
+            }
+            fileIsApk -> {
+                GlobalScope.launch(Dispatchers.IO) {
+                    val icon = file.getAPKImage(context)
+                    withContext(Dispatchers.Main) {
+                        Glide.with(context)
+                            .load(icon)
+                            .fallback(fallback)
+                            .placeholder(fallback)
+                            .error(fallback)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(binding.explorerIcon)
+                    }
+                }
+            }
+            else -> {
+                Glide.with(context)
+                    .load(file.getUri())
+                    .fallback(fallback)
+                    .placeholder(fallback)
+                    .error(fallback)
+                    .into(binding.explorerIcon)
+            }
+        }
+
+        binding.explorerName.text = fileName
+        if (item.selectable) {
+            binding.explorerCheckbox.visibility = View.VISIBLE
+            binding.explorerCheckbox.setOnClickListener { longClickListener?.invoke(it, position) }
+        } else {
+            binding.explorerCheckbox.visibility = View.INVISIBLE
+            binding.explorerCheckbox.isChecked = false
+            binding.explorerCheckbox.isClickable = false
+            binding.explorerCheckbox.isFocusable = false
+        }
+        binding.explorerCheckbox.isChecked = item.selected
     }
 
-    fun updateList(list: List<FileItem>) {
+    fun submitList(list: List<ExplorerItem>, notify: Boolean = true) {
         fileList = list.toMutableList()
+        if(notify) {
+            notifyDataSetChanged()
+        }
+    }
+
+    fun addToList(item: ExplorerItem) {
+        fileList.add(item)
+        notifyItemInserted(fileList.size-1)
+    }
+
+    fun clearData() {
+        fileList = mutableListOf()
         notifyDataSetChanged()
     }
 
-    fun addToList(file: FileItem) {
-        fileList.add(file)
-        notifyItemInserted(fileList.size-1)
+    fun getData(): List<ExplorerItem> {
+        return fileList.toList()
     }
 
 }

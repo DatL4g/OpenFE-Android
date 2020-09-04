@@ -21,10 +21,21 @@
     <color name="actionCardIconTint">#ffffff</color>
     <color name="actionCardTextColor">#ffffff</color>
 
-    <color name="appsActionStatusbarColor">#000000</color>
     <color name="appsActionCardDefaultColor">#ffffff</color>
     <color name="appsActionCardSelectedColor">#a9a9a9</color>
     <color name="appsActionTextColor">#000000</color>
+    <color name="appsActionLoadingStatusbarColor">#000000</color>
+    <color name="appsActionStatusbarColor">@color/primaryColor</color>
+    <color name="appsActionToolbarTextColor">#ffffff</color>
+    <color name="appsActionToolbarColor">@color/primaryColor</color>
+    <color name="appsActionToolbarIconTint">#ffffff</color>
 
     <color name="explorerIconTint">@color/primaryColor</color>
+    <color name="explorerToolbarTextColor">#ffffff</color>
+    <color name="explorerToolbarColor">@color/primaryColor</color>
+    <color name="explorerToolbarIconTint">#ffffff</color>
+    <color name="explorerStatusbarColor">@color/primaryColor</color>
+    <color name="explorerFileDefaultColor">#ffffff</color>
+    <color name="explorerFileSelectedColor">#a9a9a9</color>
+    <color name="explorerLoadingTextColor">#000000</color>
 </resources>

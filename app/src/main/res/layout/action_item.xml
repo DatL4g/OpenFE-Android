@@ -38,7 +38,7 @@
                 android:id="@+id/actionIcon"
                 android:layout_width="?attr/actionBarSize"
                 android:layout_height="?attr/actionBarSize"
-                android:padding="12dp"
+                android:padding="10dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -53,7 +53,7 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/actionName"
-                fontPath="fonts/Poppins-Bold.ttf"
+                fontPath="fonts/Poppins-Medium.ttf"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

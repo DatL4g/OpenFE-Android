@@ -20,7 +20,6 @@ import de.datlag.openfe.R
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
@@ -35,7 +34,6 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        statusBarColor(getColor(R.color.overviewStatusbarColor))
 
         locationList = getLocationItems()
         actionList = getActionItems()
@@ -63,19 +61,21 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
 
         locationRecycler.isNestedScrollingEnabled = false
         locationRecycler.layoutManager = LinearLayoutManager(saveContext)
-        locationRecycler.adapter = LocationRecyclerAdapter(locationList).apply {
-            clickListener = RecyclerAdapterItemClickListener { _, position ->
+        locationRecycler.adapter = LocationRecyclerAdapter().apply {
+            setOnClickListener { _, position ->
                 checkReadPermission(locationList[position])
             }
+            submitList(locationList)
         }
 
 
         actionRecycler.isNestedScrollingEnabled = false
         actionRecycler.layoutManager = GridLayoutManager(saveContext, if(saveContext.packageManager.isTelevision()) 5 else 3)
-        actionRecycler.adapter = ActionRecyclerAdapter(actionList).apply {
-            clickListener = RecyclerAdapterItemClickListener { view, position ->
+        actionRecycler.adapter = ActionRecyclerAdapter().apply {
+            setOnClickListener { _, position ->
                 findNavController().navigate(actionList[position].actionId)
             }
+            submitList(actionList)
         }
     }
 
@@ -125,6 +125,11 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
             }
 
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        statusBarColor(getColor(R.color.overviewStatusbarColor))
     }
 
     override fun onBackPressed(): Boolean {

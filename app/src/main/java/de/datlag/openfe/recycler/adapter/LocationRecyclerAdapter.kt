@@ -1,23 +1,31 @@
 package de.datlag.openfe.recycler.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.mikhaellopez.circularprogressbar.CircularProgressBar
 import de.datlag.openfe.R
 import de.datlag.openfe.databinding.LocationItemBinding
-import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
+import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.toHumanReadable
 import kotlinx.android.extensions.LayoutContainer
 
-class LocationRecyclerAdapter(private val list: List<LocationItem>) : RecyclerView.Adapter<LocationRecyclerAdapter.ViewHolder>() {
+class LocationRecyclerAdapter : ClickRecyclerAdapter<LocationRecyclerAdapter.ViewHolder>() {
 
-    var clickListener: RecyclerAdapterItemClickListener? = null
+    private val diffCallback = object: DiffUtil.ItemCallback<LocationItem>() {
+        override fun areItemsTheSame(oldItem: LocationItem, newItem: LocationItem): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(oldItem: LocationItem, newItem: LocationItem): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
+    }
+
+    val differ = AsyncListDiffer(this, diffCallback)
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, LayoutContainer {
 
@@ -31,7 +39,7 @@ class LocationRecyclerAdapter(private val list: List<LocationItem>) : RecyclerVi
         }
 
         override fun onClick(v: View?) {
-            clickListener?.onClick(v ?: containerView ?: itemView, adapterPosition)
+            clickListener?.invoke(v ?: containerView ?: itemView, adapterPosition)
         }
 
     }
@@ -41,19 +49,24 @@ class LocationRecyclerAdapter(private val list: List<LocationItem>) : RecyclerVi
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return differ.currentList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
-        binding.locationName.text = list[position].name
-        setUsage(binding, list[position])
+        val item = differ.currentList[position]
+
+        binding.locationName.text = item.name
+        setUsage(binding, item)
     }
 
     private fun setUsage(binding: LocationItemBinding, item: LocationItem) {
         val itemUsage = item.usage
+
         binding.locationProgress.progress = itemUsage.percentage
         binding.locationProgressText.text = "${itemUsage.percentage.toInt()}%"
         binding.locationUsage.text = "${itemUsage.current.toHumanReadable()} used / ${itemUsage.max.toHumanReadable()}"
     }
+
+    fun submitList(list: List<LocationItem>) = differ.submitList(list)
 
 }

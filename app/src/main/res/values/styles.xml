@@ -21,6 +21,10 @@
         <item name="color">@color/overviewDrawerToggleColor</item>
     </style>
 
+    <style name="ExplorerFragmentTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@color/explorerStatusbarColor</item>
+    </style>
+
     <declare-styleable name="ClickableCardView">
         <attr name="cardBackgroundSelector" format="reference" />
     </declare-styleable>

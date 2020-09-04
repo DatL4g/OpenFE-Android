@@ -1,19 +1,31 @@
 package de.datlag.openfe.recycler.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.datlag.openfe.R
+import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.databinding.AppsActionItemBinding
-import de.datlag.openfe.interfaces.RecyclerAdapterItemClickListener
+import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
 import kotlinx.android.extensions.LayoutContainer
 
-class AppsActionRecyclerAdapter(private var list: MutableList<AppItem>) : RecyclerView.Adapter<AppsActionRecyclerAdapter.ViewHolder>() {
+class AppsActionRecyclerAdapter : ClickRecyclerAdapter<AppsActionRecyclerAdapter.ViewHolder>() {
 
-    var clickListener: RecyclerAdapterItemClickListener? = null
+    private val diffCallback = object : DiffUtil.ItemCallback<AppItem>() {
+        override fun areItemsTheSame(oldItem: AppItem, newItem: AppItem): Boolean {
+            return oldItem.packageName == newItem.packageName
+        }
+
+        override fun areContentsTheSame(oldItem: AppItem, newItem: AppItem): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
+    }
+
+    val differ = AsyncListDiffer(this, diffCallback)
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, LayoutContainer {
 
@@ -27,7 +39,7 @@ class AppsActionRecyclerAdapter(private var list: MutableList<AppItem>) : Recycl
         }
 
         override fun onClick(v: View?) {
-            clickListener?.onClick(v ?: containerView ?: itemView, adapterPosition)
+            clickListener?.invoke(v ?: containerView ?: itemView, adapterPosition)
         }
 
     }
@@ -37,31 +49,22 @@ class AppsActionRecyclerAdapter(private var list: MutableList<AppItem>) : Recycl
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return differ.currentList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
-        binding.appIcon.setImageDrawable(list[position].icon)
-        binding.appName.text = list[position].name
+        val item = differ.currentList[position]
+
+        binding.appIcon.setImageDrawable(item.icon)
+        binding.appName.text = item.name
     }
 
-    fun updateData(data: List<AppItem>) {
-        list = data.toMutableList()
-        notifyDataSetChanged()
-    }
+    fun submitList(list: List<AppItem>) = differ.submitList(list)
 
-    fun addData(data: AppItem) {
-        list.add(data)
-        notifyItemInserted(list.size-1)
-    }
-
-    fun getData(): List<AppItem> {
-        return list
-    }
-
-    fun clearData() {
-        list = mutableListOf()
-        notifyDataSetChanged()
+    fun addToList(item: AppItem) {
+        submitList(differ.currentList.mutableCopyOf().apply {
+            add(item)
+        })
     }
 
 }

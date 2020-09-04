@@ -67,19 +67,23 @@ fun File.getDisplayName(context: Context): String {
     return if (this == context.filesDir) {
         "App Storage"
     } else {
-        if (rootFile.name.isBlank()
-            || rootFile.name.isEmpty()
-            || rootFile.name == "0"
-            || rootFile.name == "-"
-            || rootFile.name == "sdcard"
-            || rootFile.name == "sdcard0"
-            || rootFile.name == "emulated"
-            || rootFile.name == "legacy") {
+        if (rootFile.isInternal()) {
             "Internal Storage"
         } else {
             rootFile.name
         }
     }
+}
+
+fun File.isInternal(): Boolean {
+    return (this.name.isBlank()
+            || this.name.isEmpty()
+            || this.name == "0"
+            || this.name == "-"
+            || this.name == "sdcard"
+            || this.name == "sdcard0"
+            || this.name == "emulated"
+            || this.name == "legacy")
 }
 
 fun File.isAPK(): Boolean {
