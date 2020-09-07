@@ -2,29 +2,209 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/infoSheetIcon"
-        android:layout_width="?attr/actionBarSize"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
+        android:scaleType="centerInside"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/infoSheetDivider"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/infoSheetName"
-        app:layout_constraintEnd_toStartOf="@id/infoSheetName"/>
+        app:layout_constraintRight_toLeftOf="@id/infoSheetTopContainer"
+        app:layout_constraintEnd_toStartOf="@id/infoSheetTopContainer"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/infoSheetName"
-        fontPath="fonts/Poppins-Bold.ttf"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/infoSheetTopContainer"
+        android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:gravity="start|center_vertical"
-        android:textColor="#000000"
+        app:layout_constraintHorizontal_weight="2"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/infoSheetIcon"
-        app:layout_constraintStart_toEndOf="@id/infoSheetIcon"
+        app:layout_constraintBottom_toTopOf="@id/infoSheetDivider"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/infoSheetIcon"
+        app:layout_constraintStart_toEndOf="@id/infoSheetIcon">
 
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetName"
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintVertical_weight="1"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:gravity="center"
+            android:layout_weight="1"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="16sp"
+            app:autoSizeMaxTextSize="24sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/infoSheetPackage"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetPackage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:gravity="center_horizontal|bottom"
+            android:layout_weight="1"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="12sp"
+            app:autoSizeMaxTextSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/infoSheetDivider"
+        style="@style/Divider.Horizontal"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/infoSheetTopContainer" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/infoSheetHeaderContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/infoSheetDivider"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/infoSheetDataContainer"
+        app:layout_constraintEnd_toStartOf="@id/infoSheetDataContainer">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetDescriptionHeader"
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:text="Description"
+            android:gravity="center_vertical|end"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetCategoryHeader"
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:text="Category"
+            android:gravity="center_vertical|end"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetDescriptionHeader"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetInstallLocationHeader"
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:text="Install Location"
+            android:gravity="center_vertical|end"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetCategoryHeader"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetFirstInstallHeader"
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:text="First Installed"
+            android:gravity="center_vertical|end"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetInstallLocationHeader"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetLastUpdateHeader"
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:text="Last Updated"
+            android:gravity="center_vertical|end"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetFirstInstallHeader"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetVersionCodeHeader"
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:text="VersionCode"
+            android:gravity="center_vertical|end"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetLastUpdateHeader"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            fontPath="fonts/Poppins-Bold.ttf"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:text="VersionName"
+            android:gravity="center_vertical|end"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetVersionCodeHeader"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/infoSheetDataContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintTop_toBottomOf="@id/infoSheetDivider"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/infoSheetHeaderContainer"
+        app:layout_constraintStart_toEndOf="@id/infoSheetHeaderContainer">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetDescriptionData"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetCategoryData"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetDescriptionData"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetInstallLocationData"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetCategoryData"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetFirstInstallData"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetInstallLocationData"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetLastUpdateData"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetFirstInstallData"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetVersionCodeData"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetLastUpdateData"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/infoSheetVersionNameData"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/infoSheetVersionCodeData"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

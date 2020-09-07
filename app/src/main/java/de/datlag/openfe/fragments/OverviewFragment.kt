@@ -108,9 +108,8 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
     private fun checkReadPermission(locationItem: LocationItem) {
         PermissionChecker.checkReadStorage(saveContext, object: PermissionListener{
             override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                val args = Bundle()
-                args.putString("filePath", locationItem.usage.file.absolutePath)
-                findNavController().navigate(R.id.action_OverviewFragment_to_ExplorerFragment, args)
+                val action = OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(locationItem.usage.file.absolutePath)
+                findNavController().navigate(action)
             }
 
             override fun onPermissionRationaleShouldBeShown(

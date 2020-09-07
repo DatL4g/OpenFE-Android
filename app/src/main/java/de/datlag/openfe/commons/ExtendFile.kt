@@ -11,7 +11,6 @@ import de.datlag.openfe.data.Usage
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
-import java.lang.Exception
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 

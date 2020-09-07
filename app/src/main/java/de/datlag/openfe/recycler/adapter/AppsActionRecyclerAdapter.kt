@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.datlag.openfe.R
-import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.databinding.AppsActionItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
@@ -60,11 +59,5 @@ class AppsActionRecyclerAdapter : ClickRecyclerAdapter<AppsActionRecyclerAdapter
     }
 
     fun submitList(list: List<AppItem>) = differ.submitList(list)
-
-    fun addToList(item: AppItem) {
-        submitList(differ.currentList.mutableCopyOf().apply {
-            add(item)
-        })
-    }
 
 }

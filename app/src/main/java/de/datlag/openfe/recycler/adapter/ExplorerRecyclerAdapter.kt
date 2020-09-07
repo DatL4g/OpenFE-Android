@@ -16,26 +16,25 @@ import de.datlag.openfe.commons.*
 import de.datlag.openfe.databinding.ExplorerItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
-import de.datlag.openfe.recycler.data.FileItem
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ExplorerRecyclerAdapter(var fileList: MutableList<ExplorerItem>) : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
+class ExplorerRecyclerAdapter : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
 
-    init {
-        setHasStableIds(true)
+    private val diffCallback = object: DiffUtil.ItemCallback<ExplorerItem>() {
+        override fun areItemsTheSame(oldItem: ExplorerItem, newItem: ExplorerItem): Boolean {
+            return oldItem.fileItem.file.absolutePath == newItem.fileItem.file.absolutePath
+        }
+
+        override fun areContentsTheSame(oldItem: ExplorerItem, newItem: ExplorerItem): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
     }
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return position
-    }
+    val differ = AsyncListDiffer(this, diffCallback)
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener, LayoutContainer {
 
@@ -67,11 +66,11 @@ class ExplorerRecyclerAdapter(var fileList: MutableList<ExplorerItem>) : ClickRe
     }
 
     override fun getItemCount(): Int {
-        return fileList.size
+        return differ.currentList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) = with(holder) {
-        val item = fileList[position]
+        val item = differ.currentList[position]
         val file = item.fileItem.file
         val fileIsApk = file.isAPK()
         val fileName = item.fileItem.name ?: file.name
@@ -87,7 +86,7 @@ class ExplorerRecyclerAdapter(var fileList: MutableList<ExplorerItem>) : ClickRe
 
                 Glide.with(context)
                     .asBitmap()
-                    .load(item.appIcon?.toBitmap()?.fillTransparent()?.applyBorder(10F))
+                    .load(item.appItem?.icon?.toBitmap()?.fillTransparent()?.applyBorder(10F))
                     .apply(RequestOptions.circleCropTransform())
                     .into(binding.explorerAppIcon)
             }
@@ -128,25 +127,8 @@ class ExplorerRecyclerAdapter(var fileList: MutableList<ExplorerItem>) : ClickRe
         binding.explorerCheckbox.isChecked = item.selected
     }
 
-    fun submitList(list: List<ExplorerItem>, notify: Boolean = true) {
-        fileList = list.toMutableList()
-        if(notify) {
-            notifyDataSetChanged()
-        }
-    }
+    fun submitList(list: List<ExplorerItem>) = differ.submitList(list)
 
-    fun addToList(item: ExplorerItem) {
-        fileList.add(item)
-        notifyItemInserted(fileList.size-1)
-    }
-
-    fun clearData() {
-        fileList = mutableListOf()
-        notifyDataSetChanged()
-    }
-
-    fun getData(): List<ExplorerItem> {
-        return fileList.toList()
-    }
+    fun addToList(item: ExplorerItem) = submitList(differ.currentList.mutableCopyOf().apply { add(item) })
 
 }

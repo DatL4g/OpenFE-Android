@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
+        <item name="shapeAppearanceLargeComponent">@style/BottomSheetComponent</item>
     </style>
 
     <style name="AppTheme.Overlay" parent="AppTheme">
@@ -23,6 +24,23 @@
 
     <style name="ExplorerFragmentTheme" parent="AppTheme">
         <item name="android:statusBarColor">@color/explorerStatusbarColor</item>
+    </style>
+
+    <style name="Divider">
+        <item name="background">?android:attr/listDivider</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+
+    <style name="Divider.Horizontal" parent="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+    </style>
+
+    <style name="BottomSheetComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:radius">16dp</item>
     </style>
 
     <declare-styleable name="ClickableCardView">

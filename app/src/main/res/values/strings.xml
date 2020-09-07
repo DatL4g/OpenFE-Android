@@ -8,4 +8,9 @@
 
     <string name="loading">Loading…</string>
     <string name="search">Search</string>
+    <string name="filter">Filter</string>
+
+    <string name="name">Name</string>
+    <string name="installed">Installed</string>
+    <string name="updated">Updated</string>
 </resources>

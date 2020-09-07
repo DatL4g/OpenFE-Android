@@ -1,9 +1,9 @@
 package de.datlag.openfe.commons
 
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -23,7 +23,7 @@ fun PackageManager.isTelevision(): Boolean {
     }
 }
 
-suspend fun PackageManager.loadAppsAsync(nonSystemOnly: Boolean = true, resultItem: ((ApplicationInfo) -> Unit)? = null) {
+suspend fun PackageManager.loadAppsAsync(nonSystemOnly: Boolean = true, resultItem: ((Pair<ApplicationInfo, PackageInfo>) -> Unit)? = null) {
     val apps: MutableList<ApplicationInfo> = this.getInstalledApplications(PackageManager.GET_META_DATA)
 
     Collections.sort(apps, ApplicationInfo.DisplayNameComparator(this))
@@ -49,8 +49,7 @@ suspend fun PackageManager.loadAppsAsync(nonSystemOnly: Boolean = true, resultIt
         } catch (ignored: Exception) { }
 
         withContext(Dispatchers.Main) {
-            resultItem?.invoke(nextItem)
-            Log.e("Suspend", "callback")
+            resultItem?.invoke(Pair(nextItem, getPackageInfo(nextItem.packageName, PackageManager.GET_META_DATA)))
         }
     }
 }

@@ -24,7 +24,7 @@
         app:cardElevation="4dp"
         app:cardBackgroundColor="@color/appsActionCardDefaultColor"
         android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:focusableInTouchMode="false"
         android:clickable="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout

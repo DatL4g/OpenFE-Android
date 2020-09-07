@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/appsActionPopupFilterName"
+        android:title="@string/name" />
+    <item
+        android:id="@+id/appsActionPopupFilterInstalled"
+        android:title="@string/installed" />
+    <item
+        android:id="@+id/appsActionPopupFilterUpdated"
+        android:title="@string/updated" />
+</menu>

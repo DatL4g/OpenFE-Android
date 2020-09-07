@@ -7,4 +7,11 @@
         app:iconTint="@color/appsActionToolbarIconTint"
         android:title="@string/search"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/appsActionFilterItem"
+        android:icon="@drawable/ic_baseline_filter_list_24"
+        app:iconTint="@color/appsActionToolbarIconTint"
+        android:title="@string/filter"
+        app:showAsAction="ifRoom" />
 </menu>
