@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.commons.isNotCleared
+import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.saveContext
 import de.datlag.openfe.databinding.AppsActionInfoSheetBinding
 import de.datlag.openfe.recycler.data.AppItem
@@ -35,6 +38,17 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = AppsActionInfoSheetBinding.inflate(LayoutInflater.from(saveContext), container, false)
+
+        if (saveContext.packageManager.isTelevision()) {
+            dialog?.setOnShowListener {
+                val bottomSheetDialog = it as BottomSheetDialog
+                val sheetInternal: View? = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)
+                sheetInternal?.let { sheet ->
+                    BottomSheetBehavior.from(sheet).state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+        }
+
         return binding.root
     }
 
