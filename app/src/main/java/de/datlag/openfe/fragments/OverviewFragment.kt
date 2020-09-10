@@ -18,6 +18,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.*
+import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
@@ -25,12 +26,13 @@ import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.PermissionChecker
-import kotlinx.android.synthetic.main.fragment_overview.*
 
 class OverviewFragment : Fragment(), FragmentBackPressed {
 
     lateinit var locationList: List<LocationItem>
     lateinit var actionList: List<ActionItem>
+
+    private lateinit var binding: FragmentOverviewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,10 +49,11 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
 
         saveContext.theme.applyStyle(R.style.OverviewFragmentTheme, true)
-        return clonedLayoutInflater.inflate(R.layout.fragment_overview, container, false)
+        binding = FragmentOverviewBinding.inflate(clonedLayoutInflater, container, false)
+        return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as AdvancedActivity).setSupportActionBar(toolBar)
@@ -131,7 +134,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         statusBarColor(getColor(R.color.overviewStatusbarColor))
     }
 
-    override fun onBackPressed(): Boolean {
+    override fun onBackPressed(): Boolean = with(binding) {
         return if(drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START)
             false

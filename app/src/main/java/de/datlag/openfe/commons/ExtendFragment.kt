@@ -1,6 +1,5 @@
 package de.datlag.openfe.commons
 
-import android.R
 import android.content.Context
 import android.os.Build
 import android.view.View
@@ -16,9 +15,7 @@ import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
 
 
 val Fragment.saveContext: Context
-    get() {
-        return this.context ?: this.activity ?: this.requireContext()
-    }
+    get() = this.context ?: this.activity ?: this.requireContext()
 
 fun Fragment.statusBarColor(@ColorInt color: Int) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

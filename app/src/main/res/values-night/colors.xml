@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="defaultBackgroundColor">#121212</color>
+    <color name="defaultTextColor">#ffffff</color>
+    <color name="highlightTextColor">#000000</color>
+    <color name="defaultStatusBarColor">#323232</color>
+    <color name="loadingStatusBarColor">#121212</color>
+    <color name="loadingTextColor">#ffffff</color>
+    <color name="defaultToolBarColor">#323232</color>
+    <color name="defaultToolBarContentColor">#ffffff</color>
+    <color name="defaultCardColor">#323232</color>
+    <color name="defaultCardSelectedColor">#444444</color>
+
+    <color name="locationCardBackground">@color/defaultBackgroundColor</color>
+    <color name="locationCardDefaultColor">@color/defaultCardColor</color>
+    <color name="locationCardSelectedColor">@color/defaultCardSelectedColor</color>
+    <color name="locationCardTextColor">@color/defaultTextColor</color>
+    <color name="locationCardProgressColor">@color/defaultTextColor</color>
+
+    <color name="actionCardDefaultColor">@color/defaultCardColor</color>
+    <color name="actionCardSelectedColor">@color/defaultCardSelectedColor</color>
+    <color name="actionCardIconTint">@color/defaultTextColor</color>
+    <color name="actionCardTextColor">@color/defaultTextColor</color>
+
+    <color name="explorerIconTint">@color/defaultTextColor</color>
+    <color name="explorerFileDefaultColor">@color/defaultBackgroundColor</color>
+    <color name="explorerFileSelectedColor">@color/defaultCardColor</color>
+</resources>

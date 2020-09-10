@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
         <item name="shapeAppearanceLargeComponent">@style/BottomSheetComponent</item>
+        <item name="android:statusBarColor">@color/defaultStatusBarColor</item>
     </style>
 
     <style name="AppTheme.Overlay" parent="AppTheme">
@@ -41,6 +42,10 @@
         <item name="cornerSize">16dp</item>
         <item name="cornerRadius">16dp</item>
         <item name="android:radius">16dp</item>
+    </style>
+
+    <style name="DayNight.BottomNavigationView.Colored" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="android:background">@color/defaultToolBarColor</item>
     </style>
 
     <declare-styleable name="ClickableCardView">

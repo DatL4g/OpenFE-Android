@@ -44,7 +44,7 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:cpb_background_progressbar_color="@color/primaryDarkColor"
+                app:cpb_background_progressbar_color="@color/locationCardBackground"
                 app:cpb_background_progressbar_width="10dp"
                 app:cpb_progressbar_width="10dp"
                 app:cpb_progressbar_color="@color/locationCardProgressColor"

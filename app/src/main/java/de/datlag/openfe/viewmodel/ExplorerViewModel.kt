@@ -48,27 +48,35 @@ class ExplorerViewModel(explorerFragmentArgs: ExplorerFragmentArgs, private val 
                 } catch (ignored: Exception) { }
             }
             withContext(Dispatchers.Main) {
-                directories.value = explorerCopy
+                try {
+                    directories.value = explorerCopy
+                } catch (exception: Exception) {
+                    directories.postValue(explorerCopy)
+                }
             }
         }
     }
 
-    private suspend fun matchDirectoryWithApps(explorerItem: ExplorerItem, list: AppList): ExplorerItem {
-        for (appItem in list) {
-            if (explorerItem.fileItem.name?.equals(appItem.name, true) == true
-                || explorerItem.fileItem.name?.equals(appItem.packageName, true) == true
-                || explorerItem.fileItem.file.name.equals(appItem.name, true)
-                || explorerItem.fileItem.file.name.equals(appItem.packageName, true)
-                || explorerItem.fileItem.file.path.equals(appItem.sourceDir, true)
-                || explorerItem.fileItem.file.path.equals(appItem.publicSourceDir, true)
-                || explorerItem.fileItem.file.path.equals(appItem.dataDir, true)
-                || explorerItem.fileItem.file.absolutePath.equals(appItem.sourceDir, true)
-                || explorerItem.fileItem.file.absolutePath.equals(appItem.publicSourceDir, true)
-                || explorerItem.fileItem.file.absolutePath.equals(appItem.dataDir, true)) {
-                explorerItem.appItem = appItem
+    private fun matchDirectoryWithApps(explorerItem: ExplorerItem, list: AppList): ExplorerItem {
+        return try {
+            for (appItem in list) {
+                if (explorerItem.fileItem.name?.equals(appItem.name, true) == true
+                    || explorerItem.fileItem.name?.equals(appItem.packageName, true) == true
+                    || explorerItem.fileItem.file.name.equals(appItem.name, true)
+                    || explorerItem.fileItem.file.name.equals(appItem.packageName, true)
+                    || explorerItem.fileItem.file.path.equals(appItem.sourceDir, true)
+                    || explorerItem.fileItem.file.path.equals(appItem.publicSourceDir, true)
+                    || explorerItem.fileItem.file.path.equals(appItem.dataDir, true)
+                    || explorerItem.fileItem.file.absolutePath.equals(appItem.sourceDir, true)
+                    || explorerItem.fileItem.file.absolutePath.equals(appItem.publicSourceDir, true)
+                    || explorerItem.fileItem.file.absolutePath.equals(appItem.dataDir, true)) {
+                    explorerItem.appItem = appItem
+                }
             }
+            explorerItem
+        } catch (exception: Exception) {
+            explorerItem
         }
-        return explorerItem
     }
 
     private fun getStartDirectory(args: ExplorerFragmentArgs): File {

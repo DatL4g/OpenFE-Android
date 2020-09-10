@@ -19,6 +19,7 @@ import de.datlag.openfe.bottomsheets.AppsActionInfoSheet
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
 import de.datlag.openfe.extend.AdvancedActivity
+import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import de.datlag.openfe.other.AppsSortType
 import de.datlag.openfe.recycler.adapter.AppsActionRecyclerAdapter
@@ -28,17 +29,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 @ExperimentalContracts
 @AndroidEntryPoint
-class AppsFragment : Fragment(), FragmentOptionsMenu, PopupMenu.OnMenuItemClickListener {
+class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
 
     private val viewModel: AppsViewModel by viewModels()
     private lateinit var binding: FragmentAppsActionBinding
 
     private var copiedList = listOf<AppItem>()
     private lateinit var adapter: AppsActionRecyclerAdapter
-    private var selectedItem: Int = -1
+    private var selectedItem: AppItem? = null
 
     override fun onResume() {
         super.onResume()
@@ -64,10 +66,12 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, PopupMenu.OnMenuItemClickL
         (activity as AdvancedActivity).setSupportActionBar(appsActionToolbar)
         (activity as AdvancedActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         (activity as AdvancedActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
-        (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp)?.apply { tint(getColor(R.color.appsActionToolbarIconTint)) })
+        updateToolbar()
 
         appsActionToolbar.setNavigationOnClickListener {
-            findNavController().navigate(R.id.action_AppsActionFragment_to_OverviewFragment)
+            if (onBackPressedCheck()) {
+                findNavController().navigate(R.id.action_AppsActionFragment_to_OverviewFragment)
+            }
         }
 
         initRecycler()
@@ -76,13 +80,15 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, PopupMenu.OnMenuItemClickL
         loadAppsAsync()
     }
 
+    @ExperimentalContracts
     private fun initRecycler() = with(binding) {
         appsActionRecycler.layoutManager = GridLayoutManager(saveContext, if(saveContext.packageManager.isTelevision()) 5 else 3)
         adapter = AppsActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
                 appsActionBottomNavigation.visibility = View.VISIBLE
-                selectedItem = position
+                selectedItem = copiedList[position]
                 appsActionLayoutWrapper.requestLayout()
+                updateToolbar()
             }
         }
         adapter.submitList(listOf())
@@ -95,7 +101,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, PopupMenu.OnMenuItemClickL
                         appsActionBottomNavigation.visibility = View.GONE
                     }
                 } else {
-                    if(selectedItem >= 0) {
+                    if(itemValid()) {
                         appsActionBottomNavigation.visibility = View.VISIBLE
                     }
                 }
@@ -175,29 +181,37 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, PopupMenu.OnMenuItemClickL
         }
     }
 
+    @ExperimentalContracts
     private fun requestUninstall() {
-        if(selectedItemValid()) {
+        if(itemValid()) {
             val intent = Intent(Intent.ACTION_DELETE)
-            intent.data = Uri.parse("package:${adapter.differ.currentList[selectedItem].packageName}")
+            intent.data = Uri.parse("package:${selectedItem!!.packageName}")
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             saveContext.startActivity(intent)
         }
     }
 
+    @ExperimentalContracts
     private fun requestLaunch() {
-        if(selectedItemValid()) {
-            startActivity(saveContext.packageManager.getLaunchIntentForPackage(adapter.differ.currentList[selectedItem].packageName))
+        if(itemValid()) {
+            startActivity(saveContext.packageManager.getLaunchIntentForPackage(selectedItem!!.packageName))
         }
     }
 
+    @ExperimentalContracts
     private fun requestInfo() {
-        if(selectedItemValid()) {
-            showBottomSheetFragment(AppsActionInfoSheet.newInstance(adapter.differ.currentList[selectedItem]))
+        if(itemValid()) {
+            showBottomSheetFragment(AppsActionInfoSheet.newInstance(selectedItem!!))
         }
     }
 
-    private fun selectedItemValid(customRange: Pair<Int, Int> = Pair(0, adapter.differ.currentList.size-1)): Boolean {
-        return ((selectedItem >= customRange.first) && (selectedItem <= customRange.second))
+    @ExperimentalContracts
+    private fun itemValid(item: AppItem? = selectedItem): Boolean {
+        contract {
+            returns(true) implies (item != null)
+        }
+
+        return item != null
     }
 
     private fun showPopupMenu(anchor: View) {
@@ -214,6 +228,27 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, PopupMenu.OnMenuItemClickL
             }
         }
         return false
+    }
+
+    private fun onBackPressedCheck(): Boolean = with(binding) {
+        return if (itemValid()) {
+            selectedItem = null
+            appsActionBottomNavigation.visibility = View.GONE
+            updateToolbar()
+            false
+        } else {
+            true
+        }
+    }
+
+    private fun updateToolbar() {
+        if (itemValid()) {
+            (activity as AdvancedActivity).supportActionBar?.title = selectedItem!!.name
+            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp)?.apply { tint(getColor(R.color.appsActionToolbarIconTint)) })
+        } else {
+            (activity as AdvancedActivity).supportActionBar?.title = saveContext.getString(R.string.app_name)
+            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp)?.apply { tint(getColor(R.color.appsActionToolbarIconTint)) })
+        }
     }
 
     override fun onMenuItemClick(p0: MenuItem?): Boolean {
@@ -241,6 +276,10 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, PopupMenu.OnMenuItemClickL
             }
         }
         return true
+    }
+
+    override fun onBackPressed(): Boolean {
+        return onBackPressedCheck()
     }
 
     companion object {

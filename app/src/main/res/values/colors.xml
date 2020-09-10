@@ -5,37 +5,48 @@
     <color name="primaryDarkColor">#a2000f</color>
 
     <color name="defaultBackgroundColor">#ffffff</color>
+    <color name="defaultTextColor">#000000</color>
+    <color name="highlightTextColor">#ffffff</color>
+    <color name="defaultStatusBarColor">@color/primaryColor</color>
+    <color name="loadingStatusBarColor">#ffffff</color>
+    <color name="loadingTextColor">#000000</color>
+    <color name="defaultToolBarColor">@color/primaryColor</color>
+    <color name="defaultToolBarContentColor">#ffffff</color>
+    <color name="defaultCardColor">#ffffff</color>
+    <color name="defaultCardSelectedColor">#a9a9a9</color>
 
-    <color name="overviewToolbarTextColor">#ffffff</color>
-    <color name="overviewStatusbarColor">@color/primaryColor</color>
-    <color name="overviewToolbarColor">@color/primaryColor</color>
-    <color name="overviewDrawerToggleColor">#ffffff</color>
+    <color name="overviewToolbarTextColor">@color/defaultToolBarContentColor</color>
+    <color name="overviewStatusbarColor">@color/defaultStatusBarColor</color>
+    <color name="overviewToolbarColor">@color/defaultToolBarColor</color>
+    <color name="overviewDrawerToggleColor">@color/defaultToolBarContentColor</color>
 
+    <color name="locationCardBackground">@color/primaryDarkColor</color>
     <color name="locationCardDefaultColor">@color/primaryColor</color>
     <color name="locationCardSelectedColor">@color/primaryLightColor</color>
-    <color name="locationCardTextColor">#ffffff</color>
-    <color name="locationCardProgressColor">#ffffff</color>
+    <color name="locationCardTextColor">@color/highlightTextColor</color>
+    <color name="locationCardProgressColor">@color/highlightTextColor</color>
 
     <color name="actionCardDefaultColor">@color/primaryColor</color>
     <color name="actionCardSelectedColor">@color/primaryDarkColor</color>
-    <color name="actionCardIconTint">#ffffff</color>
-    <color name="actionCardTextColor">#ffffff</color>
+    <color name="actionCardIconTint">@color/highlightTextColor</color>
+    <color name="actionCardTextColor">@color/highlightTextColor</color>
 
-    <color name="appsActionCardDefaultColor">#ffffff</color>
-    <color name="appsActionCardSelectedColor">#a9a9a9</color>
-    <color name="appsActionTextColor">#000000</color>
-    <color name="appsActionLoadingStatusbarColor">#ffffff</color>
-    <color name="appsActionStatusbarColor">@color/primaryColor</color>
-    <color name="appsActionToolbarTextColor">#ffffff</color>
-    <color name="appsActionToolbarColor">@color/primaryColor</color>
-    <color name="appsActionToolbarIconTint">#ffffff</color>
+    <color name="appsActionCardDefaultColor">@color/defaultCardColor</color>
+    <color name="appsActionCardSelectedColor">@color/defaultCardSelectedColor</color>
+    <color name="appsActionTextColor">@color/defaultTextColor</color>
+    <color name="appsActionLoadingStatusbarColor">@color/loadingStatusBarColor</color>
+    <color name="appsActionStatusbarColor">@color/defaultStatusBarColor</color>
+    <color name="appsActionToolbarTextColor">@color/defaultToolBarContentColor</color>
+    <color name="appsActionToolbarColor">@color/defaultToolBarColor</color>
+    <color name="appsActionToolbarIconTint">@color/defaultToolBarContentColor</color>
 
     <color name="explorerIconTint">@color/primaryColor</color>
-    <color name="explorerToolbarTextColor">#ffffff</color>
-    <color name="explorerToolbarColor">@color/primaryColor</color>
-    <color name="explorerToolbarIconTint">#ffffff</color>
-    <color name="explorerStatusbarColor">@color/primaryColor</color>
-    <color name="explorerFileDefaultColor">#ffffff</color>
-    <color name="explorerFileSelectedColor">#a9a9a9</color>
-    <color name="explorerLoadingTextColor">#000000</color>
+    <color name="explorerToolbarTextColor">@color/defaultToolBarContentColor</color>
+    <color name="explorerToolbarColor">@color/defaultToolBarColor</color>
+    <color name="explorerToolbarIconTint">@color/defaultToolBarContentColor</color>
+    <color name="explorerStatusbarColor">@color/defaultStatusBarColor</color>
+    <color name="explorerFileDefaultColor">@color/defaultCardColor</color>
+    <color name="explorerFileSelectedColor">@color/defaultCardSelectedColor</color>
+    <color name="explorerFileTextColor">@color/defaultTextColor</color>
+    <color name="explorerLoadingTextColor">@color/loadingTextColor</color>
 </resources>
