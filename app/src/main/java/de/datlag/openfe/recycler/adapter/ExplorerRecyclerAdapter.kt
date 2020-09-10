@@ -86,7 +86,7 @@ class ExplorerRecyclerAdapter : ClickRecyclerAdapter<ExplorerRecyclerAdapter.Vie
 
                 Glide.with(context)
                     .asBitmap()
-                    .load(item.appItem?.icon?.toBitmap()?.fillTransparent()?.applyBorder(10F))
+                    .load(item.appItem?.icon?.toBitmap()?.fillTransparent()?.applyBorder(10F, ContextCompat.getColor(context, R.color.explorerFileDefaultColor)))
                     .apply(RequestOptions.circleCropTransform())
                     .into(binding.explorerAppIcon)
             }
