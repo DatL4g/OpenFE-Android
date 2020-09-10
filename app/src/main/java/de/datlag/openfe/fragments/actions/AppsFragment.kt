@@ -24,6 +24,7 @@ import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import de.datlag.openfe.other.AppsSortType
 import de.datlag.openfe.recycler.adapter.AppsActionRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
+import de.datlag.openfe.viewmodel.AppsActionViewModel
 import de.datlag.openfe.viewmodel.AppsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,16 +36,16 @@ import kotlin.contracts.contract
 @AndroidEntryPoint
 class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
 
-    private val viewModel: AppsViewModel by viewModels()
+    private val viewModel: AppsActionViewModel by viewModels()
+    private val appsViewModel: AppsViewModel by viewModels()
     private lateinit var binding: FragmentAppsActionBinding
 
     private var copiedList = listOf<AppItem>()
     private lateinit var adapter: AppsActionRecyclerAdapter
-    private var selectedItem: AppItem? = null
 
     override fun onResume() {
         super.onResume()
-        if (viewModel.apps.value.isNullOrEmpty()) {
+        if (appsViewModel.apps.value.isNullOrEmpty()) {
             statusBarColor(getColor(R.color.appsActionLoadingStatusbarColor))
         } else {
             statusBarColor(getColor(R.color.appsActionStatusbarColor))
@@ -86,7 +87,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
         adapter = AppsActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
                 appsActionBottomNavigation.visibility = View.VISIBLE
-                selectedItem = copiedList[position]
+                viewModel.selectedApp = copiedList[position]
                 appsActionLayoutWrapper.requestLayout()
                 updateToolbar()
             }
@@ -168,7 +169,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     }
 
     private fun loadAppsAsync() = with(binding) {
-        viewModel.apps.observe(viewLifecycleOwner) { list ->
+        appsViewModel.apps.observe(viewLifecycleOwner) { list ->
             if(list.isNotEmpty()) {
                 adapter.submitList(list)
                 copiedList = list.mutableCopyOf()
@@ -185,7 +186,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     private fun requestUninstall() {
         if(itemValid()) {
             val intent = Intent(Intent.ACTION_DELETE)
-            intent.data = Uri.parse("package:${selectedItem!!.packageName}")
+            intent.data = Uri.parse("package:${viewModel.selectedApp!!.packageName}")
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             saveContext.startActivity(intent)
         }
@@ -194,19 +195,19 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     @ExperimentalContracts
     private fun requestLaunch() {
         if(itemValid()) {
-            startActivity(saveContext.packageManager.getLaunchIntentForPackage(selectedItem!!.packageName))
+            startActivity(saveContext.packageManager.getLaunchIntentForPackage(viewModel.selectedApp!!.packageName))
         }
     }
 
     @ExperimentalContracts
     private fun requestInfo() {
         if(itemValid()) {
-            showBottomSheetFragment(AppsActionInfoSheet.newInstance(selectedItem!!))
+            showBottomSheetFragment(AppsActionInfoSheet.newInstance(viewModel.selectedApp!!))
         }
     }
 
     @ExperimentalContracts
-    private fun itemValid(item: AppItem? = selectedItem): Boolean {
+    private fun itemValid(item: AppItem? = viewModel.selectedApp): Boolean {
         contract {
             returns(true) implies (item != null)
         }
@@ -232,7 +233,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     private fun onBackPressedCheck(): Boolean = with(binding) {
         return if (itemValid()) {
-            selectedItem = null
+            viewModel.selectedApp = null
             appsActionBottomNavigation.visibility = View.GONE
             updateToolbar()
             false
@@ -243,7 +244,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     private fun updateToolbar() {
         if (itemValid()) {
-            (activity as AdvancedActivity).supportActionBar?.title = selectedItem!!.name
+            (activity as AdvancedActivity).supportActionBar?.title = viewModel.selectedApp!!.name
             (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp)?.apply { tint(getColor(R.color.appsActionToolbarIconTint)) })
         } else {
             (activity as AdvancedActivity).supportActionBar?.title = saveContext.getString(R.string.app_name)
@@ -254,10 +255,10 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     override fun onMenuItemClick(p0: MenuItem?): Boolean {
         p0?.let {
             when(it.itemId) {
-                R.id.appsActionPopupFilterName -> viewModel.sortType = AppsSortType.NAME
-                R.id.appsActionPopupFilterInstalled -> viewModel.sortType = AppsSortType.INSTALLED
-                R.id.appsActionPopupFilterUpdated -> viewModel.sortType = AppsSortType.UPDATED
-                else -> viewModel.sortType = AppsSortType.NAME
+                R.id.appsActionPopupFilterName -> appsViewModel.sortType = AppsSortType.NAME
+                R.id.appsActionPopupFilterInstalled -> appsViewModel.sortType = AppsSortType.INSTALLED
+                R.id.appsActionPopupFilterUpdated -> appsViewModel.sortType = AppsSortType.UPDATED
+                else -> appsViewModel.sortType = AppsSortType.NAME
             }
         }
         return false
