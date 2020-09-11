@@ -17,7 +17,7 @@ import java.io.File
 import kotlin.Exception
 
 typealias FileLiveData = MutableLiveData<File>
-typealias ExplorerLiveData = MutableLiveData<MutableList<ExplorerItem>>
+typealias ExplorerLiveData = MutableLiveData<List<ExplorerItem>>
 
 class ExplorerViewModel(explorerFragmentArgs: ExplorerFragmentArgs, private val appsViewModel: AppsViewModel) : ViewModel() {
 
@@ -33,6 +33,8 @@ class ExplorerViewModel(explorerFragmentArgs: ExplorerFragmentArgs, private val 
     private var systemAppsObserver = Observer<AppList> { list ->
         matchDirectoriesWithApps(list)
     }
+
+    var selectedItems = mutableListOf<ExplorerItem>()
 
     init {
         appsViewModel.systemApps.observeForever(systemAppsObserver)

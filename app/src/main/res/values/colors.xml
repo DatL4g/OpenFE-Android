@@ -49,4 +49,5 @@
     <color name="explorerFileSelectedColor">@color/defaultCardSelectedColor</color>
     <color name="explorerFileTextColor">@color/defaultTextColor</color>
     <color name="explorerLoadingTextColor">@color/loadingTextColor</color>
+    <color name="explorerCheckBoxColor">@color/primaryColor</color>
 </resources>

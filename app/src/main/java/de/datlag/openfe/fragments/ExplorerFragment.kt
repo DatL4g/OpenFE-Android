@@ -7,6 +7,7 @@ import android.view.*
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ferfalk.simplesearchview.SimpleSearchView
@@ -20,6 +21,7 @@ import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import de.datlag.openfe.recycler.LinearLayoutManagerWrapper
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
+import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
 import kotlin.contracts.ExperimentalContracts
@@ -34,6 +36,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
     private lateinit var recyclerAdapter: ExplorerRecyclerAdapter
     private lateinit var binding: FragmentExplorerBinding
+    private var copiedList = listOf<ExplorerItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,7 +56,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         (activity as AdvancedActivity).setSupportActionBar(explorerToolbar)
         (activity as AdvancedActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         (activity as AdvancedActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
-        (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp)?.apply { tint(getColor(R.color.explorerToolbarIconTint)) })
+        updateToolbar()
 
         explorerToolbar.setNavigationOnClickListener {
             if (onBackPressedCheck()) {
@@ -75,6 +78,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         }
         explorerViewModel.directories.observe(viewLifecycleOwner) { list ->
             recyclerAdapter.submitList(list)
+            copiedList = list.mutableCopyOf()
             loadingTextView.visibility = View.GONE
             explorerRecycler.visibility = View.VISIBLE
             appBar.visibility = View.VISIBLE
@@ -82,10 +86,14 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     }
 
     private fun initRecycler() = with(binding) {
-        recyclerAdapter = ExplorerRecyclerAdapter()
+        recyclerAdapter = ExplorerRecyclerAdapter(lifecycleScope)
 
         recyclerAdapter.setOnClickListener { _, position ->
-            recyclerClickEvent(position)
+            recyclerEvent(position)
+        }
+        recyclerAdapter.setOnLongClickListener { _, position ->
+            recyclerEvent(position, true)
+            true
         }
 
         explorerRecycler.layoutManager = LinearLayoutManagerWrapper(saveContext)
@@ -93,8 +101,20 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         explorerRecycler.setHasFixedSize(true)
     }
 
-    private fun recyclerClickEvent(position: Int) = explorerViewModel.directories.value?.let {
-        val fileItem = it[position].fileItem
+    private fun recyclerEvent(position: Int, longClick: Boolean = false) = copiedList.let {
+        val explorerItem = it[position]
+
+        if (explorerViewModel.selectedItems.isNotEmpty() || longClick) {
+            if (explorerItem.selectable) {
+                recyclerSelectEvent(explorerItem, position)
+            }
+        } else {
+            recyclerClickEvent(explorerItem)
+        }
+    }
+
+    private fun recyclerClickEvent(explorerItem: ExplorerItem) {
+        val fileItem = explorerItem.fileItem
         val file = fileItem.file
 
         if (file.isDirectory) {
@@ -121,6 +141,63 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         }
     }
 
+    private fun recyclerSelectEvent(explorerItem: ExplorerItem, position: Int) {
+        if (explorerViewModel.selectedItems.contains(explorerItem)) {
+            explorerViewModel.selectedItems.remove(explorerItem)
+            recyclerSelectUpdate(explorerItem, position)
+        } else {
+            val newItem = recyclerSelectUpdate(explorerItem, position)
+            explorerViewModel.selectedItems.add(newItem)
+        }
+        updateToolbar()
+    }
+
+    private fun recyclerSelectUpdate(explorerItem: ExplorerItem, position: Int): ExplorerItem = with(binding) {
+        explorerViewModel.directories.value?.let {
+            val explorerItems = it.mutableCopyOf()
+
+            for (i in 0 until explorerItems.size) {
+                if (explorerItems[i] == explorerItem) {
+                    explorerItems.removeAt(i)
+                    explorerItem.selected = !explorerItem.selected
+                    explorerItems.add(i, explorerItem)
+
+                    explorerViewModel.directories.value = explorerItems
+                }
+            }
+        }
+
+        val holder: ExplorerRecyclerAdapter.ViewHolder? = explorerRecycler.findViewHolderForAdapterPosition(position) as ExplorerRecyclerAdapter.ViewHolder?
+        holder?.binding?.explorerCheckbox?.isChecked = explorerItem.selected
+        return explorerItem
+    }
+
+    private fun clearSelectedItems() = with(binding) {
+        explorerViewModel.selectedItems.clear()
+        explorerViewModel.directories.value?.let {
+            val explorerItems = it.mutableCopyOf()
+
+            for (i in 0 until explorerItems.size) {
+                explorerItems[i].selected = false
+
+                val holder: ExplorerRecyclerAdapter.ViewHolder? = explorerRecycler.findViewHolderForAdapterPosition(i) as ExplorerRecyclerAdapter.ViewHolder?
+                holder?.binding?.explorerCheckbox?.isChecked = false
+            }
+
+            explorerViewModel.directories.value = explorerItems
+        }
+    }
+
+    private fun updateToolbar() {
+        if (explorerViewModel.selectedItems.isEmpty()) {
+            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp)?.apply { tint(getColor(R.color.explorerToolbarIconTint)) })
+            (activity as AdvancedActivity).supportActionBar?.title = saveContext.getString(R.string.app_name)
+        } else {
+            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp)?.apply { tint(getColor(R.color.explorerToolbarIconTint)) })
+            (activity as AdvancedActivity).supportActionBar?.title = "${explorerViewModel.selectedItems.size} Items"
+        }
+    }
+
     private fun initSearchView() = with(binding) {
         explorerSearchView.setOnQueryTextListener(object: SimpleSearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -139,13 +216,19 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     }
 
     private fun onBackPressedCheck(): Boolean {
-        return when {
-            explorerViewModel.currentDirectory.absolutePath == "/" -> true
-            explorerViewModel.currentDirectory != explorerViewModel.startDirectory -> {
-                explorerViewModel.moveToPath(explorerViewModel.currentDirectory.parentFile ?: explorerViewModel.currentDirectory)
-                false
+        return if (explorerViewModel.selectedItems.isEmpty()) {
+            when {
+                explorerViewModel.currentDirectory.absolutePath == "/" -> true
+                explorerViewModel.currentDirectory != explorerViewModel.startDirectory -> {
+                    explorerViewModel.moveToPath(explorerViewModel.currentDirectory.parentFile ?: explorerViewModel.currentDirectory)
+                    false
+                }
+                else -> true
             }
-            else -> true
+        } else {
+            clearSelectedItems()
+            updateToolbar()
+            false
         }
     }
 

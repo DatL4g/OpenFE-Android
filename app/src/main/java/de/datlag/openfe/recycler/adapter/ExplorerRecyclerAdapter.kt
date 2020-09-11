@@ -1,6 +1,5 @@
 package de.datlag.openfe.recycler.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,12 +16,9 @@ import de.datlag.openfe.databinding.ExplorerItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
-class ExplorerRecyclerAdapter : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
+class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
 
     private val diffCallback = object: DiffUtil.ItemCallback<ExplorerItem>() {
         override fun areItemsTheSame(oldItem: ExplorerItem, newItem: ExplorerItem): Boolean {
@@ -42,7 +38,6 @@ class ExplorerRecyclerAdapter : ClickRecyclerAdapter<ExplorerRecyclerAdapter.Vie
             get() = itemView
 
         val binding = ExplorerItemBinding.bind(containerView ?: itemView)
-        val context: Context = containerView?.context ?: itemView.context
 
         init {
             binding.explorerRoot.setOnClickListener(this)
@@ -74,9 +69,14 @@ class ExplorerRecyclerAdapter : ClickRecyclerAdapter<ExplorerRecyclerAdapter.Vie
         val file = item.fileItem.file
         val fileIsApk = file.isAPK()
         val fileName = item.fileItem.name ?: file.name
+        val context = holder.containerView?.context ?: holder.itemView.context
         val fallback = (if (fileIsApk) ContextCompat.getDrawable(context, R.drawable.ic_adb_24dp) else ContextCompat.getDrawable(context, R.drawable.ic_baseline_insert_drive_file_24))?.apply {
             tint(ContextCompat.getColor(context, R.color.explorerIconTint))
         }
+
+        // this fixes random icons for files of previous folders
+        binding.explorerIcon.setImageDrawable(null)
+        binding.explorerAppIcon.setImageDrawable(null)
 
         when {
             file.isDirectory -> {
@@ -86,12 +86,13 @@ class ExplorerRecyclerAdapter : ClickRecyclerAdapter<ExplorerRecyclerAdapter.Vie
 
                 Glide.with(context)
                     .asBitmap()
+                    .placeholder(null)
                     .load(item.appItem?.icon?.toBitmap()?.fillTransparent()?.applyBorder(10F, ContextCompat.getColor(context, R.color.explorerFileDefaultColor)))
                     .apply(RequestOptions.circleCropTransform())
                     .into(binding.explorerAppIcon)
             }
             fileIsApk -> {
-                GlobalScope.launch(Dispatchers.IO) {
+                coroutineScope.launch(Dispatchers.IO) {
                     val icon = file.getAPKImage(context)
                     withContext(Dispatchers.Main) {
                         Glide.with(context)
@@ -117,18 +118,13 @@ class ExplorerRecyclerAdapter : ClickRecyclerAdapter<ExplorerRecyclerAdapter.Vie
         binding.explorerName.text = fileName
         if (item.selectable) {
             binding.explorerCheckbox.visibility = View.VISIBLE
-            binding.explorerCheckbox.setOnClickListener { longClickListener?.invoke(it, position) }
         } else {
             binding.explorerCheckbox.visibility = View.INVISIBLE
             binding.explorerCheckbox.isChecked = false
-            binding.explorerCheckbox.isClickable = false
-            binding.explorerCheckbox.isFocusable = false
         }
         binding.explorerCheckbox.isChecked = item.selected
     }
 
     fun submitList(list: List<ExplorerItem>) = differ.submitList(list)
-
-    fun addToList(item: ExplorerItem) = submitList(differ.currentList.mutableCopyOf().apply { add(item) })
 
 }

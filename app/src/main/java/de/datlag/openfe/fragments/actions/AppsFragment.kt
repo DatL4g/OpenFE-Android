@@ -57,7 +57,11 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentAppsActionBinding.inflate(inflater, container, false)
+        val contextThemeWrapper = ContextThemeWrapper(saveContext, R.style.AppsActionFragmentTheme)
+        val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
+
+        saveContext.theme.applyStyle(R.style.AppsActionFragmentTheme, true)
+        binding = FragmentAppsActionBinding.inflate(clonedLayoutInflater, container, false)
         return binding.root
     }
 

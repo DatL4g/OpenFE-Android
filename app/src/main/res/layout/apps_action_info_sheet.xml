@@ -5,16 +5,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/infoSheetIcon"
+    <View
+        android:id="@+id/infoSheetSpacer"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:scaleType="centerInside"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/infoSheetDivider"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/infoSheetIcon"
+        app:layout_constraintEnd_toStartOf="@id/infoSheetIcon"
+        app:layout_constraintBottom_toTopOf="@id/infoSheetDivider"/>
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/infoSheetIcon"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/infoSheetDivider"
+        app:layout_constraintLeft_toRightOf="@id/infoSheetSpacer"
+        app:layout_constraintStart_toEndOf="@id/infoSheetSpacer"
         app:layout_constraintRight_toLeftOf="@id/infoSheetTopContainer"
         app:layout_constraintEnd_toStartOf="@id/infoSheetTopContainer"/>
 
@@ -22,7 +34,7 @@
         android:id="@+id/infoSheetTopContainer"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintHorizontal_weight="4"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/infoSheetDivider"
         app:layout_constraintRight_toRightOf="parent"

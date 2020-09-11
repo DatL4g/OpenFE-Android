@@ -7,7 +7,7 @@
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
         <item name="shapeAppearanceLargeComponent">@style/BottomSheetComponent</item>
-        <item name="android:statusBarColor">@color/defaultStatusBarColor</item>
+        <item name="android:statusBarColor">@color/defaultBackgroundColor</item>
     </style>
 
     <style name="AppTheme.Overlay" parent="AppTheme">
@@ -25,6 +25,14 @@
 
     <style name="ExplorerFragmentTheme" parent="AppTheme">
         <item name="android:statusBarColor">@color/explorerStatusbarColor</item>
+    </style>
+
+    <style name="ActionFragmentTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@color/defaultStatusBarColor</item>
+    </style>
+
+    <style name="AppsActionFragmentTheme" parent="ActionFragmentTheme">
+        <item name="android:statusBarColor">@color/appsActionStatusbarColor</item>
     </style>
 
     <style name="Divider">
@@ -46,6 +54,13 @@
 
     <style name="DayNight.BottomNavigationView.Colored" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
         <item name="android:background">@color/defaultToolBarColor</item>
+    </style>
+
+    <style name="ExplorerCheckBox" parent="ExplorerFragmentTheme">
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="colorControlActivated">@color/explorerCheckBoxColor</item>
+        <item name="android:colorControlNormal">@android:color/transparent</item>
+        <item name="android:colorControlActivated">@color/explorerCheckBoxColor</item>
     </style>
 
     <declare-styleable name="ClickableCardView">

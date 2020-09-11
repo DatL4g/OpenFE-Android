@@ -25,4 +25,5 @@
     <color name="explorerIconTint">@color/defaultTextColor</color>
     <color name="explorerFileDefaultColor">@color/defaultBackgroundColor</color>
     <color name="explorerFileSelectedColor">@color/defaultCardColor</color>
+    <color name="explorerCheckBoxColor">@color/defaultTextColor</color>
 </resources>
