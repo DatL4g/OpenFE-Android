@@ -77,7 +77,9 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         }
 
         explorerViewModel.directory.observe(viewLifecycleOwner) { dir ->
-            explorerViewModel.moveToPath(dir)
+            if (explorerViewModel.selectedItems.isNullOrEmpty()) {
+                explorerViewModel.moveToPath(dir)
+            }
         }
         explorerViewModel.directories.observe(viewLifecycleOwner) { list ->
             recyclerAdapter.submitList(list)
