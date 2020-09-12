@@ -181,7 +181,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
     private fun clearSelectedItems() = with(binding) {
         explorerViewModel.selectedItems.clear()
-        recyclerAdapter.differ.currentList.let {
+        copiedList.let {
             val explorerItems = it.mutableCopyOf()
 
             for (i in 0 until explorerItems.size) {
@@ -192,6 +192,12 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
             }
 
             explorerViewModel.directories.value = explorerItems
+        }
+
+        if (explorerViewModel.isSearching) {
+            explorerViewModel.isSearching = false
+            explorerSearchView.searchEditText.text = null
+            explorerViewModel.directories.value = copiedList
         }
     }
 
