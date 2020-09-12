@@ -36,6 +36,8 @@ class ExplorerViewModel(explorerFragmentArgs: ExplorerFragmentArgs, private val 
 
     var selectedItems = mutableListOf<ExplorerItem>()
 
+    var isSearching: Boolean = false
+
     init {
         appsViewModel.systemApps.observeForever(systemAppsObserver)
     }

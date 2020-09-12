@@ -24,6 +24,9 @@ import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -78,7 +81,9 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         }
         explorerViewModel.directories.observe(viewLifecycleOwner) { list ->
             recyclerAdapter.submitList(list)
-            copiedList = list.mutableCopyOf()
+            if (!explorerViewModel.isSearching) {
+                copiedList = list.mutableCopyOf()
+            }
             loadingTextView.visibility = View.GONE
             explorerRecycler.visibility = View.VISIBLE
             appBar.visibility = View.VISIBLE
@@ -101,7 +106,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         explorerRecycler.setHasFixedSize(true)
     }
 
-    private fun recyclerEvent(position: Int, longClick: Boolean = false) = copiedList.let {
+    private fun recyclerEvent(position: Int, longClick: Boolean = false) = recyclerAdapter.differ.currentList.let {
         val explorerItem = it[position]
 
         if (explorerViewModel.selectedItems.isNotEmpty() || longClick) {
@@ -153,7 +158,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     }
 
     private fun recyclerSelectUpdate(explorerItem: ExplorerItem, position: Int): ExplorerItem = with(binding) {
-        explorerViewModel.directories.value?.let {
+        recyclerAdapter.differ.currentList.let {
             val explorerItems = it.mutableCopyOf()
 
             for (i in 0 until explorerItems.size) {
@@ -174,7 +179,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
     private fun clearSelectedItems() = with(binding) {
         explorerViewModel.selectedItems.clear()
-        explorerViewModel.directories.value?.let {
+        recyclerAdapter.differ.currentList.let {
             val explorerItems = it.mutableCopyOf()
 
             for (i in 0 until explorerItems.size) {
@@ -201,15 +206,43 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     private fun initSearchView() = with(binding) {
         explorerSearchView.setOnQueryTextListener(object: SimpleSearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
+                if (!query.isNotCleared()) {
+                    explorerViewModel.isSearching = false
+                }
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
+                recyclerAdapter.submitList(listOf())
+
+                if (newText.isNotCleared()) {
+                    explorerViewModel.isSearching = true
+                    val newListCopy = copiedList.mutableCopyOf()
+
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val iterator = newListCopy.iterator()
+
+                        while (iterator.hasNext()) {
+                            val nextItem = iterator.next()
+                            if ((nextItem.fileItem.name?.contains(newText, true) != true) && !nextItem.fileItem.file.name.contains(newText, true)) {
+                                iterator.remove()
+                                continue
+                            }
+                        }
+                        withContext(Dispatchers.Main) {
+                            recyclerAdapter.submitList(newListCopy)
+                        }
+                    }
+                } else {
+                    explorerViewModel.isSearching = false
+                    recyclerAdapter.submitList(copiedList)
+                }
                 return false
             }
 
             override fun onQueryTextCleared(): Boolean {
-
+                explorerViewModel.isSearching = false
+                recyclerAdapter.submitList(copiedList)
                 return false
             }
         })
