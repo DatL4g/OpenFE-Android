@@ -20,7 +20,7 @@ class MainActivity : AdvancedActivity() {
     }
 
     override fun onBackPressed() {
-        val pressed: Boolean = (getCurrentNavFragment() as? FragmentBackPressed)?.onBackPressed() ?: true
+        val pressed: Boolean = (getCurrentNavFragment() as? FragmentBackPressed?)?.onBackPressed() ?: true
 
         if(pressed) {
             super.onBackPressed()
@@ -28,6 +28,6 @@ class MainActivity : AdvancedActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        return (getCurrentNavFragment() as? FragmentOptionsMenu)?.onCreateMenu(menu, menuInflater) ?: true
+        return (getCurrentNavFragment() as? FragmentOptionsMenu?)?.onCreateMenu(menu, menuInflater) ?: true
     }
 }

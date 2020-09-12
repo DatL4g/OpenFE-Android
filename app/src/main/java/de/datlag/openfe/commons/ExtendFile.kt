@@ -5,12 +5,15 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Environment
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
+import androidx.core.os.EnvironmentCompat
 import de.datlag.openfe.data.Usage
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -137,5 +140,14 @@ fun File.getAPKImage(context: Context): Drawable? {
         }
     } else {
         null
+    }
+}
+
+// Pair(readable, writeable)
+fun File.getPermissions(): Pair<Boolean, Boolean> {
+    return when(EnvironmentCompat.getStorageState(this)) {
+        Environment.MEDIA_MOUNTED -> Pair(first = true, second = true)
+        Environment.MEDIA_MOUNTED_READ_ONLY -> Pair(first = true, second = false)
+        else -> Pair(first = false, second = false)
     }
 }

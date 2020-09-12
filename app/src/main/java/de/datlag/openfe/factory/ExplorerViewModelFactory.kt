@@ -11,6 +11,7 @@ class ExplorerViewModelFactory (
     private val appsViewModel: AppsViewModel
 ) : ViewModelProvider.NewInstanceFactory() {
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(
         modelClass: Class<T>
     ) = ExplorerViewModel(explorerArgs, appsViewModel) as T

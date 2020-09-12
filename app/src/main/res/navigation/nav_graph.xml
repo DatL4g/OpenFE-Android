@@ -38,6 +38,9 @@
             android:id="@+id/action_AppsActionFragment_to_OverviewFragment"
             app:destination="@id/OverviewFragment" />
 
+        <argument android:name="filePath"
+            app:argType="string"
+            android:defaultValue="/storage" />
     </fragment>
 
 </navigation>

@@ -76,7 +76,13 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         actionRecycler.layoutManager = GridLayoutManager(saveContext, if(saveContext.packageManager.isTelevision()) 5 else 3)
         actionRecycler.adapter = ActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
-                findNavController().navigate(actionList[position].actionId)
+                when(actionList[position].actionId) {
+                    R.id.action_OverviewFragment_to_AppsActionFragment -> {
+                        val action = OverviewFragmentDirections.actionOverviewFragmentToAppsActionFragment(locationList[0].usage.file.absolutePath)
+                        findNavController().navigate(action)
+                    }
+                    else -> findNavController().navigate(actionList[position].actionId)
+                }
             }
             submitList(actionList)
         }
