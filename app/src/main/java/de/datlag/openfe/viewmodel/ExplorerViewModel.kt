@@ -1,5 +1,6 @@
 package de.datlag.openfe.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -19,7 +20,7 @@ import kotlin.Exception
 typealias FileLiveData = MutableLiveData<File>
 typealias ExplorerLiveData = MutableLiveData<List<ExplorerItem>>
 
-class ExplorerViewModel(explorerFragmentArgs: ExplorerFragmentArgs, private val appsViewModel: AppsViewModel) : ViewModel() {
+class ExplorerViewModel(private val explorerFragmentArgs: ExplorerFragmentArgs, private val appsViewModel: AppsViewModel) : ViewModel() {
 
     var startDirectory: File = getStartDirectory(explorerFragmentArgs)
         private set
@@ -84,7 +85,7 @@ class ExplorerViewModel(explorerFragmentArgs: ExplorerFragmentArgs, private val 
     }
 
     private fun getStartDirectory(args: ExplorerFragmentArgs): File {
-        val file = File(args.filePath)
+        val file = File(args.storage.list[args.storage.item].usage.file.absolutePath)
         return if(file.isDirectory) file else file.parentFile ?: File(file.getRootOfStorage())
     }
 
@@ -94,12 +95,27 @@ class ExplorerViewModel(explorerFragmentArgs: ExplorerFragmentArgs, private val 
         if (newPath.isDirectory) {
             val fileList = newPath.listFiles()?.toMutableList() ?: mutableListOf()
 
-            if (newPath != startDirectory) {
+
+            val rootFile = explorerFragmentArgs.storage.list[explorerFragmentArgs.storage.item].rootFile
+            val rootStorageFile = rootFile.parentFile ?: if (rootFile.parent != null) File(rootFile.parent!!) else rootFile
+            if (newPath == rootStorageFile) {
+                for (item in explorerFragmentArgs.storage.list) {
+                    if (!fileList.contains(item.rootFile)) {
+                        fileList.add(item.rootFile)
+                    }
+                }
+            }
+            if (newPath == File("/")) {
+                val storagePath = File("/storage")
+                if (!fileList.contains(storagePath)) {
+                    fileList.add(storagePath)
+                }
+                directories.value = mutableListOf()
+            } else {
                 val parentFile = ExplorerItem(FileItem(newPath.parentFile ?: if (newPath.parent != null) File(newPath.parent!!) else newPath, ".."), null, false)
                 directories.value = mutableListOf(parentFile)
-            } else {
-                directories.value = mutableListOf()
             }
+
 
             currentDirectory = newPath
 

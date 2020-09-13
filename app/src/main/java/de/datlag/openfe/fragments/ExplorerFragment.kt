@@ -3,6 +3,7 @@ package de.datlag.openfe.fragments
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
@@ -27,6 +28,7 @@ import de.datlag.openfe.viewmodel.ExplorerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts

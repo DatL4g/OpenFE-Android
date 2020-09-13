@@ -26,9 +26,8 @@
             android:id="@+id/action_ExplorerFragment_to_OverviewFragment"
             app:destination="@id/OverviewFragment" />
 
-        <argument android:name="filePath"
-            app:argType="string"
-            android:defaultValue="/storage" />
+        <argument android:name="storage"
+            app:argType="de.datlag.openfe.data.ExplorerFragmentStorageArgs" />
     </fragment>
     <fragment android:id="@+id/AppsActionFragment"
         android:name="de.datlag.openfe.fragments.actions.AppsFragment"

@@ -20,7 +20,7 @@ import java.util.zip.ZipInputStream
 fun File.getRootOfStorage(): String {
     var file = this
     while(true) {
-        val parentFile = file.parentFile
+        val parentFile = file.parentFile ?: if (file.parent != null) File(file.parent!!) else null
         if(parentFile == null || parentFile.totalSpace != file.totalSpace) {
             return file.absolutePath
         }

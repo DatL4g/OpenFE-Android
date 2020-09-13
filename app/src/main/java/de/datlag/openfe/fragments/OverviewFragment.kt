@@ -20,6 +20,7 @@ import com.karumi.dexter.listener.single.PermissionListener
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.commons.*
+import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
@@ -68,7 +69,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         locationRecycler.layoutManager = LinearLayoutManager(saveContext)
         locationRecycler.adapter = LocationRecyclerAdapter().apply {
             setOnClickListener { _, position ->
-                checkReadPermission(locationList[position])
+                checkReadPermission(position)
             }
             submitList(locationList)
         }
@@ -116,10 +117,12 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         return actionList
     }
 
-    private fun checkReadPermission(locationItem: LocationItem) {
+    private fun checkReadPermission(position: Int) {
         PermissionChecker.checkReadStorage(saveContext, object: PermissionListener{
             override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                val action = OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(locationItem.usage.file.absolutePath)
+                val action = OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
+                    ExplorerFragmentStorageArgs(locationList, position)
+                )
                 findNavController().navigate(action)
             }
 
