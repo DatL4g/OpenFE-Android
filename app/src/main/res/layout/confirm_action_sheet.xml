@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/confirmSheetTitle"
+        fontPath="fonts/Poppins-Bold.ttf"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:gravity="center_vertical|start"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMaxTextSize="26sp"
+        app:autoSizeMinTextSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/confirmSheetText"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/confirmSheetText"
+        fontPath="fonts/Poppins-Medium.ttf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/confirmSheetTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/confirmSheetButtonLeft"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginRight="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/confirm_button_left_selector"
+        android:textColor="@color/confirm_button_left_text_selector"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/confirmSheetText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/confirmSheetButtonRight"
+        app:layout_constraintEnd_toStartOf="@id/confirmSheetButtonRight" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/confirmSheetButtonRight"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/confirm_button_right_selector"
+        android:textColor="@color/highlightTextColor"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/confirmSheetText"
+        app:layout_constraintLeft_toRightOf="@id/confirmSheetButtonLeft"
+        app:layout_constraintStart_toEndOf="@id/confirmSheetButtonLeft"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

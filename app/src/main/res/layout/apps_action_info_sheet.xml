@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintVertical_weight="1"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:maxLines="1"
             android:singleLine="true"
             android:gravity="center"
@@ -67,7 +67,7 @@
             android:singleLine="true"
             android:gravity="center_horizontal|bottom"
             android:layout_weight="1"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:autoSizeTextType="uniform"
             app:autoSizeMinTextSize="12sp"
             app:autoSizeMaxTextSize="18sp"
@@ -102,7 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:text="Description"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toTopOf="parent"/>
 
@@ -112,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:text="Category"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toBottomOf="@id/infoSheetDescriptionHeader"/>
 
@@ -122,7 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:text="Install Location"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toBottomOf="@id/infoSheetCategoryHeader"/>
 
@@ -132,7 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:text="First Installed"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toBottomOf="@id/infoSheetInstallLocationHeader"/>
 
@@ -142,7 +142,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:text="Last Updated"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toBottomOf="@id/infoSheetFirstInstallHeader"/>
 
@@ -152,7 +152,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:text="VersionCode"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toBottomOf="@id/infoSheetLastUpdateHeader"/>
 
@@ -161,7 +161,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:text="VersionName"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             android:gravity="center_vertical|end"
             app:layout_constraintTop_toBottomOf="@id/infoSheetVersionCodeHeader"/>
 
@@ -183,7 +183,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -191,7 +191,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:layout_constraintTop_toBottomOf="@id/infoSheetDescriptionData"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -199,7 +199,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:layout_constraintTop_toBottomOf="@id/infoSheetCategoryData"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -207,7 +207,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:layout_constraintTop_toBottomOf="@id/infoSheetInstallLocationData"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -215,7 +215,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:layout_constraintTop_toBottomOf="@id/infoSheetFirstInstallData"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -223,7 +223,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:layout_constraintTop_toBottomOf="@id/infoSheetLastUpdateData"/>
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -231,7 +231,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:gravity="center"
-            android:textColor="@color/defaultTextColor"
+            android:textColor="@color/defaultContentColor"
             app:layout_constraintTop_toBottomOf="@id/infoSheetVersionCodeData"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

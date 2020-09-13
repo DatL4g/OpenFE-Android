@@ -1,6 +1,7 @@
 package de.datlag.openfe.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import de.datlag.openfe.R
+import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedActivity
@@ -125,7 +127,23 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
                 p0: PermissionRequest?,
                 p1: PermissionToken?
             ) {
-
+                val confirmActionSheet = ConfirmActionSheet.newInstance()
+                confirmActionSheet.title = "Storage Permission"
+                confirmActionSheet.text = "This permission is required to read the Files and Folders of the selected Storage.\nOtherwise this feature cannot be used!"
+                confirmActionSheet.leftText = "Cancel"
+                confirmActionSheet.rightText = "Grant"
+                confirmActionSheet.leftClickListener = {
+                    p1?.cancelPermissionRequest()
+                }
+                confirmActionSheet.rightClickListener = {
+                    p1?.continuePermissionRequest()
+                }
+                confirmActionSheet.closeOnLeftClick = true
+                confirmActionSheet.closeOnRightClick = true
+                confirmActionSheet.cancelListener = {
+                    p1?.cancelPermissionRequest()
+                }
+                showBottomSheetFragment(confirmActionSheet)
             }
 
             override fun onPermissionDenied(p0: PermissionDeniedResponse?) {

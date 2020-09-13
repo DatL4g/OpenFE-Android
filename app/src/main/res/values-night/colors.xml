@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="defaultBackgroundColor">#121212</color>
-    <color name="defaultTextColor">#ffffff</color>
+    <color name="defaultContentColor">#ffffff</color>
     <color name="highlightTextColor">#000000</color>
     <color name="defaultStatusBarColor">#323232</color>
     <color name="loadingStatusBarColor">#121212</color>
@@ -14,16 +14,22 @@
     <color name="locationCardBackground">@color/defaultBackgroundColor</color>
     <color name="locationCardDefaultColor">@color/defaultCardColor</color>
     <color name="locationCardSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="locationCardTextColor">@color/defaultTextColor</color>
-    <color name="locationCardProgressColor">@color/defaultTextColor</color>
+    <color name="locationCardTextColor">@color/defaultContentColor</color>
+    <color name="locationCardProgressColor">@color/defaultContentColor</color>
 
     <color name="actionCardDefaultColor">@color/defaultCardColor</color>
     <color name="actionCardSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="actionCardIconTint">@color/defaultTextColor</color>
-    <color name="actionCardTextColor">@color/defaultTextColor</color>
+    <color name="actionCardIconTint">@color/defaultContentColor</color>
+    <color name="actionCardTextColor">@color/defaultContentColor</color>
 
-    <color name="explorerIconTint">@color/defaultTextColor</color>
+    <color name="explorerIconTint">@color/defaultContentColor</color>
     <color name="explorerFileDefaultColor">@color/defaultBackgroundColor</color>
     <color name="explorerFileSelectedColor">@color/defaultCardColor</color>
-    <color name="explorerCheckBoxColor">@color/defaultTextColor</color>
+    <color name="explorerCheckBoxColor">@color/defaultContentColor</color>
+
+    <color name="confirmSheetButtonBackgroundColorPrimary">@color/defaultContentColor</color>
+    <color name="confirmSheetButtonBackgroundColorSecondary">@color/defaultContentColor</color>
+    <color name="confirmSheetButtonBackgroundColorDark">#dcdcdc</color>
+    <color name="confirmSheetButtonLeftTextColorPrimary">@color/defaultContentColor</color>
+    <color name="confirmSheetButtonLeftTextColorSecondary">@color/highlightTextColor</color>
 </resources>

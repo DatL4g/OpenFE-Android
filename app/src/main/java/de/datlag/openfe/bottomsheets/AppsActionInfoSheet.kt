@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import de.datlag.openfe.commons.expand
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.saveContext
@@ -37,15 +38,11 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = AppsActionInfoSheetBinding.inflate(LayoutInflater.from(saveContext), container, false)
+        binding = AppsActionInfoSheetBinding.inflate(inflater, container, false)
 
         if (saveContext.packageManager.isTelevision()) {
             dialog?.setOnShowListener {
-                val bottomSheetDialog = it as BottomSheetDialog
-                val sheetInternal: View? = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)
-                sheetInternal?.let { sheet ->
-                    BottomSheetBehavior.from(sheet).state = BottomSheetBehavior.STATE_EXPANDED
-                }
+                it.expand()
             }
         }
 

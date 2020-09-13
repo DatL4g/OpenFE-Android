@@ -25,6 +25,7 @@ import com.karumi.dexter.listener.single.PermissionListener
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.AppsActionInfoSheet
+import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
 import de.datlag.openfe.extend.AdvancedActivity
@@ -252,9 +253,9 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                         if (createFileSuccess) {
                             try {
                                 originalFile.copyTo(backupFile, true)
-                            } catch (ignored: Exception) { }
-
-                            Log.e("Copy", "done")
+                            } catch (ignored: Exception) {
+                                return@checkWritePermission
+                            }
                         }
                     }
 

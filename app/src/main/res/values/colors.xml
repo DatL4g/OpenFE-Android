@@ -5,7 +5,7 @@
     <color name="primaryDarkColor">#a2000f</color>
 
     <color name="defaultBackgroundColor">#ffffff</color>
-    <color name="defaultTextColor">#000000</color>
+    <color name="defaultContentColor">#000000</color>
     <color name="highlightTextColor">#ffffff</color>
     <color name="defaultStatusBarColor">@color/primaryColor</color>
     <color name="loadingStatusBarColor">#ffffff</color>
@@ -33,7 +33,7 @@
 
     <color name="appsActionCardDefaultColor">@color/defaultCardColor</color>
     <color name="appsActionCardSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="appsActionTextColor">@color/defaultTextColor</color>
+    <color name="appsActionTextColor">@color/defaultContentColor</color>
     <color name="appsActionLoadingStatusbarColor">@color/loadingStatusBarColor</color>
     <color name="appsActionStatusbarColor">@color/defaultStatusBarColor</color>
     <color name="appsActionToolbarTextColor">@color/defaultToolBarContentColor</color>
@@ -47,7 +47,13 @@
     <color name="explorerStatusbarColor">@color/defaultStatusBarColor</color>
     <color name="explorerFileDefaultColor">@color/defaultCardColor</color>
     <color name="explorerFileSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="explorerFileTextColor">@color/defaultTextColor</color>
+    <color name="explorerFileTextColor">@color/defaultContentColor</color>
     <color name="explorerLoadingTextColor">@color/loadingTextColor</color>
     <color name="explorerCheckBoxColor">@color/primaryColor</color>
+
+    <color name="confirmSheetButtonBackgroundColorPrimary">@color/primaryColor</color>
+    <color name="confirmSheetButtonBackgroundColorSecondary">@color/primaryColor</color>
+    <color name="confirmSheetButtonBackgroundColorDark">@color/primaryDarkColor</color>
+    <color name="confirmSheetButtonLeftTextColorPrimary">@color/primaryColor</color>
+    <color name="confirmSheetButtonLeftTextColorSecondary">@color/highlightTextColor</color>
 </resources>
