@@ -1,8 +1,11 @@
 # OpenFE-Android
 
 ![Android CI](https://github.com/DATL4G/OpenFE-Android/workflows/Android%20CI/badge.svg)
-[![Stars](https://img.shields.io/github/stars/DATL4G/OpenFE-Android.svg?style=social)](https://github.com/DATL4G/OpenFE-Android)
-[![Forks](https://img.shields.io/github/forks/DATL4G/OpenFE-Android.svg?style=social)](https://github.com/DATL4G/OpenFE-Android)
+
+[![Stars](https://img.shields.io/github/stars/DATL4G/OpenFE-Android.svg)](https://github.com/DATL4G/OpenFE-Android)
+
+[![Forks](https://img.shields.io/github/forks/DATL4G/OpenFE-Android.svg)](https://github.com/DATL4G/OpenFE-Android)
+
 [![License](https://img.shields.io/github/license/DATL4G/OpenFE-Android.svg)](https://github.com/DATL4G/OpenFE-Android)
 
 OpenFE-Android is an open source file explorer for Android
