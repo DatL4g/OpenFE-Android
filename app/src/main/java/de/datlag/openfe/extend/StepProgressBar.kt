@@ -3,6 +3,7 @@ package de.datlag.openfe.extend
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.*
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
@@ -11,6 +12,7 @@ import android.widget.ProgressBar
 import androidx.annotation.CallSuper
 import androidx.appcompat.widget.LinearLayoutCompat
 import de.datlag.openfe.R
+import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.commons.mapOf
 
 class StepProgressBar @JvmOverloads constructor(
@@ -165,10 +167,7 @@ class StepProgressBar @JvmOverloads constructor(
 
     private fun createDoneView(doneViewWidth: Int, height: Int): View {
         return if (progressPerBar) ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal).apply {
-            layoutParams = LayoutParams(doneViewWidth, height).apply {
-                minHeight = height
-                maxHeight = height
-            }
+            layoutParams = LayoutParams(doneViewWidth, height)
             isIndeterminate = false
             progressDrawable = progressLayerDrawable()
             max = 1
@@ -185,8 +184,6 @@ class StepProgressBar @JvmOverloads constructor(
                 if (doneViewExists) {
                     leftMargin = stepMargin
                 }
-                minHeight = height
-                maxHeight = height
             }
             isIndeterminate = false
             progressDrawable = progressLayerDrawable()
