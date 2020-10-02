@@ -1,0 +1,28 @@
+name: Android CI
+
+on:
+  pull_request:
+    push:
+      branches:
+        - '*'
+      tags-ignore:
+        - 'v*'
+      paths-ignore:
+        - 'README.md'
+        - '.gitignore'
+        - '.editorconfig'
+        - 'docs/**'
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK 1.8
+          uses: actions/setup-java@v1
+          with:
+            java-version: 1.8
+      - name: Unit Tests
+        run: bash ./gradlew test
