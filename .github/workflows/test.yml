@@ -2,16 +2,16 @@ name: Android CI
 
 on:
   pull_request:
-    push:
-      branches:
-        - '*'
-      tags-ignore:
-        - 'v*'
-      paths-ignore:
-        - 'README.md'
-        - '.gitignore'
-        - '.editorconfig'
-        - 'docs/**'
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - 'v*'
+    paths-ignore:
+      - 'README.md'
+      - '.gitignore'
+      - '.editorconfig'
+      - 'docs/**'
 
 jobs:
   test:
