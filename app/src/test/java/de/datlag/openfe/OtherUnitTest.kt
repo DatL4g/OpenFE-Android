@@ -1,5 +1,6 @@
 package de.datlag.openfe
 
+import de.datlag.openfe.util.toHumanReadable
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -8,9 +9,14 @@ import org.junit.Test
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class ExampleUnitTest {
+class OtherUnitTest {
+
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun humanReadableByteSize() {
+        val size: Long = 2048
+
+        assertEquals(size.toHumanReadable(true), "2,0 KiB")
+        assertEquals(size.toHumanReadable(false), "2,0 kB")
     }
+
 }
