@@ -25,9 +25,10 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 1.8
+          architecture: x86
       - name: Unit Tests
-        run: ./gradlew test
+      - run: ./gradlew test
       - name: Clean Build Cache
-        run: ./gradlew cleanBuildCache
+      - run: ./gradlew cleanBuildCache
       - name: Build App
-        run: ./gradlew build
+      - run: ./gradlew build
