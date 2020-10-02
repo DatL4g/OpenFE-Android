@@ -5,7 +5,9 @@ import android.util.AttributeSet
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class LinearLayoutManagerWrapper : LinearLayoutManager {
+
     constructor(context: Context) : super(context)
+
     constructor(context: Context, orientation: Int, reverseLayout: Boolean) : super(
         context,
         orientation,

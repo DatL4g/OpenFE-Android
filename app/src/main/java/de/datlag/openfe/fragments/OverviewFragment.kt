@@ -19,6 +19,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.ConfirmActionSheet
+import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.*
 import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
@@ -29,7 +30,9 @@ import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.PermissionChecker
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 class OverviewFragment : Fragment(), FragmentBackPressed {
 
     lateinit var locationList: List<LocationItem>
@@ -130,23 +133,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
                 p0: PermissionRequest?,
                 p1: PermissionToken?
             ) {
-                val confirmActionSheet = ConfirmActionSheet.newInstance()
-                confirmActionSheet.title = "Storage Permission"
-                confirmActionSheet.text = "This permission is required to read the Files and Folders of the selected Storage.\nOtherwise this feature cannot be used!"
-                confirmActionSheet.leftText = "Cancel"
-                confirmActionSheet.rightText = "Grant"
-                confirmActionSheet.leftClickListener = {
-                    p1?.cancelPermissionRequest()
-                }
-                confirmActionSheet.rightClickListener = {
-                    p1?.continuePermissionRequest()
-                }
-                confirmActionSheet.closeOnLeftClick = true
-                confirmActionSheet.closeOnRightClick = true
-                confirmActionSheet.cancelListener = {
-                    p1?.cancelPermissionRequest()
-                }
-                showBottomSheetFragment(confirmActionSheet)
+                showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
             }
 
             override fun onPermissionDenied(p0: PermissionDeniedResponse?) {

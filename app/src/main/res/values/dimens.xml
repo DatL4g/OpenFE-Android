@@ -5,4 +5,8 @@
     <dimen name="locationCardElevation">4dp</dimen>
 
     <dimen name="actionItemSize">100dp</dimen>
+
+    <dimen name="stepProgressDefaultMargin">2dp</dimen>
+    <dimen name="stepProgressDefaultHeight">2dp</dimen>
+    <dimen name="stepProgressDefaultRoundedCorner">5dp</dimen>
 </resources>

@@ -2,10 +2,10 @@ package de.datlag.openfe.fragments.actions
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
 import androidx.core.view.iterator
@@ -42,8 +42,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -94,8 +92,6 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                 findNavController().navigate(R.id.action_AppsActionFragment_to_OverviewFragment)
             }
         }
-
-        Log.e("Dir", args.filePath)
 
         initRecycler()
         initEditText()
@@ -251,8 +247,15 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                         val createFileSuccess = backupFile.createNewFile()
 
                         if (createFileSuccess) {
+                            val confirmSheet = ConfirmActionSheet.newInstance()
+                            confirmSheet.title = "Copy file..."
+                            confirmSheet.rightText = "Close"
+                            confirmSheet.closeOnRightClick = true
+                            showBottomSheetFragment(confirmSheet)
                             try {
-                                originalFile.copyTo(backupFile, true)
+                                originalFile.copyTo(backupFile, true) {
+                                    confirmSheet.text = "Done: $it%"
+                                }
                             } catch (ignored: Exception) {
                                 return@checkWritePermission
                             }
@@ -265,18 +268,22 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     }
 
     private fun checkManageFilePermission(): Boolean {
-        if (!Environment.isExternalStorageManager()) {
-            try {
-                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                intent.data = Uri.fromParts("package", saveContext.packageName, null)
-                saveContext.startActivity(intent)
-            } catch (ignored: Exception) {
-                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                startActivity(intent)
+        return if (androidGreaterOr(Build.VERSION_CODES.R)) {
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    intent.data = Uri.fromParts("package", saveContext.packageName, null)
+                    saveContext.startActivity(intent)
+                } catch (ignored: Exception) {
+                    val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    startActivity(intent)
+                }
             }
-        }
 
-        return Environment.isExternalStorageManager()
+            Environment.isExternalStorageManager()
+        } else {
+            true
+        }
     }
 
     @ExperimentalContracts
@@ -305,9 +312,10 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                 p0: PermissionRequest?,
                 p1: PermissionToken?
             ) {
+                showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
             }
 
-            override fun onPermissionDenied(p0: PermissionDeniedResponse?) {}
+            override fun onPermissionDenied(p0: PermissionDeniedResponse?) { }
         })
     }
 

@@ -1,6 +1,5 @@
 package de.datlag.openfe.bottomsheets
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,51 +9,52 @@ import de.datlag.openfe.commons.expand
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.saveContext
-import de.datlag.openfe.databinding.ConfirmActionSheetBinding
+import de.datlag.openfe.databinding.FileProgressSheetBinding
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
-class ConfirmActionSheet : BottomSheetDialogFragment() {
+class FileProgressSheet : BottomSheetDialogFragment() {
 
-    private var binding: ConfirmActionSheetBinding? = null
+    var binding: FileProgressSheetBinding? = null
 
     var title: String = String()
         set(value) = with(binding) {
             field = value
-            this?.confirmSheetTitle?.text = field
+            this?.fileProgressSheetTitle?.text = field
         }
 
     var text: String = String()
         set(value) = with(binding) {
             field = value
-            this?.confirmSheetText?.text = field
+            this?.fileProgressSheetText?.text = field
         }
 
     var leftText: String = String()
         set(value) = with(binding) {
             field = value
-            this?.confirmSheetButtonLeft?.text = field
+            this?.fileProgressSheetButtonLeft?.text = field
             if (!field.isNotCleared()) {
-                this?.confirmSheetButtonLeft?.visibility = View.GONE
+                this?.fileProgressSheetButtonLeft?.visibility = View.GONE
             }
         }
 
     var rightText: String = String()
         set(value) = with(binding) {
             field = value
-            this?.confirmSheetButtonRight?.text = field
+            this?.fileProgressSheetButtonRight?.text = field
             if (!field.isNotCleared()) {
-                this?.confirmSheetButtonRight?.visibility = View.GONE
+                this?.fileProgressSheetButtonRight?.visibility = View.GONE
             }
         }
 
     var leftClickListener: ((view: View) -> Unit)? = null
         set(value) = with(binding) {
             field = value
-            this?.confirmSheetButtonLeft?.setOnClickListener {
+            this?.fileProgressSheetButtonLeft?.setOnClickListener {
                 leftClickListener?.invoke(it)
                 if (closeOnLeftClick) {
-                    this@ConfirmActionSheet.dialog?.dismiss()
+                    this@FileProgressSheet.dismiss()
+                    this@FileProgressSheet.dialog?.dismiss()
                 }
             }
         }
@@ -62,81 +62,83 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
     var rightClickListener: ((view: View) -> Unit)? = null
         set(value) = with(binding) {
             field = value
-            this?.confirmSheetButtonRight?.setOnClickListener {
+            this?.fileProgressSheetButtonRight?.setOnClickListener {
                 rightClickListener?.invoke(it)
                 if (closeOnRightClick) {
-                    this@ConfirmActionSheet.dismiss()
+                    this@FileProgressSheet.dismiss()
+                    this@FileProgressSheet.dialog?.dismiss()
                 }
             }
         }
 
     var closeOnLeftClick: Boolean = false
     var closeOnRightClick: Boolean = false
-    var cancelListener: ((dialogInterface: DialogInterface) -> Unit)? = null
+
+    var updateable: (() -> Unit)? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = ConfirmActionSheetBinding.inflate(inflater, container, false)
+        binding = FileProgressSheetBinding.inflate(inflater, container, false)
 
         if (saveContext.packageManager.isTelevision()) {
             dialog?.setOnShowListener {
                 it.expand()
             }
         }
+        isCancelable = false
 
         return binding!!.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        
-        val touchOutsideView = dialog?.window?.decorView?.findViewById<View>(com.google.android.material.R.id.touch_outside)
-        touchOutsideView?.setOnClickListener {
-            dialog?.cancel()
-        }
-        dialog?.setOnCancelListener {
-            cancelListener?.invoke(it)
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        updateable?.invoke()
         initViews()
     }
 
     private fun initViews() = with(binding!!) {
-        confirmSheetTitle.text = title
-        confirmSheetText.text = text
-        confirmSheetButtonLeft.text = leftText
-        confirmSheetButtonRight.text = rightText
+        fileProgressSheetTitle.text = title
+        fileProgressSheetText.text = text
+        fileProgressSheetButtonLeft.text = leftText
+        fileProgressSheetButtonRight.text = rightText
 
-        confirmSheetButtonLeft.setOnClickListener {
+        fileProgressSheetButtonLeft.setOnClickListener {
             leftClickListener?.invoke(it)
             if (closeOnLeftClick) {
-                this@ConfirmActionSheet.dialog?.dismiss()
+                this@FileProgressSheet.dismiss()
+                this@FileProgressSheet.dialog?.dismiss()
             }
         }
 
-        confirmSheetButtonRight.setOnClickListener {
+        fileProgressSheetButtonRight.setOnClickListener {
             rightClickListener?.invoke(it)
             if (closeOnRightClick) {
-                this@ConfirmActionSheet.dismiss()
+                this@FileProgressSheet.dismiss()
+                this@FileProgressSheet.dialog?.dismiss()
             }
         }
 
         if (!leftText.isNotCleared()) {
-            confirmSheetButtonLeft.visibility = View.GONE
+            fileProgressSheetButtonLeft.visibility = View.GONE
         }
         if (!rightText.isNotCleared()) {
-            confirmSheetButtonRight.visibility = View.GONE
+            fileProgressSheetButtonRight.visibility = View.GONE
         }
+
+        fileProgressBar.max = 0
+        fileProgressBar.step = 0
+        fileProgressBar.progressPerBar = true
+    }
+
+    fun updateProgressList(newArray: FloatArray) = with(binding) {
+        this?.fileProgressBar?.updateProgressPerBarList(newArray)
     }
 
     companion object {
-        fun newInstance() = ConfirmActionSheet()
+        fun newInstance() = FileProgressSheet()
     }
-
 }

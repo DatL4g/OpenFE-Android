@@ -5,15 +5,21 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import androidx.core.os.EnvironmentCompat
 import de.datlag.openfe.data.Usage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.net.URLConnection
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -40,27 +46,47 @@ fun File.getUsage(): Usage {
 
 fun File.getExtension(): String? = MimeTypeMap.getFileExtensionFromUrl(getUri().toString())
 
-fun File.getUri(): Uri? = Uri.fromFile(this)
+fun File.getUri(): Uri = Uri.fromFile(this)
 
-fun File.getProviderUri(context: Context): Uri? = FileProvider.getUriForFile(context, "${context.applicationContext.packageName}.fileprovider", this)
+fun File.getProviderUri(context: Context): Uri? = FileProvider.getUriForFile(
+    context,
+    "${context.applicationContext.packageName}.fileprovider",
+    this
+)
 
-fun File.getMime(context: Context): String? {
-    if(this.isDirectory) {
+fun File.getMimeType(context: Context): String? {
+    if (this.isDirectory) {
         return null
     }
 
-    var type: String? = null
-    getExtension()?.let { type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(it.toLower()) }
-
-    if(type == null) {
-        getUri()?.let {
-            if(it.scheme == ContentResolver.SCHEME_CONTENT) {
-                type = context.contentResolver.getType(it)
-            }
+    fun fallbackMimeType(uri: Uri): String? {
+        return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+            context.contentResolver.getType(uri)
+        } else {
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(this.getExtension()?.toLower())
         }
     }
 
-    return type
+    fun catchUrlMimeType(): String? {
+        val uri = getUri()
+
+        return if (androidGreaterOr(Build.VERSION_CODES.O)) {
+            val path = Paths.get(uri.toString())
+            try {
+                Files.probeContentType(path) ?: fallbackMimeType(uri)
+            } catch (ignored: Exception) {
+                fallbackMimeType(uri)
+            }
+        } else {
+            fallbackMimeType(uri)
+        }
+    }
+
+    return try {
+        URLConnection.guessContentTypeFromStream(this.inputStream()) ?: catchUrlMimeType()
+    } catch (ignored: Exception) {
+        catchUrlMimeType()
+    }
 }
 
 fun File.getDisplayName(context: Context): String {
@@ -129,7 +155,10 @@ fun File.isAPK(): Boolean {
 
 fun File.getAPKImage(context: Context): Drawable? {
     return if(this.isAPK()) {
-        val packageInfo = context.packageManager.getPackageArchiveInfo(this.absolutePath, PackageManager.GET_ACTIVITIES)
+        val packageInfo = context.packageManager.getPackageArchiveInfo(
+            this.absolutePath,
+            PackageManager.GET_ACTIVITIES
+        )
         if(packageInfo != null) {
             val appInfo = packageInfo.applicationInfo
             appInfo.sourceDir = this.path
@@ -150,4 +179,72 @@ fun File.getPermissions(): Pair<Boolean, Boolean> {
         Environment.MEDIA_MOUNTED_READ_ONLY -> Pair(first = true, second = false)
         else -> Pair(first = false, second = false)
     }
+}
+
+fun File.copyTo(
+    target: File,
+    overwrite: Boolean = false,
+    bufferSize: Int = DEFAULT_BUFFER_SIZE,
+    listener: ((Float) -> Unit)? = null
+): File {
+    if (!this.exists()) {
+        throw NoSuchFileException(this, null, "The source file doesn't exist.")
+    }
+
+    if (target.exists()) {
+        if (!overwrite)
+            throw FileAlreadyExistsException(this, target, "The destination file already exists.")
+        else if (!target.delete())
+            throw FileAlreadyExistsException(
+                this,
+                target,
+                "Tried to overwrite the destination, but failed to delete it."
+            )
+    }
+
+    if (this.isDirectory) {
+        if (!target.mkdirs())
+            throw FileSystemException(this, target, "Failed to create target directory.")
+    } else {
+        target.parentFile?.mkdirs()
+
+        this.inputStream().use { input ->
+            target.outputStream().use { output ->
+                input.copyTo(output, bufferSize, this.length(), listener)
+            }
+        }
+    }
+
+    return target
+}
+
+suspend fun File.deleteRecursively(listener: (Float) -> Unit): Boolean {
+    val totalSize = sizeRecursively(FileWalkDirection.BOTTOM_UP)
+    var doneSize: Long = 0
+    return walkBottomUp().fold(true, { res, file ->
+        doneSize += file.length()
+        withContext(Dispatchers.Main) {
+            delay(1000)
+            listener.invoke(((doneSize*100)/totalSize).toFloat())
+        }
+        (file.delete() || !file.exists()) && res
+    })
+}
+
+fun File.sizeRecursively(direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): Long {
+    var size: Long = 0
+    walk(direction).fold(true, { res, file ->
+        size += file.length()
+        file.exists() && res
+    })
+    return size
+}
+
+fun File.countRecursively(direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): Int {
+    var count = 1
+    walk(direction).fold(true, { res, file ->
+        count += file.listFiles()?.size ?: 0
+        file.exists() && res
+    })
+    return count
 }
