@@ -372,8 +372,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
         p0?.let {
             when(it.itemId) {
                 R.id.appsActionPopupFilterName -> appsViewModel.sortType = AppsSortType.NAME
-                R.id.appsActionPopupFilterInstalled -> appsViewModel.sortType =
-                    AppsSortType.INSTALLED
+                R.id.appsActionPopupFilterInstalled -> appsViewModel.sortType = AppsSortType.INSTALLED
                 R.id.appsActionPopupFilterUpdated -> appsViewModel.sortType = AppsSortType.UPDATED
                 else -> appsViewModel.sortType = AppsSortType.NAME
             }
