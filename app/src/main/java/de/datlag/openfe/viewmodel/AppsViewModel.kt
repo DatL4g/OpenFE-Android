@@ -46,9 +46,24 @@ class AppsViewModel @ViewModelInject constructor(
     var sortType = AppsSortType.NAME
         set(value) {
             when (value) {
-                AppsSortType.NAME -> appsSortedByName.value?.let { apps.value = it }
-                AppsSortType.INSTALLED -> appsSortedByInstalled.value?.let { apps.value = it }
-                AppsSortType.UPDATED -> appsSortedByUpdated.value?.let { apps.value = it }
+                AppsSortType.NAME -> {
+                    if (field == value) {
+                        appsSortedByName.value = appsSortedByName.value?.asReversed()
+                    }
+                    appsSortedByName.value?.let { apps.value = it }
+                }
+                AppsSortType.INSTALLED -> {
+                    if (field == value) {
+                        appsSortedByInstalled.value = appsSortedByInstalled.value?.asReversed()
+                    }
+                    appsSortedByInstalled.value?.let { apps.value = it }
+                }
+                AppsSortType.UPDATED -> {
+                    if (field == value) {
+                        appsSortedByUpdated.value = appsSortedByUpdated.value?.asReversed()
+                    }
+                    appsSortedByUpdated.value?.let { apps.value = it }
+                }
             }
             field = value
         }
