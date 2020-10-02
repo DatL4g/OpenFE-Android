@@ -14,7 +14,6 @@ class StringUnitTest {
         val testString = String()
 
         assertEquals(testString.isNotCleared(), false)
-        assertEquals(!testString.isNotCleared(), true)
     }
 
     @Test
