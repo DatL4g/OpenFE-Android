@@ -15,5 +15,4 @@ object AppModule {
     @Singleton
     @Provides
     fun providePackageManager(app: Application): PackageManager = app.applicationContext.packageManager
-
 }

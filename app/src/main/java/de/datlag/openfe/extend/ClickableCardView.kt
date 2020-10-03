@@ -22,5 +22,4 @@ open class ClickableCardView @JvmOverloads constructor(context: Context, attrs: 
 
         selectorStateList?.let { this.setCardBackgroundColor(it) }
     }
-
 }

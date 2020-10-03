@@ -25,9 +25,9 @@ import java.util.zip.ZipInputStream
 
 fun File.getRootOfStorage(): String {
     var file = this
-    while(true) {
+    while (true) {
         val parentFile = file.parentFile ?: if (file.parent != null) File(file.parent!!) else null
-        if(parentFile == null || parentFile.totalSpace != file.totalSpace) {
+        if (parentFile == null || parentFile.totalSpace != file.totalSpace) {
             return file.absolutePath
         }
         file = parentFile
@@ -104,19 +104,21 @@ fun File.getDisplayName(context: Context): String {
 }
 
 fun File.isInternal(): Boolean {
-    return (this.name.isBlank()
-            || this.name.isEmpty()
-            || this.name == "0"
-            || this.name == "-"
-            || this.name == "sdcard"
-            || this.name == "sdcard0"
-            || this.name == "emulated"
-            || this.name == "legacy")
+    return (
+        this.name.isBlank() ||
+            this.name.isEmpty() ||
+            this.name == "0" ||
+            this.name == "-" ||
+            this.name == "sdcard" ||
+            this.name == "sdcard0" ||
+            this.name == "emulated" ||
+            this.name == "legacy"
+        )
 }
 
 fun File.isAPK(): Boolean {
     val extension = this.getExtension()
-    return if(extension != null && (extension.toLower() == ".apk" || extension.toLower() == "apk")) {
+    return if (extension != null && (extension.toLower() == ".apk" || extension.toLower() == "apk")) {
         true
     } else {
         val fileInputStream: FileInputStream?
@@ -133,12 +135,12 @@ fun File.isAPK(): Boolean {
 
             while (zipInputStream.nextEntry != null) {
                 zipEntry = zipInputStream.nextEntry
-                if(zipEntry.name.toLower() == dexFile.toLower()) {
+                if (zipEntry.name.toLower() == dexFile.toLower()) {
                     hasDex = true
-                } else if(zipEntry.name.toLower() == manifestFile.toLower()) {
+                } else if (zipEntry.name.toLower() == manifestFile.toLower()) {
                     hasManifest = true
                 }
-                if(hasDex && hasManifest) {
+                if (hasDex && hasManifest) {
                     zipInputStream.close()
                     fileInputStream.close()
                     return true
@@ -154,12 +156,12 @@ fun File.isAPK(): Boolean {
 }
 
 fun File.getAPKImage(context: Context): Drawable? {
-    return if(this.isAPK()) {
+    return if (this.isAPK()) {
         val packageInfo = context.packageManager.getPackageArchiveInfo(
             this.absolutePath,
             PackageManager.GET_ACTIVITIES
         )
-        if(packageInfo != null) {
+        if (packageInfo != null) {
             val appInfo = packageInfo.applicationInfo
             appInfo.sourceDir = this.path
             appInfo.publicSourceDir = this.path
@@ -174,7 +176,7 @@ fun File.getAPKImage(context: Context): Drawable? {
 
 // Pair(readable, writeable)
 fun File.getPermissions(): Pair<Boolean, Boolean> {
-    return when(EnvironmentCompat.getStorageState(this)) {
+    return when (EnvironmentCompat.getStorageState(this)) {
         Environment.MEDIA_MOUNTED -> Pair(first = true, second = true)
         Environment.MEDIA_MOUNTED_READ_ONLY -> Pair(first = true, second = false)
         else -> Pair(first = false, second = false)
@@ -221,30 +223,39 @@ fun File.copyTo(
 suspend fun File.deleteRecursively(listener: (Float) -> Unit): Boolean {
     val totalSize = sizeRecursively(FileWalkDirection.BOTTOM_UP)
     var doneSize: Long = 0
-    return walkBottomUp().fold(true, { res, file ->
-        doneSize += file.length()
-        withContext(Dispatchers.Main) {
-            delay(1000)
-            listener.invoke(((doneSize*100)/totalSize).toFloat())
+    return walkBottomUp().fold(
+        true,
+        { res, file ->
+            doneSize += file.length()
+            withContext(Dispatchers.Main) {
+                delay(1000)
+                listener.invoke(((doneSize * 100) / totalSize).toFloat())
+            }
+            (file.delete() || !file.exists()) && res
         }
-        (file.delete() || !file.exists()) && res
-    })
+    )
 }
 
 fun File.sizeRecursively(direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): Long {
     var size: Long = 0
-    walk(direction).fold(true, { res, file ->
-        size += file.length()
-        file.exists() && res
-    })
+    walk(direction).fold(
+        true,
+        { res, file ->
+            size += file.length()
+            file.exists() && res
+        }
+    )
     return size
 }
 
 fun File.countRecursively(direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): Int {
     var count = 1
-    walk(direction).fold(true, { res, file ->
-        count += file.listFiles()?.size ?: 0
-        file.exists() && res
-    })
+    walk(direction).fold(
+        true,
+        { res, file ->
+            count += file.listFiles()?.size ?: 0
+            file.exists() && res
+        }
+    )
     return count
 }

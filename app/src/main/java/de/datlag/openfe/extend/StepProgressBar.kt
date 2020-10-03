@@ -2,17 +2,18 @@ package de.datlag.openfe.extend
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.*
-import android.os.Build
+import android.graphics.drawable.ClipDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.PaintDrawable
+import android.graphics.drawable.ShapeDrawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.ProgressBar
 import androidx.annotation.CallSuper
 import androidx.appcompat.widget.LinearLayoutCompat
 import de.datlag.openfe.R
-import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.commons.mapOf
 
 class StepProgressBar @JvmOverloads constructor(
@@ -158,7 +159,7 @@ class StepProgressBar @JvmOverloads constructor(
     private fun getDefaultHeight(size: Int, measureSpec: Int): Int {
         val specMode = MeasureSpec.getMode(measureSpec)
         val specSize = MeasureSpec.getSize(measureSpec)
-        return when(specMode) {
+        return when (specMode) {
             MeasureSpec.EXACTLY -> specSize
             MeasureSpec.UNSPECIFIED, MeasureSpec.AT_MOST -> size
             else -> size
@@ -220,7 +221,8 @@ class StepProgressBar @JvmOverloads constructor(
             },
             PaintDrawable(stepUndoneColor).apply {
                 setCornerRadius(roundedCorner.toFloat())
-            })
+            }
+        )
     }
 
     @CallSuper

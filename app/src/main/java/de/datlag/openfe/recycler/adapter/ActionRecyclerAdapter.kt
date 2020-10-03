@@ -14,7 +14,7 @@ import kotlinx.android.extensions.LayoutContainer
 
 class ActionRecyclerAdapter : ClickRecyclerAdapter<ActionRecyclerAdapter.ViewHolder>() {
 
-    private val diffCallback = object: DiffUtil.ItemCallback<ActionItem>() {
+    private val diffCallback = object : DiffUtil.ItemCallback<ActionItem>() {
         override fun areItemsTheSame(oldItem: ActionItem, newItem: ActionItem): Boolean {
             return oldItem.actionId == newItem.actionId
         }
@@ -40,7 +40,6 @@ class ActionRecyclerAdapter : ClickRecyclerAdapter<ActionRecyclerAdapter.ViewHol
         override fun onClick(v: View?) {
             clickListener?.invoke(v ?: containerView ?: itemView, adapterPosition)
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -59,5 +58,4 @@ class ActionRecyclerAdapter : ClickRecyclerAdapter<ActionRecyclerAdapter.ViewHol
     }
 
     fun submitList(list: List<ActionItem>) = differ.submitList(list)
-
 }

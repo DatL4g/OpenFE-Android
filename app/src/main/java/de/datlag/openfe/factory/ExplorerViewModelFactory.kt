@@ -8,7 +8,7 @@ import de.datlag.openfe.viewmodel.ExplorerViewModel
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
-class ExplorerViewModelFactory (
+class ExplorerViewModelFactory(
     private val explorerArgs: ExplorerFragmentArgs,
     private val appsViewModel: AppsViewModel
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -17,5 +17,4 @@ class ExplorerViewModelFactory (
     override fun <T : ViewModel?> create(
         modelClass: Class<T>
     ) = ExplorerViewModel(explorerArgs, appsViewModel) as T
-
 }

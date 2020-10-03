@@ -40,7 +40,6 @@ class AppsActionRecyclerAdapter : ClickRecyclerAdapter<AppsActionRecyclerAdapter
         override fun onClick(v: View?) {
             clickListener?.invoke(v ?: containerView ?: itemView, adapterPosition)
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -59,5 +58,4 @@ class AppsActionRecyclerAdapter : ClickRecyclerAdapter<AppsActionRecyclerAdapter
     }
 
     fun submitList(list: List<AppItem>) = differ.submitList(list)
-
 }

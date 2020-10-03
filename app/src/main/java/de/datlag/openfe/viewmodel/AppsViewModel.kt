@@ -27,20 +27,30 @@ class AppsViewModel @ViewModelInject constructor(
     private var firstNonSystemAppsFetch: Boolean = true
 
     private var appsSortedByName: AppLiveData = getApps {
-        appsSortedByName = AppLiveData(it.value?.sortedWith { o1, o2 ->
-            o1.name.compareTo(o2.name, true)
-        })
+        appsSortedByName = AppLiveData(
+            it.value?.sortedWith { o1, o2 ->
+                o1.name.compareTo(o2.name, true)
+            }
+        )
     }
     private var appsSortedByInstalled: AppLiveData = getApps {
-        appsSortedByInstalled = AppLiveData(it.value?.sortedWith { o1, o2 ->
-            o1.firstInstall.compareTo(o2.firstInstall)
-        })
+        appsSortedByInstalled = AppLiveData(
+            it.value?.sortedWith { o1, o2 ->
+                o1.firstInstall.compareTo(o2.firstInstall)
+            }
+        )
     }
     private var appsSortedByUpdated: AppLiveData = getApps {
-        appsSortedByUpdated = AppLiveData(it.value?.sortedWith { o1, o2 ->
-            o1.lastUpdate.compareTo(o2.lastUpdate)
-        })
+        appsSortedByUpdated = AppLiveData(
+            it.value?.sortedWith { o1, o2 ->
+                o1.lastUpdate.compareTo(o2.lastUpdate)
+            }
+        )
     }
+
+    var isAppsSortedByNameReversed = true
+    var isAppsSortedByInstalledReversed = false
+    var isAppsSortedByUpdatedReversed = false
 
     val apps = MediatorLiveData<List<AppItem>>()
     var sortType = AppsSortType.NAME
@@ -49,18 +59,27 @@ class AppsViewModel @ViewModelInject constructor(
                 AppsSortType.NAME -> {
                     if (field == value) {
                         appsSortedByName.value = appsSortedByName.value?.asReversed()
+                        isAppsSortedByNameReversed = !isAppsSortedByNameReversed
+                        isAppsSortedByInstalledReversed = false
+                        isAppsSortedByUpdatedReversed = false
                     }
                     appsSortedByName.value?.let { apps.value = it }
                 }
                 AppsSortType.INSTALLED -> {
                     if (field == value) {
                         appsSortedByInstalled.value = appsSortedByInstalled.value?.asReversed()
+                        isAppsSortedByInstalledReversed = !isAppsSortedByInstalledReversed
+                        isAppsSortedByNameReversed = false
+                        isAppsSortedByUpdatedReversed = false
                     }
                     appsSortedByInstalled.value?.let { apps.value = it }
                 }
                 AppsSortType.UPDATED -> {
                     if (field == value) {
                         appsSortedByUpdated.value = appsSortedByUpdated.value?.asReversed()
+                        isAppsSortedByUpdatedReversed = !isAppsSortedByUpdatedReversed
+                        isAppsSortedByNameReversed = false
+                        isAppsSortedByInstalledReversed = false
                     }
                     appsSortedByUpdated.value?.let { apps.value = it }
                 }
@@ -104,7 +123,7 @@ class AppsViewModel @ViewModelInject constructor(
 
                 var alreadyContaining = false
                 for (app in (if (nonSystemOnly) nonSystemAppList else allAppList)) {
-                    if(app.packageName == item.packageName) {
+                    if (app.packageName == item.packageName) {
                         alreadyContaining = true
                     }
                 }
@@ -115,7 +134,7 @@ class AppsViewModel @ViewModelInject constructor(
             liveData.postValue(if (nonSystemOnly) nonSystemAppList else allAppList)
         }
 
-        if((if (nonSystemOnly) firstNonSystemAppsFetch else firstAllAppsFetch)) {
+        if ((if (nonSystemOnly) firstNonSystemAppsFetch else firstAllAppsFetch)) {
             viewModelScope.launch {
                 job.join()
                 withContext(Dispatchers.Main) {
@@ -128,5 +147,4 @@ class AppsViewModel @ViewModelInject constructor(
 
         return liveData
     }
-
 }

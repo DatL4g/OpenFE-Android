@@ -15,5 +15,4 @@ abstract class ClickRecyclerAdapter<VH : RecyclerView.ViewHolder> : RecyclerView
     fun setOnLongClickListener(listener: ((view: View, position: Int) -> Boolean)) {
         longClickListener = listener
     }
-
 }

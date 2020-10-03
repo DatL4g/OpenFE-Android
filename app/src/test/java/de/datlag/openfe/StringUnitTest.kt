@@ -2,7 +2,7 @@ package de.datlag.openfe
 
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.toLower
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import kotlin.contracts.ExperimentalContracts
 
@@ -23,5 +23,4 @@ class StringUnitTest {
 
         assertEquals(testString.toLower(), actualString)
     }
-
 }

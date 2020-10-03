@@ -6,17 +6,19 @@ import android.content.pm.PackageManager
 import android.os.Build
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Collections
 
 @Suppress("DEPRECATION")
 fun PackageManager.isTelevision(): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             this.hasSystemFeature(PackageManager.FEATURE_TELEVISION) || this.hasSystemFeature(
-                PackageManager.FEATURE_LEANBACK) || this.hasSystemFeature(PackageManager.FEATURE_LEANBACK_ONLY)
+                PackageManager.FEATURE_LEANBACK
+            ) || this.hasSystemFeature(PackageManager.FEATURE_LEANBACK_ONLY)
         } else {
             this.hasSystemFeature(PackageManager.FEATURE_TELEVISION) || this.hasSystemFeature(
-                PackageManager.FEATURE_LEANBACK)
+                PackageManager.FEATURE_LEANBACK
+            )
         }
     } else {
         this.hasSystemFeature(PackageManager.FEATURE_TELEVISION)
@@ -31,7 +33,7 @@ suspend fun PackageManager.loadAppsAsync(nonSystemOnly: Boolean = true, resultIt
     val iterator = apps.iterator()
     while (iterator.hasNext()) {
         val nextItem = iterator.next()
-        if(nonSystemOnly) {
+        if (nonSystemOnly) {
             if (nextItem.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
                 iterator.remove()
                 continue

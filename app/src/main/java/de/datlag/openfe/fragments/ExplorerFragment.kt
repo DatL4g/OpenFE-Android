@@ -4,7 +4,11 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,7 +19,19 @@ import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.FileProgressSheet
-import de.datlag.openfe.commons.*
+import de.datlag.openfe.commons.androidGreaterOr
+import de.datlag.openfe.commons.countRecursively
+import de.datlag.openfe.commons.getColor
+import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.getMimeType
+import de.datlag.openfe.commons.getProviderUri
+import de.datlag.openfe.commons.getUri
+import de.datlag.openfe.commons.isNotCleared
+import de.datlag.openfe.commons.mutableCopyOf
+import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.showBottomSheetFragment
+import de.datlag.openfe.commons.statusBarColor
+import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.factory.ExplorerViewModelFactory
@@ -26,10 +42,9 @@ import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.selects.SelectClause0
-import kotlinx.coroutines.selects.SelectInstance
-import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -179,7 +194,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
     private fun initBottomNavigation() = with(binding) {
         explorerBottomNavigation.setOnNavigationItemSelectedListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.explorerBottomDelete -> {
                     deleteSelectedFiles()
                     true
@@ -190,7 +205,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     }
 
     private fun initSearchView() = with(binding) {
-        explorerSearchView.setOnQueryTextListener(object: SimpleSearchView.OnQueryTextListener{
+        explorerSearchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (!query.isNotCleared()) {
                     explorerViewModel.isSearching = false
@@ -297,5 +312,4 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     companion object {
         fun newInstance() = ExplorerFragment()
     }
-
 }

@@ -1,6 +1,11 @@
 package de.datlag.openfe.commons
 
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import kotlin.math.min
 
 fun Bitmap.applyBorder(borderSize: Float = 2F, borderColor: Int = Color.WHITE): Bitmap {

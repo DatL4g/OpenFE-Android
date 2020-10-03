@@ -11,16 +11,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import de.datlag.openfe.R
-import de.datlag.openfe.commons.*
+import de.datlag.openfe.commons.applyBorder
+import de.datlag.openfe.commons.fillTransparent
+import de.datlag.openfe.commons.getAPKImage
+import de.datlag.openfe.commons.getUri
+import de.datlag.openfe.commons.isAPK
+import de.datlag.openfe.commons.tint
+import de.datlag.openfe.commons.toBitmap
 import de.datlag.openfe.databinding.ExplorerItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
 
-    private val diffCallback = object: DiffUtil.ItemCallback<ExplorerItem>() {
+    private val diffCallback = object : DiffUtil.ItemCallback<ExplorerItem>() {
         override fun areItemsTheSame(oldItem: ExplorerItem, newItem: ExplorerItem): Boolean {
             return oldItem.fileItem.file.absolutePath == newItem.fileItem.file.absolutePath
         }
@@ -53,7 +62,6 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
         override fun onLongClick(p0: View?): Boolean {
             return longClickListener?.invoke(p0 ?: containerView ?: itemView, adapterPosition) ?: true
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -126,5 +134,4 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
     }
 
     fun submitList(list: List<ExplorerItem>) = differ.submitList(list)
-
 }

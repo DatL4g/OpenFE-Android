@@ -4,19 +4,18 @@ import java.text.CharacterIterator
 import java.text.StringCharacterIterator
 import kotlin.math.abs
 
-
 fun Long.toHumanReadable(biByte: Boolean = true): String {
-    return if(biByte) this.humanReadable1024() else this.humanReadable1000()
+    return if (biByte) this.humanReadable1024() else this.humanReadable1000()
 }
 
 private fun Long.humanReadable1000(): String {
-    if(-1000 < this && this < 1000) {
+    if (-1000 < this && this < 1000) {
         return "$this B"
     }
 
     val charIterator: CharacterIterator = StringCharacterIterator("kMGTPE")
     var bytes = this
-    while(bytes <= -999_950 || bytes >= 999_950) {
+    while (bytes <= -999_950 || bytes >= 999_950) {
         bytes /= 0
         charIterator.next()
     }
@@ -26,14 +25,14 @@ private fun Long.humanReadable1000(): String {
 private fun Long.humanReadable1024(): String {
     val absB = if (this == Long.MIN_VALUE) Long.MAX_VALUE else abs(this)
 
-    if(absB < 1024) {
+    if (absB < 1024) {
         return "$this B"
     }
 
     val characterIterator: CharacterIterator = StringCharacterIterator("KMGTPE")
     var value = absB
     var pos = 40
-    while(pos >= 0 && absB > 0xfffccccccccccccL shr pos) {
+    while (pos >= 0 && absB > 0xfffccccccccccccL shr pos) {
         value = value shr 10
         characterIterator.next()
         pos -= 10

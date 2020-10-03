@@ -6,7 +6,13 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.view.*
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
@@ -26,7 +32,17 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.AppsActionInfoSheet
 import de.datlag.openfe.bottomsheets.ConfirmActionSheet
-import de.datlag.openfe.commons.*
+import de.datlag.openfe.commons.androidGreaterOr
+import de.datlag.openfe.commons.getColor
+import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.getPermissions
+import de.datlag.openfe.commons.isNotCleared
+import de.datlag.openfe.commons.isTelevision
+import de.datlag.openfe.commons.mutableCopyOf
+import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.showBottomSheetFragment
+import de.datlag.openfe.commons.statusBarColor
+import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.factory.AppsActionViewModelFactory
@@ -41,7 +57,6 @@ import de.datlag.openfe.viewmodel.AppsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -50,7 +65,7 @@ import kotlin.contracts.contract
 class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
 
     private val args: AppsFragmentArgs by navArgs()
-    private val viewModel: AppsActionViewModel by viewModels{ AppsActionViewModelFactory(args) }
+    private val viewModel: AppsActionViewModel by viewModels { AppsActionViewModelFactory(args) }
     private val appsViewModel: AppsViewModel by viewModels()
     private lateinit var binding: FragmentAppsActionBinding
 
@@ -151,9 +166,9 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                                     newText,
                                     true
                                 ) && !nextItem.packageName.contains(
-                                    newText,
-                                    true
-                                )
+                                        newText,
+                                        true
+                                    )
                             ) {
                                 iterator.remove()
                                 continue
@@ -178,7 +193,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     private fun initBottomNavigation() = with(binding) {
         appsActionBottomNavigation.setOnNavigationItemSelectedListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.appsActionBottomUninstallApp -> {
                     requestUninstall()
                     true
@@ -202,7 +217,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     private fun loadAppsAsync() = with(binding) {
         appsViewModel.apps.observe(viewLifecycleOwner) { list ->
-            if(list.isNotEmpty()) {
+            if (list.isNotEmpty()) {
                 adapter.submitList(list)
                 copiedList = list.mutableCopyOf()
                 loadingTextView.visibility = View.GONE
@@ -216,7 +231,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     @ExperimentalContracts
     private fun requestUninstall() {
-        if(itemValid()) {
+        if (itemValid()) {
             val intent = Intent(Intent.ACTION_DELETE)
             intent.data = Uri.parse("package:${viewModel.selectedApp!!.packageName}")
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -226,7 +241,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     @ExperimentalContracts
     private fun requestLaunch() {
-        if(itemValid()) {
+        if (itemValid()) {
             startActivity(saveContext.packageManager.getLaunchIntentForPackage(viewModel.selectedApp!!.packageName))
         }
     }
@@ -236,8 +251,30 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
         if (itemValid()) {
             checkWritePermission { writeable ->
                 if (writeable && checkManageFilePermission()) {
+                    backupConfirmDialog(viewModel.selectedApp!!)
+                }
+            }
+        }
+    }
 
-                    val originalFile = File(viewModel.selectedApp!!.publicSourceDir)
+    private fun backupConfirmDialog(item: AppItem) {
+        val confirmActionSheet = ConfirmActionSheet.newInstance()
+
+        confirmActionSheet.title = "Backup ${item.name}"
+        confirmActionSheet.text = "The backup file is created in the folder OpenFE/Apps/${item.name}-Backup and can be installed and shared from there"
+        confirmActionSheet.leftText = "Cancel"
+        confirmActionSheet.rightText = "Backup"
+        confirmActionSheet.closeOnLeftClick = true
+        confirmActionSheet.closeOnRightClick = true
+        confirmActionSheet.rightClickListener = {
+            backupProgressDialog(item)
+        }
+        showBottomSheetFragment(confirmActionSheet)
+    }
+
+    private fun backupProgressDialog(item: AppItem) {
+        /*
+        val originalFile = File(viewModel.selectedApp!!.publicSourceDir)
                     val fileName = "${viewModel.selectedApp!!.name}-Backup"
                     val storage = File("${viewModel.storageFile.absolutePath}${File.separator}OpenFE${File.separator}Apps")
                     val createFolderSuccess = if (!storage.exists()) { storage.mkdirs() } else { true }
@@ -261,10 +298,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                             }
                         }
                     }
-
-                }
-            }
-        }
+         */
     }
 
     private fun checkManageFilePermission(): Boolean {
@@ -288,7 +322,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     @ExperimentalContracts
     private fun requestInfo() {
-        if(itemValid()) {
+        if (itemValid()) {
             showBottomSheetFragment(AppsActionInfoSheet.newInstance(viewModel.selectedApp!!))
         }
     }
@@ -303,31 +337,43 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     }
 
     private fun checkWritePermission(granted: (writeable: Boolean) -> Unit) {
-        PermissionChecker.checkWriteStorage(saveContext, object : PermissionListener {
-            override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                granted.invoke(viewModel.storageFile.getPermissions().second)
-            }
+        PermissionChecker.checkWriteStorage(
+            saveContext,
+            object : PermissionListener {
+                override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                    granted.invoke(viewModel.storageFile.getPermissions().second)
+                }
 
-            override fun onPermissionRationaleShouldBeShown(
-                p0: PermissionRequest?,
-                p1: PermissionToken?
-            ) {
-                showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
-            }
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?,
+                    p1: PermissionToken?
+                ) {
+                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
+                }
 
-            override fun onPermissionDenied(p0: PermissionDeniedResponse?) { }
-        })
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) { }
+            }
+        )
     }
 
-    private fun showPopupMenu(anchor: View) {
+    private fun showPopupMenu(anchor: View) = with(appsViewModel) {
         val popupMenu = PopupMenu(saveContext, anchor)
         popupMenu.menuInflater.inflate(R.menu.apps_action_popup_menu, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener(this)
+        if (isAppsSortedByNameReversed) {
+            popupMenu.menu.getItem(0).title = "Name (Reversed)"
+        }
+        if (isAppsSortedByInstalledReversed) {
+            popupMenu.menu.getItem(1).title = "Name (Reversed)"
+        }
+        if (isAppsSortedByUpdatedReversed) {
+            popupMenu.menu.getItem(2).title = "Name (Reversed)"
+        }
+        popupMenu.setOnMenuItemClickListener(this@AppsFragment)
         popupMenu.show()
     }
 
     private fun setupMenuItemClickListener(item: MenuItem): Boolean {
-        when(item.itemId) {
+        when (item.itemId) {
             R.id.appsActionFilterItem -> {
                 showPopupMenu(item.actionView ?: requireView().rootView.findViewById(item.itemId))
             }
@@ -349,28 +395,32 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     private fun updateToolbar() {
         if (itemValid()) {
             (activity as AdvancedActivity).supportActionBar?.title = viewModel.selectedApp!!.name
-            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp)?.apply {
-                tint(
-                    getColor(
-                        R.color.appsActionToolbarIconTint
+            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(
+                getDrawable(R.drawable.ic_close_24dp)?.apply {
+                    tint(
+                        getColor(
+                            R.color.appsActionToolbarIconTint
+                        )
                     )
-                )
-            })
+                }
+            )
         } else {
             (activity as AdvancedActivity).supportActionBar?.title = saveContext.getString(R.string.app_name)
-            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
-                tint(
-                    getColor(
-                        R.color.appsActionToolbarIconTint
+            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(
+                getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
+                    tint(
+                        getColor(
+                            R.color.appsActionToolbarIconTint
+                        )
                     )
-                )
-            })
+                }
+            )
         }
     }
 
     override fun onMenuItemClick(p0: MenuItem?): Boolean {
         p0?.let {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.appsActionPopupFilterName -> appsViewModel.sortType = AppsSortType.NAME
                 R.id.appsActionPopupFilterInstalled -> appsViewModel.sortType = AppsSortType.INSTALLED
                 R.id.appsActionPopupFilterUpdated -> appsViewModel.sortType = AppsSortType.UPDATED
@@ -384,8 +434,8 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
         inflater.inflate(R.menu.apps_action_toolbar_menu, menu)
         menu?.let {
             appsActionSearchView.setMenuItem(it.findItem(R.id.appsActionSearchItem))
-            for(item in it.iterator()) {
-                if(item.itemId != R.id.appsActionSearchItem) {
+            for (item in it.iterator()) {
+                if (item.itemId != R.id.appsActionSearchItem) {
                     item.setOnMenuItemClickListener { menuItem ->
                         return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
                     }
@@ -402,5 +452,4 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     companion object {
         fun newInstance() = AppsFragment()
     }
-
 }

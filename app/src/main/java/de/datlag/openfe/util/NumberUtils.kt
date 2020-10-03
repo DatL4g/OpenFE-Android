@@ -4,13 +4,13 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.graphics.Color
 import android.os.Build
-import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.IntDef
 import androidx.core.graphics.ColorUtils
 import de.datlag.openfe.commons.androidGreaterOr
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object NumberUtils {
 
@@ -38,7 +38,6 @@ object NumberUtils {
     @Retention(AnnotationRetention.SOURCE)
     annotation class AppInstallLocation
 
-
     @JvmStatic
     @JvmOverloads
     fun convertToDate(milli: Long, format: String = DEFAULT_DATE_FORMAT): String {
@@ -60,7 +59,7 @@ object NumberUtils {
     @JvmStatic
     @AppCategory
     fun getAppCategory(value: Int): Int {
-        return when(value) {
+        return when (value) {
             CATEGORY_GAME -> CATEGORY_GAME
             CATEGORY_AUDIO -> CATEGORY_AUDIO
             CATEGORY_VIDEO -> CATEGORY_VIDEO
@@ -92,7 +91,7 @@ object NumberUtils {
     @JvmStatic
     @AppInstallLocation
     fun getAppInstallLocation(value: Int): Int {
-        return when(value) {
+        return when (value) {
             INSTALL_LOCATION_INTERNAL_ONLY -> INSTALL_LOCATION_INTERNAL_ONLY
             INSTALL_LOCATION_PREFER_EXTERNAL -> INSTALL_LOCATION_PREFER_EXTERNAL
             else -> INSTALL_LOCATION_AUTO
@@ -113,7 +112,7 @@ object NumberUtils {
 
     @JvmStatic
     @AppInstallLocation
-    fun getAppInstallLocation(packageInfo: PackageInfo) =getAppInstallLocation(if (androidGreaterOr(Build.VERSION_CODES.LOLLIPOP)) packageInfo.installLocation else INSTALL_LOCATION_AUTO)
+    fun getAppInstallLocation(packageInfo: PackageInfo) = getAppInstallLocation(if (androidGreaterOr(Build.VERSION_CODES.LOLLIPOP)) packageInfo.installLocation else INSTALL_LOCATION_AUTO)
 
     fun useStatusBarDarkContrast(@ColorInt color: Int): Boolean {
         val whiteContrast = ColorUtils.calculateContrast(Color.WHITE, color)

@@ -15,15 +15,17 @@ class App : MultiDexApplication() {
     }
 
     private fun applyFont() {
-        ViewPump.init(ViewPump.builder()
-            .addInterceptor(
-                CalligraphyInterceptor(
-                    CalligraphyConfig.Builder()
-                        .setDefaultFontPath(this.getString(R.string.font_path))
-                        .setFontAttrId(R.attr.fontPath)
-                        .build())
-            )
-            .build())
+        ViewPump.init(
+            ViewPump.builder()
+                .addInterceptor(
+                    CalligraphyInterceptor(
+                        CalligraphyConfig.Builder()
+                            .setDefaultFontPath(this.getString(R.string.font_path))
+                            .setFontAttrId(R.attr.fontPath)
+                            .build()
+                    )
+                )
+                .build()
+        )
     }
-
 }

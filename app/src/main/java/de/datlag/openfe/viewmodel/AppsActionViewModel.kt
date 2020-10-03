@@ -9,5 +9,4 @@ class AppsActionViewModel(appsActionArgs: AppsFragmentArgs) : ViewModel() {
 
     val storageFile = File(appsActionArgs.filePath)
     var selectedApp: AppItem? = null
-
 }

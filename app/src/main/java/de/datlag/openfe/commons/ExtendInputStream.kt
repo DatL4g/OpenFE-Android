@@ -13,7 +13,7 @@ fun InputStream.copyTo(out: OutputStream, bufferSize: Int = DEFAULT_BUFFER_SIZE,
         out.write(buffer, 0, bytes)
         bytesCopied += bytes
         bytes = read(buffer)
-        listener?.invoke(((bytesCopied*100)/length).toFloat())
+        listener?.invoke(((bytesCopied * 100) / length).toFloat())
     }
     return bytesCopied
 }

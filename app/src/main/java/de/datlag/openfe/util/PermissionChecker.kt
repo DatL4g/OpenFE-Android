@@ -44,7 +44,5 @@ class PermissionChecker {
             }
             return confirmActionSheet
         }
-
     }
-
 }

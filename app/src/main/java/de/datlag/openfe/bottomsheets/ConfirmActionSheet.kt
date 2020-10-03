@@ -92,7 +92,7 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        
+
         val touchOutsideView = dialog?.window?.decorView?.findViewById<View>(com.google.android.material.R.id.touch_outside)
         touchOutsideView?.setOnClickListener {
             dialog?.cancel()
@@ -138,5 +138,4 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
     companion object {
         fun newInstance() = ConfirmActionSheet()
     }
-
 }

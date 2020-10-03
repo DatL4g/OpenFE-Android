@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.commons.expand
 import de.datlag.openfe.commons.isNotCleared
@@ -65,7 +63,7 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
     }
 
     private fun categoryToString(@NumberUtils.AppCategory category: Int): String {
-        return when(category) {
+        return when (category) {
             CATEGORY_GAME -> "Game"
             CATEGORY_AUDIO -> "Audio"
             CATEGORY_VIDEO -> "Video"
@@ -79,7 +77,7 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
     }
 
     private fun installLocationToString(@NumberUtils.AppInstallLocation installLocation: Int): String {
-        return when(installLocation) {
+        return when (installLocation) {
             INSTALL_LOCATION_INTERNAL_ONLY -> "Internal Only"
             INSTALL_LOCATION_PREFER_EXTERNAL -> "Prefer External"
             else -> "Automatic"
@@ -94,5 +92,4 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
             return AppsActionInfoSheet()
         }
     }
-
 }

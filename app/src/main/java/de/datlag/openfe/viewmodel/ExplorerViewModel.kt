@@ -5,7 +5,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.bottomsheets.FileProgressSheet
-import de.datlag.openfe.commons.*
+import de.datlag.openfe.commons.deleteRecursively
+import de.datlag.openfe.commons.getRootOfStorage
+import de.datlag.openfe.commons.isInternal
+import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
@@ -71,16 +74,16 @@ class ExplorerViewModel(
     private fun matchDirectoryWithApps(explorerItem: ExplorerItem, list: AppList): ExplorerItem {
         return try {
             for (appItem in list) {
-                if (explorerItem.fileItem.name?.equals(appItem.name, true) == true
-                    || explorerItem.fileItem.name?.equals(appItem.packageName, true) == true
-                    || explorerItem.fileItem.file.name.equals(appItem.name, true)
-                    || explorerItem.fileItem.file.name.equals(appItem.packageName, true)
-                    || explorerItem.fileItem.file.path.equals(appItem.sourceDir, true)
-                    || explorerItem.fileItem.file.path.equals(appItem.publicSourceDir, true)
-                    || explorerItem.fileItem.file.path.equals(appItem.dataDir, true)
-                    || explorerItem.fileItem.file.absolutePath.equals(appItem.sourceDir, true)
-                    || explorerItem.fileItem.file.absolutePath.equals(appItem.publicSourceDir, true)
-                    || explorerItem.fileItem.file.absolutePath.equals(appItem.dataDir, true)
+                if (explorerItem.fileItem.name?.equals(appItem.name, true) == true ||
+                    explorerItem.fileItem.name?.equals(appItem.packageName, true) == true ||
+                    explorerItem.fileItem.file.name.equals(appItem.name, true) ||
+                    explorerItem.fileItem.file.name.equals(appItem.packageName, true) ||
+                    explorerItem.fileItem.file.path.equals(appItem.sourceDir, true) ||
+                    explorerItem.fileItem.file.path.equals(appItem.publicSourceDir, true) ||
+                    explorerItem.fileItem.file.path.equals(appItem.dataDir, true) ||
+                    explorerItem.fileItem.file.absolutePath.equals(appItem.sourceDir, true) ||
+                    explorerItem.fileItem.file.absolutePath.equals(appItem.publicSourceDir, true) ||
+                    explorerItem.fileItem.file.absolutePath.equals(appItem.dataDir, true)
                 ) {
                     explorerItem.appItem = appItem
                 }
@@ -101,7 +104,6 @@ class ExplorerViewModel(
 
         if (newPath.isDirectory) {
             val fileList = newPath.listFiles()?.toMutableList() ?: mutableListOf()
-
 
             val rootFile =
                 explorerFragmentArgs.storage.list[explorerFragmentArgs.storage.item].rootFile
@@ -124,12 +126,13 @@ class ExplorerViewModel(
                 val parentFile = ExplorerItem(
                     FileItem(
                         newPath.parentFile
-                            ?: if (newPath.parent != null) File(newPath.parent!!) else newPath, ".."
-                    ), null, false
+                            ?: if (newPath.parent != null) File(newPath.parent!!) else newPath,
+                        ".."
+                    ),
+                    null, false
                 )
                 directories.value = mutableListOf(parentFile)
             }
-
 
             currentDirectory = newPath
 

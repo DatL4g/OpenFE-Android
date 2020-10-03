@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
 
-
 val Fragment.saveContext: Context
     get() = this.context ?: this.activity ?: this.requireContext()
 

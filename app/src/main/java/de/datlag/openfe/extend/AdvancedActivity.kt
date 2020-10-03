@@ -17,11 +17,10 @@ abstract class AdvancedActivity : AppCompatActivity() {
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        if(newBase != null) {
+        if (newBase != null) {
             super.attachBaseContext(ViewPumpContextWrapper.wrap(newBase))
         } else {
             super.attachBaseContext(newBase)
         }
     }
-
 }

@@ -14,18 +14,18 @@ import java.io.File
 fun Context.getStorageVolumes(): Array<Usage> {
     val usageList = mutableListOf<Usage>()
 
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val storageManager = this.getSystemService(Context.STORAGE_SERVICE) as StorageManager
         val storageVolumes = storageManager.storageVolumes
         val storageStatsManager = this.getSystemService(Context.STORAGE_STATS_SERVICE) as StorageStatsManager
 
-        for(storageVolume in storageVolumes) {
+        for (storageVolume in storageVolumes) {
             var freeSpace = 0L
             var totalSpace = 0L
             val path = this.getPath(storageVolume)
-            val storageFile = if(path != null) File(path) else continue
+            val storageFile = if (path != null) File(path) else continue
 
-            if(storageVolume.isPrimary) {
+            if (storageVolume.isPrimary) {
                 totalSpace = storageStatsManager.getTotalBytes(StorageManager.UUID_DEFAULT)
                 freeSpace = storageStatsManager.getFreeBytes(StorageManager.UUID_DEFAULT)
             } else {
@@ -46,7 +46,7 @@ fun Context.getStorageVolumes(): Array<Usage> {
     } else {
         val externalFiles = ContextCompat.getExternalFilesDirs(this, null)
 
-        for(storageFile in externalFiles) {
+        for (storageFile in externalFiles) {
             usageList.add(storageFile.getUsage())
         }
     }
@@ -69,16 +69,16 @@ fun Context.getPath(storageVolume: StorageVolume): String? {
     } catch (ignored: Exception) { }
 
     val extDirs = ContextCompat.getExternalFilesDirs(this, null)
-    for(extDir in extDirs) {
+    for (extDir in extDirs) {
         val storageManager = this.getSystemService(Context.STORAGE_SERVICE) as StorageManager
         val fileStorageVolume: StorageVolume = storageManager.getStorageVolume(extDir) ?: continue
 
-        if(fileStorageVolume == storageVolume) {
+        if (fileStorageVolume == storageVolume) {
             var file = extDir
-            while(true) {
+            while (true) {
                 val parent = file.parentFile ?: return file.absolutePath
                 val parentStorageVolume = storageManager.getStorageVolume(parent) ?: return file.absolutePath
-                if(parentStorageVolume != storageVolume) {
+                if (parentStorageVolume != storageVolume) {
                     return file.absolutePath
                 }
                 file = parent

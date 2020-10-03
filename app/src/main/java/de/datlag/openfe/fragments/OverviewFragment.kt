@@ -1,7 +1,6 @@
 package de.datlag.openfe.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
@@ -18,9 +17,14 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import de.datlag.openfe.R
-import de.datlag.openfe.bottomsheets.ConfirmActionSheet
-import de.datlag.openfe.bottomsheets.FileProgressSheet
-import de.datlag.openfe.commons.*
+import de.datlag.openfe.commons.getColor
+import de.datlag.openfe.commons.getDisplayName
+import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.getStorageVolumes
+import de.datlag.openfe.commons.isTelevision
+import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.showBottomSheetFragment
+import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedActivity
@@ -48,7 +52,8 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val contextThemeWrapper = ContextThemeWrapper(saveContext, R.style.OverviewFragmentTheme)
@@ -77,12 +82,11 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
             submitList(locationList)
         }
 
-
         actionRecycler.isNestedScrollingEnabled = false
-        actionRecycler.layoutManager = GridLayoutManager(saveContext, if(saveContext.packageManager.isTelevision()) 5 else 3)
+        actionRecycler.layoutManager = GridLayoutManager(saveContext, if (saveContext.packageManager.isTelevision()) 5 else 3)
         actionRecycler.adapter = ActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
-                when(actionList[position].actionId) {
+                when (actionList[position].actionId) {
                     R.id.action_OverviewFragment_to_AppsActionFragment -> {
                         val action = OverviewFragmentDirections.actionOverviewFragmentToAppsActionFragment(locationList[0].usage.file.absolutePath)
                         findNavController().navigate(action)
@@ -99,7 +103,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         val locationList = mutableListOf<LocationItem>()
 
         for (usageStat in usageStats) {
-            if(usageStat.max != 0L && usageStat.current != 0L) {
+            if (usageStat.max != 0L && usageStat.current != 0L) {
                 locationList.add(LocationItem(usageStat.file.getDisplayName(saveContext), usageStat))
             }
         }
@@ -121,26 +125,27 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
     }
 
     private fun checkReadPermission(position: Int) {
-        PermissionChecker.checkReadStorage(saveContext, object: PermissionListener{
-            override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                val action = OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
-                    ExplorerFragmentStorageArgs(locationList, position)
-                )
-                findNavController().navigate(action)
+        PermissionChecker.checkReadStorage(
+            saveContext,
+            object : PermissionListener {
+                override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
+                    val action = OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
+                        ExplorerFragmentStorageArgs(locationList, position)
+                    )
+                    findNavController().navigate(action)
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    p0: PermissionRequest?,
+                    p1: PermissionToken?
+                ) {
+                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
+                }
+
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
+                }
             }
-
-            override fun onPermissionRationaleShouldBeShown(
-                p0: PermissionRequest?,
-                p1: PermissionToken?
-            ) {
-                showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
-            }
-
-            override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
-
-            }
-
-        })
+        )
     }
 
     override fun onResume() {
@@ -149,7 +154,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
     }
 
     override fun onBackPressed(): Boolean = with(binding) {
-        return if(drawer.isDrawerOpen(GravityCompat.START)) {
+        return if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START)
             false
         } else {

@@ -22,7 +22,7 @@ class MainActivity : AdvancedActivity() {
     override fun onBackPressed() {
         val pressed: Boolean = (getCurrentNavFragment() as? FragmentBackPressed?)?.onBackPressed() ?: true
 
-        if(pressed) {
+        if (pressed) {
             super.onBackPressed()
         }
     }

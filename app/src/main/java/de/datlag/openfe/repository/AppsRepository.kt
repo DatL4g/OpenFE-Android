@@ -11,5 +11,4 @@ class AppsRepository @Inject constructor(
 ) {
 
     suspend fun loadApps(nonSystemOnly: Boolean = true, resultItem: ((Pair<ApplicationInfo, PackageInfo>) -> Unit)? = null) = packageManager.loadAppsAsync(nonSystemOnly, resultItem)
-
 }
