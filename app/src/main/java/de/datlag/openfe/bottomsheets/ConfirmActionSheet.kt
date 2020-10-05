@@ -12,7 +12,7 @@ import de.datlag.openfe.commons.getDimenInPixel
 import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
-import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.setMargin
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.databinding.ConfirmActionSheetBinding
@@ -42,7 +42,7 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
             this?.confirmSheetButtonLeft?.text = field
             if (!field.isNotCleared()) {
                 this?.confirmSheetButtonLeft?.hide()
-                this?.confirmSheetButtonRight?.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+                this?.confirmSheetButtonRight?.setMargin(0, *MarginSide.horizontal())
             } else {
                 this?.confirmSheetButtonLeft?.show()
                 context?.let { this?.confirmSheetButtonRight?.setMargin(it.getDimenInPixel(R.dimen.confirmSheetButtonSideMargin), *MarginSide.horizontal()) }
@@ -55,7 +55,7 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
             this?.confirmSheetButtonRight?.text = field
             if (!field.isNotCleared()) {
                 this?.confirmSheetButtonRight?.hide()
-                this?.confirmSheetButtonLeft?.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+                this?.confirmSheetButtonLeft?.setMargin(0, *MarginSide.horizontal())
             } else {
                 this?.confirmSheetButtonRight?.show()
                 context?.let { this?.confirmSheetButtonLeft?.setMargin(it.getDimenInPixel(R.dimen.confirmSheetButtonSideMargin), *MarginSide.horizontal()) }
@@ -95,7 +95,7 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
     ): View? {
         binding = ConfirmActionSheetBinding.inflate(inflater, container, false)
 
-        if (saveContext.packageManager.isTelevision()) {
+        if (safeContext.packageManager.isTelevision()) {
             dialog?.setOnShowListener {
                 it.expand()
             }
@@ -143,18 +143,18 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
 
         if (!leftText.isNotCleared()) {
             confirmSheetButtonLeft.hide()
-            confirmSheetButtonRight.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+            confirmSheetButtonRight.setMargin(0, *MarginSide.horizontal())
         } else {
             confirmSheetButtonLeft.show()
-            confirmSheetButtonRight.setMargin(saveContext.getDimenInPixel(R.dimen.confirmSheetButtonSideMargin), *MarginSide.horizontal())
+            confirmSheetButtonRight.setMargin(safeContext.getDimenInPixel(R.dimen.confirmSheetButtonSideMargin), *MarginSide.horizontal())
         }
 
         if (!rightText.isNotCleared()) {
             confirmSheetButtonRight.hide()
-            confirmSheetButtonLeft.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+            confirmSheetButtonLeft.setMargin(0, *MarginSide.horizontal())
         } else {
             confirmSheetButtonRight.show()
-            confirmSheetButtonLeft.setMargin(saveContext.getDimenInPixel(R.dimen.confirmSheetButtonSideMargin), *MarginSide.horizontal())
+            confirmSheetButtonLeft.setMargin(safeContext.getDimenInPixel(R.dimen.confirmSheetButtonSideMargin), *MarginSide.horizontal())
         }
     }
 

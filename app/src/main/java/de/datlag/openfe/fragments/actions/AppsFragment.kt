@@ -41,7 +41,7 @@ import de.datlag.openfe.commons.getPermissions
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.mutableCopyOf
-import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.tint
@@ -89,10 +89,10 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val contextThemeWrapper = ContextThemeWrapper(saveContext, R.style.AppsActionFragmentTheme)
+        val contextThemeWrapper = ContextThemeWrapper(safeContext, R.style.AppsActionFragmentTheme)
         val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
 
-        saveContext.theme.applyStyle(R.style.AppsActionFragmentTheme, true)
+        safeContext.theme.applyStyle(R.style.AppsActionFragmentTheme, true)
         binding = FragmentAppsActionBinding.inflate(clonedLayoutInflater, container, false)
         return binding.root
     }
@@ -120,8 +120,8 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     @ExperimentalContracts
     private fun initRecycler() = with(binding) {
         appsActionRecycler.layoutManager = GridLayoutManager(
-            saveContext,
-            if (saveContext.packageManager.isTelevision()) 5 else 3
+            safeContext,
+            if (safeContext.packageManager.isTelevision()) 5 else 3
         )
         adapter = AppsActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
@@ -238,14 +238,14 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
             val intent = Intent(Intent.ACTION_DELETE)
             intent.data = Uri.parse("package:${viewModel.selectedApp!!.packageName}")
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            saveContext.startActivity(intent)
+            safeContext.startActivity(intent)
         }
     }
 
     @ExperimentalContracts
     private fun requestLaunch() {
         if (itemValid()) {
-            startActivity(saveContext.packageManager.getLaunchIntentForPackage(viewModel.selectedApp!!.packageName))
+            startActivity(safeContext.packageManager.getLaunchIntentForPackage(viewModel.selectedApp!!.packageName))
         }
     }
 
@@ -339,8 +339,8 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
             if (!Environment.isExternalStorageManager()) {
                 try {
                     val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                    intent.data = Uri.fromParts("package", saveContext.packageName, null)
-                    saveContext.startActivity(intent)
+                    intent.data = Uri.fromParts("package", safeContext.packageName, null)
+                    safeContext.startActivity(intent)
                 } catch (ignored: Exception) {
                     val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                     startActivity(intent)
@@ -371,7 +371,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
 
     private fun checkWritePermission(granted: (writeable: Boolean) -> Unit) {
         PermissionChecker.checkWriteStorage(
-            saveContext,
+            safeContext,
             object : PermissionListener {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                     granted.invoke(viewModel.storageFile.getPermissions().second)
@@ -381,7 +381,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                     p0: PermissionRequest?,
                     p1: PermissionToken?
                 ) {
-                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
+                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(safeContext, p1))
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) { }
@@ -390,7 +390,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     }
 
     private fun showPopupMenu(anchor: View) = with(appsViewModel) {
-        val popupMenu = PopupMenu(saveContext, anchor)
+        val popupMenu = PopupMenu(safeContext, anchor)
         popupMenu.menuInflater.inflate(R.menu.apps_action_popup_menu, popupMenu.menu)
         if (isAppsSortedByNameReversed) {
             popupMenu.menu.getItem(0).title = "Name (Reversed)"
@@ -438,7 +438,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                 }
             )
         } else {
-            (activity as AdvancedActivity).supportActionBar?.title = saveContext.getString(R.string.app_name)
+            (activity as AdvancedActivity).supportActionBar?.title = safeContext.getString(R.string.app_name)
             (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(
                 getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
                     tint(

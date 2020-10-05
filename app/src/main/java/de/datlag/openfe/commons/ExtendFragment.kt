@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
 
-val Fragment.saveContext: Context
+val Fragment.safeContext: Context
     get() = this.context ?: this.activity ?: this.requireContext()
 
 @Suppress("DEPRECATION")
@@ -37,15 +37,15 @@ fun Fragment.statusBarColor(@ColorInt color: Int) {
     }
 }
 
-fun Fragment.getColor(@ColorRes color: Int) = ContextCompat.getColor(saveContext, color)
+fun Fragment.getColor(@ColorRes color: Int) = ContextCompat.getColor(safeContext, color)
 
 fun Fragment.getDrawable(@DrawableRes drawable: Int) = ContextCompat.getDrawable(
-    saveContext,
+    safeContext,
     drawable
 )
 
 fun Fragment.getColorStateList(@ColorRes colorStateList: Int) = ContextCompat.getColorStateList(
-    saveContext,
+    safeContext,
     colorStateList
 )
 

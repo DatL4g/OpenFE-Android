@@ -8,7 +8,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.commons.expand
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
-import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.databinding.AppsActionInfoSheetBinding
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.util.NumberUtils.convertToDate
@@ -26,7 +26,7 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
     ): View? {
         binding = AppsActionInfoSheetBinding.inflate(inflater, container, false)
 
-        if (saveContext.packageManager.isTelevision()) {
+        if (safeContext.packageManager.isTelevision()) {
             dialog?.setOnShowListener {
                 it.expand()
             }
@@ -42,8 +42,8 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
         infoSheetName.text = appData.name
         infoSheetPackage.text = appData.packageName
         infoSheetDescriptionData.text = if (appData.description.isNotCleared() && !appData.description.equals("null", true)) appData.description else "(none)"
-        infoSheetCategoryData.text = appData.category.toString(saveContext)
-        infoSheetInstallLocationData.text = appData.installLocation.toString(saveContext)
+        infoSheetCategoryData.text = appData.category.toString(safeContext)
+        infoSheetInstallLocationData.text = appData.installLocation.toString(safeContext)
         infoSheetFirstInstallData.text = convertToDate(appData.firstInstall)
         infoSheetLastUpdateData.text = convertToDate(appData.lastUpdate)
         infoSheetVersionCodeData.text = appData.versionCode.toString()

@@ -22,7 +22,7 @@ import de.datlag.openfe.commons.getDisplayName
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getStorageVolumes
 import de.datlag.openfe.commons.isTelevision
-import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.data.ExplorerFragmentStorageArgs
@@ -56,10 +56,10 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val contextThemeWrapper = ContextThemeWrapper(saveContext, R.style.OverviewFragmentTheme)
+        val contextThemeWrapper = ContextThemeWrapper(safeContext, R.style.OverviewFragmentTheme)
         val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
 
-        saveContext.theme.applyStyle(R.style.OverviewFragmentTheme, true)
+        safeContext.theme.applyStyle(R.style.OverviewFragmentTheme, true)
         binding = FragmentOverviewBinding.inflate(clonedLayoutInflater, container, false)
         return binding.root
     }
@@ -74,7 +74,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         toggle.syncState()
 
         locationRecycler.isNestedScrollingEnabled = false
-        locationRecycler.layoutManager = LinearLayoutManager(saveContext)
+        locationRecycler.layoutManager = LinearLayoutManager(safeContext)
         locationRecycler.adapter = LocationRecyclerAdapter().apply {
             setOnClickListener { _, position ->
                 checkReadPermission(position)
@@ -83,7 +83,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         }
 
         actionRecycler.isNestedScrollingEnabled = false
-        actionRecycler.layoutManager = GridLayoutManager(saveContext, if (saveContext.packageManager.isTelevision()) 5 else 3)
+        actionRecycler.layoutManager = GridLayoutManager(safeContext, if (safeContext.packageManager.isTelevision()) 5 else 3)
         actionRecycler.adapter = ActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
                 when (actionList[position].actionId) {
@@ -99,12 +99,12 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
     }
 
     private fun getLocationItems(): List<LocationItem> {
-        val usageStats = saveContext.getStorageVolumes()
+        val usageStats = safeContext.getStorageVolumes()
         val locationList = mutableListOf<LocationItem>()
 
         for (usageStat in usageStats) {
             if (usageStat.max != 0L && usageStat.current != 0L) {
-                locationList.add(LocationItem(usageStat.file.getDisplayName(saveContext), usageStat))
+                locationList.add(LocationItem(usageStat.file.getDisplayName(safeContext), usageStat))
             }
         }
 
@@ -126,7 +126,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
 
     private fun checkReadPermission(position: Int) {
         PermissionChecker.checkReadStorage(
-            saveContext,
+            safeContext,
             object : PermissionListener {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                     val action = OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
@@ -139,7 +139,7 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
                     p0: PermissionRequest?,
                     p1: PermissionToken?
                 ) {
-                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(saveContext, p1))
+                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(safeContext, p1))
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) {

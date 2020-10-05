@@ -11,7 +11,7 @@ import de.datlag.openfe.commons.getDimenInPixel
 import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
-import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.setMargin
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.databinding.FileProgressSheetBinding
@@ -41,7 +41,7 @@ class FileProgressSheet : BottomSheetDialogFragment() {
             this?.fileProgressSheetButtonLeft?.text = field
             if (!field.isNotCleared()) {
                 this?.fileProgressSheetButtonLeft?.hide()
-                this?.fileProgressSheetButtonRight?.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+                this?.fileProgressSheetButtonRight?.setMargin(0, *MarginSide.horizontal())
             } else {
                 this?.fileProgressSheetButtonLeft?.show()
                 context?.let { this?.fileProgressSheetButtonRight?.setMargin(it.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal()) }
@@ -54,7 +54,7 @@ class FileProgressSheet : BottomSheetDialogFragment() {
             this?.fileProgressSheetButtonRight?.text = field
             if (!field.isNotCleared()) {
                 this?.fileProgressSheetButtonRight?.hide()
-                this?.fileProgressSheetButtonLeft?.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+                this?.fileProgressSheetButtonLeft?.setMargin(0, *MarginSide.horizontal())
             } else {
                 this?.fileProgressSheetButtonRight?.show()
                 context?.let { this?.fileProgressSheetButtonLeft?.setMargin(it.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal()) }
@@ -97,7 +97,7 @@ class FileProgressSheet : BottomSheetDialogFragment() {
     ): View? {
         binding = FileProgressSheetBinding.inflate(inflater, container, false)
 
-        if (saveContext.packageManager.isTelevision()) {
+        if (safeContext.packageManager.isTelevision()) {
             dialog?.setOnShowListener {
                 it.expand()
             }
@@ -138,18 +138,18 @@ class FileProgressSheet : BottomSheetDialogFragment() {
 
         if (!leftText.isNotCleared()) {
             fileProgressSheetButtonLeft.hide()
-            fileProgressSheetButtonRight.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+            fileProgressSheetButtonRight.setMargin(0, *MarginSide.horizontal())
         } else {
             fileProgressSheetButtonLeft.show()
-            fileProgressSheetButtonRight.setMargin(saveContext.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal())
+            fileProgressSheetButtonRight.setMargin(safeContext.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal())
         }
 
         if (!rightText.isNotCleared()) {
             fileProgressSheetButtonRight.hide()
-            fileProgressSheetButtonLeft.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+            fileProgressSheetButtonLeft.setMargin(0, *MarginSide.horizontal())
         } else {
             fileProgressSheetButtonRight.show()
-            fileProgressSheetButtonLeft.setMargin(saveContext.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal())
+            fileProgressSheetButtonLeft.setMargin(safeContext.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal())
         }
 
         fileProgressBar.max = 0

@@ -29,7 +29,7 @@ import de.datlag.openfe.commons.getProviderUri
 import de.datlag.openfe.commons.getUri
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.mutableCopyOf
-import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.tint
@@ -65,7 +65,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val contextThemeWrapper = ContextThemeWrapper(saveContext, R.style.ExplorerFragmentTheme)
+        val contextThemeWrapper = ContextThemeWrapper(safeContext, R.style.ExplorerFragmentTheme)
         val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
 
         binding = FragmentExplorerBinding.inflate(clonedLayoutInflater, container, false)
@@ -123,7 +123,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
             true
         }
 
-        explorerRecycler.layoutManager = LinearLayoutManagerWrapper(saveContext)
+        explorerRecycler.layoutManager = LinearLayoutManagerWrapper(safeContext)
         explorerRecycler.adapter = recyclerAdapter
         explorerRecycler.setHasFixedSize(true)
     }
@@ -151,11 +151,11 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
                 explorerViewModel.moveToPath(file)
             }
         } else {
-            val mime = file.getMimeType(saveContext)
+            val mime = file.getMimeType(safeContext)
             Log.e("MimeType", mime.toString())
             val intent = Intent(Intent.ACTION_VIEW)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.setDataAndType(file.getProviderUri(saveContext) ?: file.getUri(), mime)
+            intent.setDataAndType(file.getProviderUri(safeContext) ?: file.getUri(), mime)
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
@@ -184,7 +184,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     private fun updateToolbar() = with(binding) {
         if (explorerViewModel.selectedItems.isEmpty()) {
             (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp)?.apply { tint(getColor(R.color.explorerToolbarIconTint)) })
-            (activity as AdvancedActivity).supportActionBar?.title = saveContext.getString(R.string.app_name)
+            (activity as AdvancedActivity).supportActionBar?.title = safeContext.getString(R.string.app_name)
             explorerBottomNavigation.visibility = View.GONE
         } else {
             (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp)?.apply { tint(getColor(R.color.explorerToolbarIconTint)) })
