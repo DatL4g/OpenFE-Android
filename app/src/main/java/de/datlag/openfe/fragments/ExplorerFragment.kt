@@ -18,6 +18,7 @@ import androidx.navigation.fragment.navArgs
 import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
+import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.commons.countRecursively
@@ -196,7 +197,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         explorerBottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.explorerBottomDelete -> {
-                    deleteSelectedFiles()
+                    deleteFilesConfirmDialog()
                     true
                 }
                 else -> false
@@ -266,17 +267,17 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         }
     }
 
-    private fun deleteSelectedFiles() {
+    private fun deleteFilesProgressDialog(items: List<ExplorerItem> = explorerViewModel.selectedItems) {
         val fileProgressSheet = FileProgressSheet.newInstance()
 
         fileProgressSheet.title = "Delete Files..."
-        fileProgressSheet.text = "Deleting ${countSelectedFilesRecursively()} files..."
+        fileProgressSheet.text = "Deleting ${countSelectedFilesRecursively(items)} files..."
         fileProgressSheet.rightText = "Close"
         fileProgressSheet.closeOnRightClick = true
         fileProgressSheet.leftText = "Cancel"
         fileProgressSheet.closeOnLeftClick = true
         fileProgressSheet.updateable = {
-            explorerViewModel.deleteSelectedItems(fileProgressSheet) {
+            explorerViewModel.deleteSelectedItems(fileProgressSheet, items) {
                 fileProgressSheet.leftText = String()
                 fileProgressSheet.rightText = "Done"
                 explorerViewModel.moveToPath(explorerViewModel.currentDirectory)
@@ -288,9 +289,25 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         showBottomSheetFragment(fileProgressSheet)
     }
 
-    private fun countSelectedFilesRecursively(direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): Int {
+    private fun deleteFilesConfirmDialog(items: List<ExplorerItem> = explorerViewModel.selectedItems) {
+        val confirmActionSheet = ConfirmActionSheet.newInstance()
+
+        confirmActionSheet.title = "Delete ${items.size} files"
+        confirmActionSheet.text = "This can not be undone!\nAre you sure you want to delete all selected files and folders (${countSelectedFilesRecursively(items)} in total)"
+        confirmActionSheet.leftText = "Cancel"
+        confirmActionSheet.rightText = "Delete"
+        confirmActionSheet.closeOnLeftClick = true
+        confirmActionSheet.closeOnRightClick = true
+        confirmActionSheet.rightClickListener = {
+            deleteFilesProgressDialog(items)
+        }
+
+        showBottomSheetFragment(confirmActionSheet)
+    }
+
+    private fun countSelectedFilesRecursively(items: List<ExplorerItem> = explorerViewModel.selectedItems, direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): Int {
         var count = 0
-        for (item in explorerViewModel.selectedItems) {
+        for (item in items) {
             count += item.fileItem.file.countRecursively(direction)
         }
         return count

@@ -222,14 +222,14 @@ class ExplorerViewModel(
             }
         }
 
-    fun deleteSelectedItems(sheet: FileProgressSheet, done: (() -> Unit)? = null): Job {
-        val initialList = FloatArray(selectedItems.size)
+    fun deleteSelectedItems(sheet: FileProgressSheet, items: List<ExplorerItem> = selectedItems, done: (() -> Unit)? = null): Job {
+        val initialList = FloatArray(items.size)
         val copyList = initialList.copyOf()
 
         sheet.updateProgressList(initialList)
         val job = viewModelScope.launch(Dispatchers.IO) {
-            for (pos in selectedItems.indices) {
-                selectedItems[pos].fileItem.file.deleteRecursively { percent ->
+            for (pos in items.indices) {
+                items[pos].fileItem.file.deleteRecursively { percent ->
                     copyList[pos] = percent
                     sheet.updateProgressList(copyList)
                 }

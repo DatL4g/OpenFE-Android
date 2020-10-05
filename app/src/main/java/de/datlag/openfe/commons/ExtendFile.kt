@@ -12,7 +12,6 @@ import androidx.core.content.FileProvider
 import androidx.core.os.EnvironmentCompat
 import de.datlag.openfe.data.Usage
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
 import java.io.File
@@ -229,7 +228,6 @@ suspend fun File.deleteRecursively(listener: (Float) -> Unit): Boolean {
         { res, file ->
             doneSize += file.length()
             withContext(Dispatchers.Main) {
-                delay(1000)
                 listener.invoke(((doneSize * 100) / totalSize).toFloat())
             }
             (file.delete() || !file.exists()) && res
