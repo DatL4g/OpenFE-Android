@@ -16,6 +16,7 @@ import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
 val Fragment.saveContext: Context
     get() = this.context ?: this.activity ?: this.requireContext()
 
+@Suppress("DEPRECATION")
 fun Fragment.statusBarColor(@ColorInt color: Int) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)

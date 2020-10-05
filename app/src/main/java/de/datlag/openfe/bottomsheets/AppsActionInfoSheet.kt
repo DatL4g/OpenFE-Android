@@ -10,13 +10,8 @@ import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.saveContext
 import de.datlag.openfe.databinding.AppsActionInfoSheetBinding
-import de.datlag.openfe.enums.AppInstallLocation
-import de.datlag.openfe.enums.AppInstallLocation.AUTO
-import de.datlag.openfe.enums.AppInstallLocation.INTERNAL_ONLY
-import de.datlag.openfe.enums.AppInstallLocation.PREFER_EXTERNAL
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.util.NumberUtils.convertToDate
-import de.datlag.openfe.util.NumberUtils.getAppCategory
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
