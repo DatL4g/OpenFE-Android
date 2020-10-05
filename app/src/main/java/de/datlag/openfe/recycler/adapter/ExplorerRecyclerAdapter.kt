@@ -101,7 +101,7 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
             }
             fileIsApk -> {
                 coroutineScope.launch(Dispatchers.IO) {
-                    val icon = file.getAPKImage(context)
+                    val icon = file.getAPKImage(context, true)
                     withContext(Dispatchers.Main) {
                         Glide.with(context)
                             .load(icon)

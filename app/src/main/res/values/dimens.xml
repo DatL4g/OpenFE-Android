@@ -9,4 +9,7 @@
     <dimen name="stepProgressDefaultMargin">2dp</dimen>
     <dimen name="stepProgressDefaultHeight">2dp</dimen>
     <dimen name="stepProgressDefaultRoundedCorner">5dp</dimen>
+
+    <dimen name="confirmSheetButtonSideMargin">4dp</dimen>
+    <dimen name="fileProgressSheetButtonSideMargin">4dp</dimen>
 </resources>

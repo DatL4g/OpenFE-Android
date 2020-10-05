@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
 import de.datlag.openfe.commons.androidGreaterOr
+import de.datlag.openfe.enums.AppCategory
+import de.datlag.openfe.enums.AppInstallLocation
 import de.datlag.openfe.util.NumberUtils.getAppCategory
 import de.datlag.openfe.util.NumberUtils.getAppInstallLocation
 
@@ -14,13 +16,13 @@ data class AppItem(
     val name: String,
     val description: String,
     val packageName: String,
-    val category: Int,
+    val category: AppCategory,
     val sourceDir: String,
     val publicSourceDir: String,
     val dataDir: String,
     val splitSourceDirs: Array<String>,
     val splitPublicSourceDirs: Array<String>,
-    val installLocation: Int,
+    val installLocation: AppInstallLocation,
     val firstInstall: Long,
     val lastUpdate: Long,
     val versionCode: Long,
@@ -57,13 +59,13 @@ data class AppItem(
         result = 31 * result + name.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + packageName.hashCode()
-        result = 31 * result + category
+        result = 31 * result + category.hashCode()
         result = 31 * result + sourceDir.hashCode()
         result = 31 * result + publicSourceDir.hashCode()
         result = 31 * result + dataDir.hashCode()
         result = 31 * result + splitSourceDirs.contentHashCode()
         result = 31 * result + splitPublicSourceDirs.contentHashCode()
-        result = 31 * result + installLocation
+        result = 31 * result + installLocation.hashCode()
         result = 31 * result + firstInstall.hashCode()
         result = 31 * result + lastUpdate.hashCode()
         result = 31 * result + versionCode.hashCode()
@@ -75,6 +77,7 @@ data class AppItem(
 
         @JvmStatic
         @JvmOverloads
+        @Suppress("DEPRECATION")
         fun from(packageManager: PackageManager, packageInfo: PackageInfo, applicationInfo: ApplicationInfo = packageInfo.applicationInfo): AppItem {
             return AppItem(
                 applicationInfo.loadIcon(packageManager),

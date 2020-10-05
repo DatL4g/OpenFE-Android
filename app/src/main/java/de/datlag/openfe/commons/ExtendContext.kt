@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Parcel
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
+import androidx.annotation.DimenRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import de.datlag.openfe.data.Usage
@@ -20,8 +21,8 @@ fun Context.getStorageVolumes(): Array<Usage> {
         val storageStatsManager = this.getSystemService(Context.STORAGE_STATS_SERVICE) as StorageStatsManager
 
         for (storageVolume in storageVolumes) {
-            var freeSpace = 0L
-            var totalSpace = 0L
+            var freeSpace: Long
+            var totalSpace: Long
             val path = this.getPath(storageVolume)
             val storageFile = if (path != null) File(path) else continue
 
@@ -96,3 +97,5 @@ fun Context.getPath(storageVolume: StorageVolume): String? {
 
     return null
 }
+
+fun Context.getDimenInPixel(@DimenRes res: Int) = this.resources.getDimensionPixelSize(res)

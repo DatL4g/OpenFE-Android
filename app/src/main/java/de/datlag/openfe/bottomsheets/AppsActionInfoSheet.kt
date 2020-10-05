@@ -10,18 +10,11 @@ import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.saveContext
 import de.datlag.openfe.databinding.AppsActionInfoSheetBinding
+import de.datlag.openfe.enums.AppInstallLocation
+import de.datlag.openfe.enums.AppInstallLocation.AUTO
+import de.datlag.openfe.enums.AppInstallLocation.INTERNAL_ONLY
+import de.datlag.openfe.enums.AppInstallLocation.PREFER_EXTERNAL
 import de.datlag.openfe.recycler.data.AppItem
-import de.datlag.openfe.util.NumberUtils
-import de.datlag.openfe.util.NumberUtils.CATEGORY_AUDIO
-import de.datlag.openfe.util.NumberUtils.CATEGORY_GAME
-import de.datlag.openfe.util.NumberUtils.CATEGORY_IMAGE
-import de.datlag.openfe.util.NumberUtils.CATEGORY_MAPS
-import de.datlag.openfe.util.NumberUtils.CATEGORY_NEWS
-import de.datlag.openfe.util.NumberUtils.CATEGORY_PRODUCTIVITY
-import de.datlag.openfe.util.NumberUtils.CATEGORY_SOCIAL
-import de.datlag.openfe.util.NumberUtils.CATEGORY_VIDEO
-import de.datlag.openfe.util.NumberUtils.INSTALL_LOCATION_INTERNAL_ONLY
-import de.datlag.openfe.util.NumberUtils.INSTALL_LOCATION_PREFER_EXTERNAL
 import de.datlag.openfe.util.NumberUtils.convertToDate
 import de.datlag.openfe.util.NumberUtils.getAppCategory
 import kotlin.contracts.ExperimentalContracts
@@ -54,34 +47,12 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
         infoSheetName.text = appData.name
         infoSheetPackage.text = appData.packageName
         infoSheetDescriptionData.text = if (appData.description.isNotCleared() && !appData.description.equals("null", true)) appData.description else "(none)"
-        infoSheetCategoryData.text = categoryToString(getAppCategory(appData.category))
-        infoSheetInstallLocationData.text = installLocationToString(appData.installLocation)
+        infoSheetCategoryData.text = appData.category.toString(saveContext)
+        infoSheetInstallLocationData.text = appData.installLocation.toString(saveContext)
         infoSheetFirstInstallData.text = convertToDate(appData.firstInstall)
         infoSheetLastUpdateData.text = convertToDate(appData.lastUpdate)
         infoSheetVersionCodeData.text = appData.versionCode.toString()
         infoSheetVersionNameData.text = appData.versionName
-    }
-
-    private fun categoryToString(@NumberUtils.AppCategory category: Int): String {
-        return when (category) {
-            CATEGORY_GAME -> "Game"
-            CATEGORY_AUDIO -> "Audio"
-            CATEGORY_VIDEO -> "Video"
-            CATEGORY_IMAGE -> "Image"
-            CATEGORY_SOCIAL -> "Social"
-            CATEGORY_NEWS -> "News"
-            CATEGORY_MAPS -> "Maps"
-            CATEGORY_PRODUCTIVITY -> "Productivity"
-            else -> "(undefined)"
-        }
-    }
-
-    private fun installLocationToString(@NumberUtils.AppInstallLocation installLocation: Int): String {
-        return when (installLocation) {
-            INSTALL_LOCATION_INTERNAL_ONLY -> "Internal Only"
-            INSTALL_LOCATION_PREFER_EXTERNAL -> "Prefer External"
-            else -> "Automatic"
-        }
     }
 
     companion object {

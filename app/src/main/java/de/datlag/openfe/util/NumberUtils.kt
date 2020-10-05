@@ -5,9 +5,22 @@ import android.content.pm.PackageInfo
 import android.graphics.Color
 import android.os.Build
 import androidx.annotation.ColorInt
-import androidx.annotation.IntDef
 import androidx.core.graphics.ColorUtils
 import de.datlag.openfe.commons.androidGreaterOr
+import de.datlag.openfe.enums.AppCategory
+import de.datlag.openfe.enums.AppCategory.AUDIO
+import de.datlag.openfe.enums.AppCategory.GAME
+import de.datlag.openfe.enums.AppCategory.IMAGE
+import de.datlag.openfe.enums.AppCategory.MAPS
+import de.datlag.openfe.enums.AppCategory.NEWS
+import de.datlag.openfe.enums.AppCategory.PRODUCTIVITY
+import de.datlag.openfe.enums.AppCategory.SOCIAL
+import de.datlag.openfe.enums.AppCategory.UNDEFINED
+import de.datlag.openfe.enums.AppCategory.VIDEO
+import de.datlag.openfe.enums.AppInstallLocation
+import de.datlag.openfe.enums.AppInstallLocation.AUTO
+import de.datlag.openfe.enums.AppInstallLocation.INTERNAL_ONLY
+import de.datlag.openfe.enums.AppInstallLocation.PREFER_EXTERNAL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -15,28 +28,6 @@ import java.util.Locale
 object NumberUtils {
 
     private const val DEFAULT_DATE_FORMAT = "dd. MMM YYYY"
-
-    const val CATEGORY_UNDEFINED = -1
-    const val CATEGORY_GAME = 0
-    const val CATEGORY_AUDIO = 1
-    const val CATEGORY_VIDEO = 2
-    const val CATEGORY_IMAGE = 3
-    const val CATEGORY_SOCIAL = 4
-    const val CATEGORY_NEWS = 5
-    const val CATEGORY_MAPS = 6
-    const val CATEGORY_PRODUCTIVITY = 7
-
-    const val INSTALL_LOCATION_AUTO = 0
-    const val INSTALL_LOCATION_INTERNAL_ONLY = 1
-    const val INSTALL_LOCATION_PREFER_EXTERNAL = 2
-
-    @IntDef(CATEGORY_UNDEFINED, CATEGORY_GAME, CATEGORY_AUDIO, CATEGORY_VIDEO, CATEGORY_IMAGE, CATEGORY_SOCIAL, CATEGORY_NEWS, CATEGORY_MAPS, CATEGORY_PRODUCTIVITY)
-    @Retention(AnnotationRetention.SOURCE)
-    annotation class AppCategory
-
-    @IntDef(INSTALL_LOCATION_AUTO, INSTALL_LOCATION_INTERNAL_ONLY, INSTALL_LOCATION_PREFER_EXTERNAL)
-    @Retention(AnnotationRetention.SOURCE)
-    annotation class AppInstallLocation
 
     @JvmStatic
     @JvmOverloads
@@ -57,62 +48,52 @@ object NumberUtils {
     fun convertToDate(milli: Double, format: String = DEFAULT_DATE_FORMAT) = convertToDate(milli.toLong(), format)
 
     @JvmStatic
-    @AppCategory
-    fun getAppCategory(value: Int): Int {
+    fun getAppCategory(value: Int): AppCategory {
         return when (value) {
-            CATEGORY_GAME -> CATEGORY_GAME
-            CATEGORY_AUDIO -> CATEGORY_AUDIO
-            CATEGORY_VIDEO -> CATEGORY_VIDEO
-            CATEGORY_IMAGE -> CATEGORY_IMAGE
-            CATEGORY_SOCIAL -> CATEGORY_SOCIAL
-            CATEGORY_NEWS -> CATEGORY_NEWS
-            CATEGORY_MAPS -> CATEGORY_MAPS
-            CATEGORY_PRODUCTIVITY -> CATEGORY_PRODUCTIVITY
-            else -> CATEGORY_UNDEFINED
+            GAME.associatedValue -> GAME
+            AUDIO.associatedValue -> AUDIO
+            VIDEO.associatedValue -> VIDEO
+            IMAGE.associatedValue -> IMAGE
+            SOCIAL.associatedValue -> SOCIAL
+            NEWS.associatedValue -> NEWS
+            MAPS.associatedValue -> MAPS
+            PRODUCTIVITY.associatedValue -> PRODUCTIVITY
+            else -> UNDEFINED
         }
     }
 
     @JvmStatic
-    @AppCategory
-    fun getAppCategory(value: Long) = getAppCategory(value.toInt())
+    fun getAppCategory(value: Long): AppCategory = getAppCategory(value.toInt())
 
     @JvmStatic
-    @AppCategory
-    fun getAppCategory(value: Float) = getAppCategory(value.toInt())
+    fun getAppCategory(value: Float): AppCategory = getAppCategory(value.toInt())
 
     @JvmStatic
-    @AppCategory
-    fun getAppCategory(value: Double) = getAppCategory(value.toInt())
+    fun getAppCategory(value: Double): AppCategory = getAppCategory(value.toInt())
 
     @JvmStatic
-    @AppCategory
-    fun getAppCategory(applicationInfo: ApplicationInfo) = getAppCategory(if (androidGreaterOr(Build.VERSION_CODES.O)) applicationInfo.category else CATEGORY_UNDEFINED)
+    fun getAppCategory(applicationInfo: ApplicationInfo): AppCategory = getAppCategory(if (androidGreaterOr(Build.VERSION_CODES.O)) applicationInfo.category else UNDEFINED.associatedValue)
 
     @JvmStatic
-    @AppInstallLocation
-    fun getAppInstallLocation(value: Int): Int {
+    fun getAppInstallLocation(value: Int): AppInstallLocation {
         return when (value) {
-            INSTALL_LOCATION_INTERNAL_ONLY -> INSTALL_LOCATION_INTERNAL_ONLY
-            INSTALL_LOCATION_PREFER_EXTERNAL -> INSTALL_LOCATION_PREFER_EXTERNAL
-            else -> INSTALL_LOCATION_AUTO
+            INTERNAL_ONLY.associatedValue -> INTERNAL_ONLY
+            PREFER_EXTERNAL.associatedValue -> PREFER_EXTERNAL
+            else -> AUTO
         }
     }
 
     @JvmStatic
-    @AppInstallLocation
-    fun getAppInstallLocation(value: Long) = getAppInstallLocation(value.toInt())
+    fun getAppInstallLocation(value: Long): AppInstallLocation = getAppInstallLocation(value.toInt())
 
     @JvmStatic
-    @AppInstallLocation
-    fun getAppInstallLocation(value: Float) = getAppInstallLocation(value.toInt())
+    fun getAppInstallLocation(value: Float): AppInstallLocation = getAppInstallLocation(value.toInt())
 
     @JvmStatic
-    @AppInstallLocation
-    fun getAppInstallLocation(value: Double) = getAppInstallLocation(value.toInt())
+    fun getAppInstallLocation(value: Double): AppInstallLocation = getAppInstallLocation(value.toInt())
 
     @JvmStatic
-    @AppInstallLocation
-    fun getAppInstallLocation(packageInfo: PackageInfo) = getAppInstallLocation(if (androidGreaterOr(Build.VERSION_CODES.LOLLIPOP)) packageInfo.installLocation else INSTALL_LOCATION_AUTO)
+    fun getAppInstallLocation(packageInfo: PackageInfo) = getAppInstallLocation(if (androidGreaterOr(Build.VERSION_CODES.LOLLIPOP)) packageInfo.installLocation else AUTO.associatedValue)
 
     fun useStatusBarDarkContrast(@ColorInt color: Int): Boolean {
         val whiteContrast = ColorUtils.calculateContrast(Color.WHITE, color)

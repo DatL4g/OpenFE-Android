@@ -272,9 +272,9 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         fileProgressSheet.title = "Delete Files..."
         fileProgressSheet.text = "Deleting ${countSelectedFilesRecursively()} files..."
         fileProgressSheet.rightText = "Close"
-        fileProgressSheet.closeOnRightClick = false
+        fileProgressSheet.closeOnRightClick = true
         fileProgressSheet.leftText = "Cancel"
-        fileProgressSheet.closeOnLeftClick = false
+        fileProgressSheet.closeOnLeftClick = true
         fileProgressSheet.updateable = {
             explorerViewModel.deleteSelectedItems(fileProgressSheet) {
                 fileProgressSheet.leftText = String()

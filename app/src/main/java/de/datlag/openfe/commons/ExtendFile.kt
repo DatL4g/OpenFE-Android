@@ -155,8 +155,9 @@ fun File.isAPK(): Boolean {
     }
 }
 
-fun File.getAPKImage(context: Context): Drawable? {
-    return if (this.isAPK()) {
+@JvmOverloads
+fun File.getAPKImage(context: Context, checked: Boolean = false): Drawable? {
+    return if (checked || this.isAPK()) {
         val packageInfo = context.packageManager.getPackageArchiveInfo(
             this.absolutePath,
             PackageManager.GET_ACTIVITIES

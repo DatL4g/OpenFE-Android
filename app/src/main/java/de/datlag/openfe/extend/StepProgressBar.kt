@@ -14,6 +14,7 @@ import android.widget.ProgressBar
 import androidx.annotation.CallSuper
 import androidx.appcompat.widget.LinearLayoutCompat
 import de.datlag.openfe.R
+import de.datlag.openfe.commons.getDimenInPixel
 import de.datlag.openfe.commons.mapOf
 
 class StepProgressBar @JvmOverloads constructor(
@@ -22,7 +23,7 @@ class StepProgressBar @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayoutCompat(context, attrs, defStyleAttr) {
 
-    private val defaultHeight = resources.getDimensionPixelSize(R.dimen.stepProgressDefaultHeight)
+    private val defaultHeight = context.getDimenInPixel(R.dimen.stepProgressDefaultHeight)
 
     private var needInitial = true
 
@@ -127,7 +128,7 @@ class StepProgressBar @JvmOverloads constructor(
     }
 
     private fun configureStepView(width: Int = getWidth(), height: Int = getHeight()) {
-        if (needInitial) {
+        if (needInitial || max == 0) {
             return
         }
 

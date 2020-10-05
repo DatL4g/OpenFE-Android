@@ -5,11 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import de.datlag.openfe.R
 import de.datlag.openfe.commons.expand
+import de.datlag.openfe.commons.getDimenInPixel
+import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.saveContext
+import de.datlag.openfe.commons.setMargin
+import de.datlag.openfe.commons.show
 import de.datlag.openfe.databinding.FileProgressSheetBinding
+import de.datlag.openfe.enums.MarginSide
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -34,7 +40,11 @@ class FileProgressSheet : BottomSheetDialogFragment() {
             field = value
             this?.fileProgressSheetButtonLeft?.text = field
             if (!field.isNotCleared()) {
-                this?.fileProgressSheetButtonLeft?.visibility = View.GONE
+                this?.fileProgressSheetButtonLeft?.hide()
+                this?.fileProgressSheetButtonRight?.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+            } else {
+                this?.fileProgressSheetButtonLeft?.show()
+                context?.let { this?.fileProgressSheetButtonRight?.setMargin(it.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal()) }
             }
         }
 
@@ -43,7 +53,11 @@ class FileProgressSheet : BottomSheetDialogFragment() {
             field = value
             this?.fileProgressSheetButtonRight?.text = field
             if (!field.isNotCleared()) {
-                this?.fileProgressSheetButtonRight?.visibility = View.GONE
+                this?.fileProgressSheetButtonRight?.hide()
+                this?.fileProgressSheetButtonLeft?.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+            } else {
+                this?.fileProgressSheetButtonRight?.show()
+                context?.let { this?.fileProgressSheetButtonLeft?.setMargin(it.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal()) }
             }
         }
 
@@ -123,10 +137,19 @@ class FileProgressSheet : BottomSheetDialogFragment() {
         }
 
         if (!leftText.isNotCleared()) {
-            fileProgressSheetButtonLeft.visibility = View.GONE
+            fileProgressSheetButtonLeft.hide()
+            fileProgressSheetButtonRight.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+        } else {
+            fileProgressSheetButtonLeft.show()
+            fileProgressSheetButtonRight.setMargin(saveContext.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal())
         }
+
         if (!rightText.isNotCleared()) {
-            fileProgressSheetButtonRight.visibility = View.GONE
+            fileProgressSheetButtonRight.hide()
+            fileProgressSheetButtonLeft.setMargin(0, MarginSide.LEFT, MarginSide.RIGHT)
+        } else {
+            fileProgressSheetButtonRight.show()
+            fileProgressSheetButtonLeft.setMargin(saveContext.getDimenInPixel(R.dimen.fileProgressSheetButtonSideMargin), *MarginSide.horizontal())
         }
 
         fileProgressBar.max = 0

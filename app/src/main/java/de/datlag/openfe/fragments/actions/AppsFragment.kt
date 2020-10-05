@@ -32,7 +32,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.AppsActionInfoSheet
 import de.datlag.openfe.bottomsheets.ConfirmActionSheet
+import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.androidGreaterOr
+import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getPermissions
@@ -57,6 +59,7 @@ import de.datlag.openfe.viewmodel.AppsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -299,6 +302,36 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                         }
                     }
          */
+        val fileProgressSheet = FileProgressSheet.newInstance()
+        val originalFile = File(item.publicSourceDir)
+        val fileName = "${item.name}-Backup"
+        val storage = File("${viewModel.storageFile.absolutePath}${File.separator}OpenFE${File.separator}Apps")
+        val createFolderSuccess = if (!storage.exists()) { storage.mkdirs() } else { true }
+
+        fileProgressSheet.title = "Backup ${item.name}"
+        fileProgressSheet.text = "Creating Backup file in OpenFE/Apps/${item.name}-Backup..."
+        fileProgressSheet.leftText = "Cancel"
+        fileProgressSheet.closeOnLeftClick = true
+        fileProgressSheet.closeOnRightClick = true
+        fileProgressSheet.updateable = {
+            if (createFolderSuccess) {
+                val backupFile = File(storage, "$fileName-${originalFile.name}")
+                val createFileSuccess = backupFile.createNewFile()
+
+                if (createFileSuccess) {
+                    originalFile.copyTo(backupFile, true) {
+                        fileProgressSheet.updateProgressList(floatArrayOf(it))
+
+                        if (it == 100F) {
+                            fileProgressSheet.leftText = String()
+                            fileProgressSheet.rightText = "Done"
+                        }
+                    }
+                }
+            }
+        }
+
+        showBottomSheetFragment(fileProgressSheet)
     }
 
     private fun checkManageFilePermission(): Boolean {

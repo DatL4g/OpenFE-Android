@@ -32,4 +32,6 @@
     <color name="confirmSheetButtonBackgroundColorDark">#dcdcdc</color>
     <color name="confirmSheetButtonLeftTextColorPrimary">@color/defaultContentColor</color>
     <color name="confirmSheetButtonLeftTextColorSecondary">@color/highlightTextColor</color>
+
+    <color name="fileProgressBarColor">@color/defaultContentColor</color>
 </resources>
