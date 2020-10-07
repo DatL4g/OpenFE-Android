@@ -10,6 +10,7 @@ import android.os.Environment
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import androidx.core.os.EnvironmentCompat
+import de.datlag.openfe.data.FilePermission
 import de.datlag.openfe.data.Usage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,31 +22,35 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import kotlin.contracts.ExperimentalContracts
 
 fun File.getRootOfStorage(): String {
     var file = this
     while (true) {
-        val parentFile = file.parentFile ?: if (file.parent != null) File(file.parent!!) else null
-        if (parentFile == null || parentFile.totalSpace != file.totalSpace) {
+        val parentDirectory = file.parentDir
+        if (parentDirectory.totalSpace != file.totalSpace) {
             return file.absolutePath
         }
-        file = parentFile
+        file = file.parentDir
     }
 }
 
-fun File.getUsage(): Usage {
-    val used = this.totalSpace - this.freeSpace
-    return Usage(
-        this,
-        this.totalSpace,
-        used,
-        (used.toDouble() / this.totalSpace.toDouble() * 100).toFloat()
-    )
-}
+val File.usage: Usage
+    get() {
+        val used = this.totalSpace - this.freeSpace
+        return Usage(
+            this,
+            this.totalSpace,
+            used,
+            (used.toDouble() / this.totalSpace.toDouble() * 100).toFloat()
+        )
+    }
 
-fun File.getExtension(): String? = MimeTypeMap.getFileExtensionFromUrl(getUri().toString())
+val File.extension: String?
+    get() = MimeTypeMap.getFileExtensionFromUrl(this.uri.toString())
 
-fun File.getUri(): Uri = Uri.fromFile(this)
+val File.uri: Uri
+    get() = Uri.fromFile(this)
 
 fun File.getProviderUri(context: Context): Uri? = FileProvider.getUriForFile(
     context,
@@ -62,22 +67,22 @@ fun File.getMimeType(context: Context): String? {
         return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
             context.contentResolver.getType(uri)
         } else {
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(this.getExtension()?.toLower())
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(this.extension?.toLower())
         }
     }
 
     fun catchUrlMimeType(): String? {
-        val uri = getUri()
+        val fileUri = this.uri
 
         return if (androidGreaterOr(Build.VERSION_CODES.O)) {
-            val path = Paths.get(uri.toString())
+            val path = Paths.get(fileUri.toString())
             try {
-                Files.probeContentType(path) ?: fallbackMimeType(uri)
+                Files.probeContentType(path) ?: fallbackMimeType(fileUri)
             } catch (ignored: Exception) {
-                fallbackMimeType(uri)
+                fallbackMimeType(fileUri)
             }
         } else {
-            fallbackMimeType(uri)
+            fallbackMimeType(fileUri)
         }
     }
 
@@ -115,9 +120,10 @@ fun File.isInternal(): Boolean {
         )
 }
 
+@ExperimentalContracts
 fun File.isAPK(): Boolean {
-    val extension = this.getExtension()
-    return if (extension != null && (extension.toLower() == ".apk" || extension.toLower() == "apk")) {
+    val fileExtension = this.extension
+    return if (fileExtension.isNotCleared() && (fileExtension.toLower() == ".apk" || fileExtension.toLower() == "apk")) {
         true
     } else {
         val fileInputStream: FileInputStream?
@@ -154,6 +160,7 @@ fun File.isAPK(): Boolean {
     }
 }
 
+@ExperimentalContracts
 @JvmOverloads
 fun File.getAPKImage(context: Context, checked: Boolean = false): Drawable? {
     return if (checked || this.isAPK()) {
@@ -174,14 +181,14 @@ fun File.getAPKImage(context: Context, checked: Boolean = false): Drawable? {
     }
 }
 
-// Pair(readable, writeable)
-fun File.getPermissions(): Pair<Boolean, Boolean> {
-    return when (EnvironmentCompat.getStorageState(this)) {
-        Environment.MEDIA_MOUNTED -> Pair(first = true, second = true)
-        Environment.MEDIA_MOUNTED_READ_ONLY -> Pair(first = true, second = false)
-        else -> Pair(first = false, second = false)
+val File.permissions: FilePermission
+    get() {
+        return when (EnvironmentCompat.getStorageState(this)) {
+            Environment.MEDIA_MOUNTED -> FilePermission(readable = true, writeable = true)
+            Environment.MEDIA_MOUNTED_READ_ONLY -> FilePermission(readable = true, writeable = false)
+            else -> FilePermission(readable = false, writeable = false)
+        }
     }
-}
 
 fun File.copyTo(
     target: File,
@@ -257,4 +264,18 @@ fun File.countRecursively(direction: FileWalkDirection = FileWalkDirection.TOP_D
         }
     )
     return count
+}
+
+val File.parentDir: File
+    get() = this.parentFile ?: if (this.parent != null) File(this.parent!!) else File(this.absolutePath.replaceLast(this.name, String(), true))
+
+fun File.renameTo(newName: String): Boolean {
+    val parentDir = this.parentDir
+    if (!parentDir.exists() || !this.exists()) {
+        return false
+    }
+
+    val newFile = File("${parentDir.absolutePath}${File.separator}$newName")
+
+    return this.renameTo(newFile)
 }

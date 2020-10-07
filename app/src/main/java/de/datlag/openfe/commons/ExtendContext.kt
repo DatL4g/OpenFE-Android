@@ -48,7 +48,7 @@ fun Context.getStorageVolumes(): Array<Usage> {
         val externalFiles = ContextCompat.getExternalFilesDirs(this, null)
 
         for (storageFile in externalFiles) {
-            usageList.add(storageFile.getUsage())
+            usageList.add(storageFile.usage)
         }
     }
 

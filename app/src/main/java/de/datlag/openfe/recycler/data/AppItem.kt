@@ -5,14 +5,18 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Parcelable
 import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.enums.AppCategory
 import de.datlag.openfe.enums.AppInstallLocation
 import de.datlag.openfe.util.NumberUtils.getAppCategory
 import de.datlag.openfe.util.NumberUtils.getAppInstallLocation
+import kotlinx.android.parcel.Parcelize
+import kotlinx.android.parcel.RawValue
 
+@Parcelize
 data class AppItem(
-    val icon: Drawable?,
+    val icon: @RawValue Drawable?,
     val name: String,
     val description: String,
     val packageName: String,
@@ -27,7 +31,7 @@ data class AppItem(
     val lastUpdate: Long,
     val versionCode: Long,
     val versionName: String
-) {
+) : Parcelable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

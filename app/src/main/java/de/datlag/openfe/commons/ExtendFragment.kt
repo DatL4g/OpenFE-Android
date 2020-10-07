@@ -44,6 +44,8 @@ fun Fragment.getDrawable(@DrawableRes drawable: Int) = ContextCompat.getDrawable
     drawable
 )
 
+fun Fragment.getDrawable(@DrawableRes drawable: Int, @ColorInt tint: Int) = this.getDrawable(drawable)?.tint(tint)
+
 fun Fragment.getColorStateList(@ColorRes colorStateList: Int) = ContextCompat.getColorStateList(
     safeContext,
     colorStateList

@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.deleteRecursively
-import de.datlag.openfe.commons.getRootOfStorage
 import de.datlag.openfe.commons.isInternal
 import de.datlag.openfe.commons.mutableCopyOf
+import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
@@ -96,7 +96,7 @@ class ExplorerViewModel(
 
     private fun getStartDirectory(args: ExplorerFragmentArgs): File {
         val file = File(args.storage.list[args.storage.item].usage.file.absolutePath)
-        return if (file.isDirectory) file else file.parentFile ?: File(file.getRootOfStorage())
+        return if (file.isDirectory) file else file.parentDir
     }
 
     fun moveToPath(path: File, force: Boolean = false) {
@@ -105,10 +105,8 @@ class ExplorerViewModel(
         if (newPath.isDirectory) {
             val fileList = newPath.listFiles()?.toMutableList() ?: mutableListOf()
 
-            val rootFile =
-                explorerFragmentArgs.storage.list[explorerFragmentArgs.storage.item].rootFile
-            val rootStorageFile = rootFile.parentFile
-                ?: if (rootFile.parent != null) File(rootFile.parent!!) else rootFile
+            val rootFile = explorerFragmentArgs.storage.list[explorerFragmentArgs.storage.item].rootFile
+            val rootStorageFile = rootFile.parentDir
             if (newPath == rootStorageFile) {
                 for (item in explorerFragmentArgs.storage.list) {
                     if (!fileList.contains(item.rootFile)) {
@@ -125,8 +123,7 @@ class ExplorerViewModel(
             } else {
                 val parentFile = ExplorerItem(
                     FileItem(
-                        newPath.parentFile
-                            ?: if (newPath.parent != null) File(newPath.parent!!) else newPath,
+                        newPath.parentDir,
                         ".."
                     ),
                     null, false

@@ -37,10 +37,10 @@ import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
-import de.datlag.openfe.commons.getPermissions
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.mutableCopyOf
+import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
@@ -374,7 +374,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
             safeContext,
             object : PermissionListener {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                    granted.invoke(viewModel.storageFile.getPermissions().second)
+                    granted.invoke(viewModel.storageFile.permissions.writeable)
                 }
 
                 override fun onPermissionRationaleShouldBeShown(

@@ -14,10 +14,10 @@ import de.datlag.openfe.R
 import de.datlag.openfe.commons.applyBorder
 import de.datlag.openfe.commons.fillTransparent
 import de.datlag.openfe.commons.getAPKImage
-import de.datlag.openfe.commons.getUri
 import de.datlag.openfe.commons.isAPK
 import de.datlag.openfe.commons.tint
 import de.datlag.openfe.commons.toBitmap
+import de.datlag.openfe.commons.uri
 import de.datlag.openfe.databinding.ExplorerItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
@@ -26,7 +26,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<ExplorerItem>() {
@@ -115,7 +117,7 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
             }
             else -> {
                 Glide.with(context)
-                    .load(file.getUri())
+                    .load(file.uri)
                     .fallback(fallback)
                     .placeholder(fallback)
                     .error(fallback)
