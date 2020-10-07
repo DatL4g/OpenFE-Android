@@ -12,6 +12,7 @@ on:
       - '.gitignore'
       - '.editorconfig'
       - 'docs/**'
+      - 'preview/**'
 
 jobs:
   test:

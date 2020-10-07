@@ -12,7 +12,8 @@ on:
       - '.gitignore'
       - '.editorconfig'
       - 'docs/**'
-      -
+      - 'preview/**'
+
 jobs:
   cancel:
     name: 'Cancel Previous Runs'

@@ -26,9 +26,11 @@ import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getMimeType
 import de.datlag.openfe.commons.getProviderUri
+import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.safeContext
+import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.uri
@@ -105,9 +107,9 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
             if (!explorerViewModel.isSearching) {
                 copiedList = list.mutableCopyOf()
             }
-            loadingTextView.visibility = View.GONE
-            explorerRecycler.visibility = View.VISIBLE
-            appBar.visibility = View.VISIBLE
+            loadingTextView.hide()
+            explorerRecycler.show()
+            appBar.show()
         }
     }
 
@@ -184,11 +186,11 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         if (explorerViewModel.selectedItems.isEmpty()) {
             (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp, getColor(R.color.explorerToolbarIconTint)))
             (activity as AdvancedActivity).supportActionBar?.title = safeContext.getString(R.string.app_name)
-            explorerBottomNavigation.visibility = View.GONE
+            explorerBottomNavigation.hide()
         } else {
             (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp, getColor(R.color.explorerToolbarIconTint)))
             (activity as AdvancedActivity).supportActionBar?.title = "${explorerViewModel.selectedItems.size} Items"
-            explorerBottomNavigation.visibility = View.VISIBLE
+            explorerBottomNavigation.show()
         }
     }
 

@@ -37,11 +37,13 @@ import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.commons.safeContext
+import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.tint
@@ -125,7 +127,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
         )
         adapter = AppsActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
-                appsActionBottomNavigation.visibility = View.VISIBLE
+                appsActionBottomNavigation.show()
                 viewModel.selectedApp = copiedList[position]
                 appsActionLayoutWrapper.requestLayout()
                 updateToolbar()
@@ -138,11 +140,11 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
                     if (dy >= 24) {
-                        appsActionBottomNavigation.visibility = View.GONE
+                        appsActionBottomNavigation.hide()
                     }
                 } else {
                     if (itemValid()) {
-                        appsActionBottomNavigation.visibility = View.VISIBLE
+                        appsActionBottomNavigation.show()
                     }
                 }
             }
@@ -223,10 +225,10 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
             if (list.isNotEmpty()) {
                 adapter.submitList(list)
                 copiedList = list.mutableCopyOf()
-                loadingTextView.visibility = View.GONE
-                appBar.visibility = View.VISIBLE
-                appsActionRecycler.visibility = View.VISIBLE
-                appsActionLayoutWrapper.visibility = View.VISIBLE
+                loadingTextView.hide()
+                appBar.show()
+                appsActionRecycler.show()
+                appsActionLayoutWrapper.show()
                 statusBarColor(getColor(R.color.appsActionStatusbarColor))
             }
         }
@@ -417,7 +419,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     private fun onBackPressedCheck(): Boolean = with(binding) {
         return if (itemValid()) {
             viewModel.selectedApp = null
-            appsActionBottomNavigation.visibility = View.GONE
+            appsActionBottomNavigation.hide()
             updateToolbar()
             false
         } else {

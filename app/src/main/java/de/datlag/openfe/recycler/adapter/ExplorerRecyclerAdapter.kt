@@ -14,7 +14,9 @@ import de.datlag.openfe.R
 import de.datlag.openfe.commons.applyBorder
 import de.datlag.openfe.commons.fillTransparent
 import de.datlag.openfe.commons.getAPKImage
+import de.datlag.openfe.commons.invisible
 import de.datlag.openfe.commons.isAPK
+import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.tint
 import de.datlag.openfe.commons.toBitmap
 import de.datlag.openfe.commons.uri
@@ -127,9 +129,9 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
 
         binding.explorerName.text = fileName
         if (item.selectable) {
-            binding.explorerCheckbox.visibility = View.VISIBLE
+            binding.explorerCheckbox.show()
         } else {
-            binding.explorerCheckbox.visibility = View.INVISIBLE
+            binding.explorerCheckbox.invisible()
             binding.explorerCheckbox.isChecked = false
         }
         binding.explorerCheckbox.isChecked = item.selected
