@@ -2,6 +2,7 @@ package de.datlag.openfe.commons
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -280,4 +281,21 @@ fun File.renameTo(newName: String): Boolean {
     val newFile = File("${parentDir.absolutePath}${File.separator}$newName")
 
     return this.renameTo(newFile)
+}
+
+fun File.intentChooser(context: Context): Intent {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    intent.setDataAndType(this.getProviderUri(context) ?: this.uri, this.getMimeType(context))
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+
+    if (androidGreaterOr(Build.VERSION_CODES.KITKAT)) {
+        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+    }
+    if (androidGreaterOr(Build.VERSION_CODES.LOLLIPOP)) {
+        intent.addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
+    }
+
+    return Intent.createChooser(intent, "Choose App to open file")
 }

@@ -1,6 +1,7 @@
 package de.datlag.openfe.enums
 
 import android.content.Context
+import de.datlag.openfe.R
 
 enum class AppInstallLocation(val associatedValue: Int) {
 
@@ -10,9 +11,9 @@ enum class AppInstallLocation(val associatedValue: Int) {
 
     fun toString(context: Context): String {
         return when (this) {
-            INTERNAL_ONLY -> "Audio"
-            PREFER_EXTERNAL -> "Video"
-            else -> "Automatic"
+            INTERNAL_ONLY -> context.getString(R.string.app_install_location_internal)
+            PREFER_EXTERNAL -> context.getString(R.string.app_install_location_external)
+            else -> context.getString(R.string.app_install_location_auto)
         }
     }
 }

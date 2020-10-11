@@ -4,27 +4,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import de.datlag.openfe.bottomsheets.FileProgressSheet
-import de.datlag.openfe.commons.copyOf
-import de.datlag.openfe.commons.deleteRecursively
-import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.isInternal
+import de.datlag.openfe.commons.matchWithApps
 import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.parentDir
-import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
-import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.recycler.data.FileItem
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
-
-typealias FileLiveData = MutableLiveData<File>
-typealias ExplorerLiveData = MutableLiveData<List<ExplorerItem>>
 
 @ExperimentalContracts
 class ExplorerViewModel(
@@ -32,286 +24,104 @@ class ExplorerViewModel(
     private val appsViewModel: AppsViewModel
 ) : ViewModel() {
 
-    var startDirectory: File = getStartDirectory(explorerFragmentArgs)
-        private set
+    private val startDirectory: File = getStartDirectory(explorerFragmentArgs)
 
-    var currentDirectory: File = startDirectory
-        private set
+    var currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
+    var currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
 
-    var directory: FileLiveData = FileLiveData(currentDirectory)
-    var directories: ExplorerLiveData = MutableLiveData()
-    var directoriesCopy = listOf<ExplorerItem>()
-
-    private var systemAppsObserver = Observer<AppList> { list ->
-        matchDirectoriesWithApps(list)
+    private val systemAppsObserver = Observer<AppList> { list ->
+        matchNewAppsToDirectories(list)
     }
 
-    var selectedItems = mutableListOf<ExplorerItem>()
-    var copiedItems = mutableListOf<ExplorerItem>()
-    var copiedDirectory: File? = null
+    private val currentDirectoryObserver = Observer<File> { dir ->
+        val fileList = dir.listFiles()?.toMutableList() ?: mutableListOf()
+        val startDirParent = startDirectory.parentDir
 
-    var isSearching: Boolean = false
+        if (dir == startDirParent) {
+            for (item in explorerFragmentArgs.storage.list) {
+                if (!fileList.contains(item.rootFile)) {
+                    fileList.add(item.rootFile)
+                }
+            }
+        }
+
+        if (dir == File("/")) {
+            val storagePath = File("/storage")
+            if (!fileList.contains(storagePath)) {
+                fileList.add(storagePath)
+            }
+        } else {
+            val parentFile = ExplorerItem(
+                FileItem(
+                    dir.parentDir,
+                    ".."
+                ),
+                null, false, false
+            )
+            currentSubDirectories.value = listOf(parentFile)
+        }
+        createSubDirectories(fileList)
+    }
 
     init {
         appsViewModel.systemApps.observeForever(systemAppsObserver)
+        currentDirectory.observeForever(currentDirectoryObserver)
     }
 
-    private fun matchDirectoriesWithApps(list: AppList) = viewModelScope.launch(Dispatchers.IO) {
-        directories.value?.let {
-            val explorerCopy = it.mutableCopyOf()
-
-            for (explorerItem in explorerCopy) {
-                try {
-                    matchDirectoryWithApps(explorerItem, list)
-                } catch (ignored: Exception) {
-                }
-            }
-            withContext(Dispatchers.Main) {
-                try {
-                    directories.value = explorerCopy
-                } catch (exception: Exception) {
-                    directories.postValue(explorerCopy)
-                }
-                if (!isSearching) {
-                    directoriesCopy = it.copyOf()
-                }
-            }
-        }
-    }
-
-    private fun matchDirectoryWithApps(explorerItem: ExplorerItem, list: AppList): ExplorerItem {
-        return try {
-            for (appItem in list) {
-                if (explorerItem.fileItem.name?.equals(appItem.name, true) == true ||
-                    explorerItem.fileItem.name?.equals(appItem.packageName, true) == true ||
-                    explorerItem.fileItem.file.name.equals(appItem.name, true) ||
-                    explorerItem.fileItem.file.name.equals(appItem.packageName, true) ||
-                    explorerItem.fileItem.file.path.equals(appItem.sourceDir, true) ||
-                    explorerItem.fileItem.file.path.equals(appItem.publicSourceDir, true) ||
-                    explorerItem.fileItem.file.path.equals(appItem.dataDir, true) ||
-                    explorerItem.fileItem.file.absolutePath.equals(appItem.sourceDir, true) ||
-                    explorerItem.fileItem.file.absolutePath.equals(appItem.publicSourceDir, true) ||
-                    explorerItem.fileItem.file.absolutePath.equals(appItem.dataDir, true)
-                ) {
-                    explorerItem.appItem = appItem
-                }
-            }
-            explorerItem
-        } catch (exception: Exception) {
-            explorerItem
-        }
-    }
-
-    private fun getStartDirectory(args: ExplorerFragmentArgs): File {
-        val file = File(args.storage.list[args.storage.item].usage.file.absolutePath)
+    private fun getStartDirectory(args: ExplorerFragmentArgs = explorerFragmentArgs): File {
+        val file = File(args.storage.list[args.storage.selected].usage.file.absolutePath)
         return if (file.isDirectory) file else file.parentDir
+    }
+
+    private fun createSubDirectories(fileList: MutableList<File>) = viewModelScope.launch(Dispatchers.IO) {
+        fileList.sort()
+        val iterator = fileList.listIterator()
+
+        while (iterator.hasNext()) {
+            val file = iterator.next()
+
+            if (!file.isHidden) {
+                val explorerItem = ExplorerItem.from(file, appsViewModel.systemApps.value ?: listOf())
+                val copy = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
+                copy.add(explorerItem)
+
+                withContext(Dispatchers.Main) {
+                    currentSubDirectories.value = copy
+                }
+            }
+        }
     }
 
     fun moveToPath(path: File, force: Boolean = false) {
         val newPath = if (path.isInternal() && !force) startDirectory else path
 
-        if (newPath.isDirectory) {
-            val fileList = newPath.listFiles()?.toMutableList() ?: mutableListOf()
-
-            val rootFile = explorerFragmentArgs.storage.list[explorerFragmentArgs.storage.item].rootFile
-            val rootStorageFile = rootFile.parentDir
-            if (newPath == rootStorageFile) {
-                for (item in explorerFragmentArgs.storage.list) {
-                    if (!fileList.contains(item.rootFile)) {
-                        fileList.add(item.rootFile)
-                    }
-                }
-            }
-            if (newPath == File("/")) {
-                val storagePath = File("/storage")
-                if (!fileList.contains(storagePath)) {
-                    fileList.add(storagePath)
-                }
-                directories.value = mutableListOf()
-            } else {
-                val parentFile = ExplorerItem(
-                    FileItem(
-                        newPath.parentDir,
-                        ".."
-                    ),
-                    null, false
-                )
-                directories.value = mutableListOf(parentFile)
-            }
-
-            currentDirectory = newPath
-            if (!isSearching) {
-                directories.value?.let { directoriesCopy = it.copyOf() }
-            }
-
-            createExplorerDirectories(fileList)
+        currentDirectory.value = if (newPath.isDirectory) {
+            newPath
+        } else {
+            newPath.parentDir
         }
     }
 
-    private fun createExplorerDirectories(fileList: MutableList<File>) =
-        viewModelScope.launch(Dispatchers.IO) {
-            fileList.sort()
-            val fileIterator = fileList.listIterator()
+    private fun matchNewAppsToDirectories(list: AppList) = viewModelScope.launch(Dispatchers.IO) {
+        val copy = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
 
-            while (fileIterator.hasNext()) {
-                val file = fileIterator.next()
+        for (explorerItem in copy) {
+            explorerItem.matchWithApps(list)
+        }
 
-                if (!file.isHidden) {
-                    val fileItem = FileItem(file)
-
-                    val explorerItem = if (!appsViewModel.systemApps.value.isNullOrEmpty()) {
-                        matchDirectoryWithApps(
-                            ExplorerItem(fileItem),
-                            appsViewModel.systemApps.value!!
-                        )
-                    } else {
-                        ExplorerItem(fileItem)
-                    }
-
-                    withContext(Dispatchers.Main) {
-                        if (directories.value != null) {
-                            directories.value =
-                                directories.value!!.mutableCopyOf().apply { add(explorerItem) }
-                        } else {
-                            directories.value = mutableListOf(explorerItem)
-                        }
-                        if (!isSearching) {
-                            directories.value?.let { directoriesCopy = it.copyOf() }
-                        }
-                    }
-                }
+        withContext(Dispatchers.Main) {
+            try {
+                currentSubDirectories.value = copy
+            } catch (exception: Exception) {
+                currentSubDirectories.postValue(copy)
             }
         }
-
-    fun recyclerSelectUpdate(
-        explorerItem: ExplorerItem,
-        position: Int,
-        recyclerAdapter: ExplorerRecyclerAdapter,
-        binding: FragmentExplorerBinding?
-    ): ExplorerItem = with(binding) {
-        recyclerAdapter.differ.currentList.let {
-            val explorerItems = it.mutableCopyOf()
-
-            for (i in 0 until explorerItems.size) {
-                if (explorerItems[i] == explorerItem) {
-                    explorerItems.removeAt(i)
-                    explorerItem.selected = !explorerItem.selected
-                    explorerItems.add(i, explorerItem)
-
-                    directories.value = explorerItems
-                    if (!isSearching) {
-                        directories.value?.let { items -> directoriesCopy = items.copyOf() }
-                    }
-                }
-            }
-        }
-
-        val holder: ExplorerRecyclerAdapter.ViewHolder? =
-            this?.explorerRecycler?.findViewHolderForAdapterPosition(position) as ExplorerRecyclerAdapter.ViewHolder?
-        holder?.binding?.explorerCheckbox?.isChecked = explorerItem.selected
-        return explorerItem
-    }
-
-    fun clearSelectedItems(copiedList: List<ExplorerItem> = directoriesCopy, binding: FragmentExplorerBinding? = null) =
-        with(binding) {
-            selectedItems.clear()
-            copiedList.let {
-                val explorerItems = it.mutableCopyOf()
-
-                for (i in 0 until explorerItems.size) {
-                    explorerItems[i].selected = false
-
-                    val holder: ExplorerRecyclerAdapter.ViewHolder? =
-                        this?.explorerRecycler?.findViewHolderForAdapterPosition(i) as ExplorerRecyclerAdapter.ViewHolder?
-                    holder?.binding?.explorerCheckbox?.isChecked = false
-                }
-
-                directories.value = explorerItems
-
-                if (!isSearching) {
-                    directories.value?.let { items ->
-                        directoriesCopy = items.copyOf()
-                    }
-                }
-            }
-
-            if (isSearching) {
-                isSearching = false
-                this?.explorerSearchView?.searchEditText?.text = null
-                directories.value = copiedList
-
-                if (!isSearching) {
-                    directories.value?.let { items ->
-                        directoriesCopy = items.copyOf()
-                    }
-                }
-            }
-        }
-
-    fun deleteSelectedItems(sheet: FileProgressSheet? = null, items: List<ExplorerItem> = selectedItems, done: (() -> Unit)? = null): Job {
-        val initialList = FloatArray(items.size)
-        val copyList = initialList.copyOf()
-
-        sheet?.updateProgressList(initialList)
-        val job = viewModelScope.launch(Dispatchers.IO) {
-            for (pos in items.indices) {
-                items[pos].fileItem.file.deleteRecursively { percent, scope ->
-                    copyList[pos] = percent
-                    scope.launch(Dispatchers.Main) {
-                        sheet?.updateProgressList(copyList)
-                    }
-                }
-            }
-            withContext(Dispatchers.Main) {
-                done?.invoke()
-            }
-        }
-
-        sheet?.leftClickListener = {
-            job.cancel()
-        }
-        sheet?.rightClickListener = {
-            job.start()
-        }
-        return job
-    }
-
-    fun copySelectedItems(items: List<ExplorerItem> = selectedItems) {
-        copiedItems = items.mutableCopyOf()
-        copiedDirectory = currentDirectory
-    }
-
-    fun pasteCopiedItems(sheet: FileProgressSheet? = null, items: List<ExplorerItem> = copiedItems, done: (() -> Unit)? = null): Job {
-        val initialList = FloatArray(items.size)
-        val copyList = initialList.copyOf()
-
-        sheet?.updateProgressList(initialList)
-        val job = viewModelScope.launch(Dispatchers.IO) {
-            for (pos in items.indices) {
-                items[pos].fileItem.file.copyTo(File("${currentDirectory.absolutePath}${File.separator}${items[pos].fileItem.file.name}"), scope = this) { percent, scope ->
-                    copyList[pos] = percent
-                    scope?.launch(Dispatchers.Main) {
-                        sheet?.updateProgressList(copyList)
-                    }
-                }
-            }
-            copiedItems = mutableListOf()
-            withContext(Dispatchers.Main) {
-                done?.invoke()
-            }
-        }
-
-        sheet?.leftClickListener = {
-            job.cancel()
-        }
-        sheet?.rightClickListener = {
-            job.start()
-        }
-        return job
     }
 
     override fun onCleared() {
         super.onCleared()
         appsViewModel.systemApps.removeObserver(systemAppsObserver)
+        currentDirectory.removeObserver(currentDirectoryObserver)
     }
+
 }

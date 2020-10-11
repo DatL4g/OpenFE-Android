@@ -1,9 +1,7 @@
 package de.datlag.openfe.fragments
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -15,25 +13,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
-import de.datlag.openfe.bottomsheets.ConfirmActionSheet
-import de.datlag.openfe.bottomsheets.FileProgressSheet
-import de.datlag.openfe.commons.androidGreaterOr
-import de.datlag.openfe.commons.countRecursively
 import de.datlag.openfe.commons.getColor
-import de.datlag.openfe.commons.getDrawable
-import de.datlag.openfe.commons.getMimeType
-import de.datlag.openfe.commons.getProviderUri
 import de.datlag.openfe.commons.hide
-import de.datlag.openfe.commons.isNotCleared
-import de.datlag.openfe.commons.mutableCopyOf
+import de.datlag.openfe.commons.intentChooser
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.show
-import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
-import de.datlag.openfe.commons.uri
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.factory.ExplorerViewModelFactory
@@ -44,9 +31,7 @@ import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -78,7 +63,6 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         (activity as AdvancedActivity).setSupportActionBar(explorerToolbar)
         (activity as AdvancedActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
         (activity as AdvancedActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
-        updateToolbar()
 
         explorerToolbar.setNavigationOnClickListener {
             if (onBackPressedCheck()) {
@@ -86,37 +70,25 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
             }
         }
 
-        initRecycler()
-        initBottomNavigation()
-        initSearchView()
-        initPasteFAB()
+        initRecyclerView()
 
-        explorerViewModel.directory.value?.let {
-            if (it != explorerViewModel.currentDirectory) {
-                explorerViewModel.directory.value = explorerViewModel.currentDirectory
-            }
+        explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
+            Timber.e(dir.absolutePath)
         }
 
-        explorerViewModel.directory.observe(viewLifecycleOwner) { dir ->
-            if (explorerViewModel.selectedItems.isNullOrEmpty()) {
-                explorerViewModel.moveToPath(dir)
-            }
-            updatePasteFAB()
-        }
-        explorerViewModel.directories.observe(viewLifecycleOwner) { list ->
+        explorerViewModel.currentSubDirectories.observe(viewLifecycleOwner) { list ->
+            checkViewVisibility(list.size)
             recyclerAdapter.submitList(list)
-            loadingTextView.hide()
-            explorerRecycler.show()
-            appBar.show()
         }
     }
 
-    private fun initRecycler() = with(binding) {
+    private fun initRecyclerView() = with(binding) {
         recyclerAdapter = ExplorerRecyclerAdapter(lifecycleScope)
 
         recyclerAdapter.setOnClickListener { _, position ->
-            recyclerEvent(position)
+            recyclerEvent(position, false)
         }
+
         recyclerAdapter.setOnLongClickListener { _, position ->
             recyclerEvent(position, true)
             true
@@ -124,18 +96,20 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
         explorerRecycler.layoutManager = LinearLayoutManagerWrapper(safeContext)
         explorerRecycler.adapter = recyclerAdapter
-        explorerRecycler.setHasFixedSize(true)
     }
 
-    private fun recyclerEvent(position: Int, longClick: Boolean = false) = recyclerAdapter.differ.currentList.let {
+    private fun recyclerEvent(position: Int, longClick: Boolean) = recyclerAdapter.differ.currentList.let {
+        if (position < 0) {
+            return@let
+        }
+
         val explorerItem = it[position]
 
-        if (explorerViewModel.selectedItems.isNotEmpty() || longClick) {
-            if (explorerItem.selectable) {
-                recyclerSelectEvent(explorerItem, position)
-            }
-        } else {
+        // ToDo("check selected items")
+        if (!longClick) {
             recyclerClickEvent(explorerItem)
+        } else {
+            // ToDO("select")
         }
     }
 
@@ -144,223 +118,28 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         val file = fileItem.file
 
         if (file.isDirectory) {
-            if (fileItem.name != null && fileItem.name == "..") {
-                explorerViewModel.moveToPath(file, true)
-            } else {
-                explorerViewModel.moveToPath(file)
-            }
-            updatePasteFAB()
+            explorerViewModel.moveToPath(file, (fileItem.name != null && fileItem.name == ".."))
         } else {
-            val mime = file.getMimeType(safeContext)
-            Log.e("MimeType", mime.toString())
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            intent.setDataAndType(file.getProviderUri(safeContext) ?: file.uri, mime)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-
-            if (androidGreaterOr(Build.VERSION_CODES.KITKAT)) {
-                intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+            try {
+                startActivity(file.intentChooser(safeContext))
+            } catch (exception: Exception) {
+                Timber.e("error when creating intent")
             }
-            if (androidGreaterOr(Build.VERSION_CODES.LOLLIPOP)) {
-                intent.addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
-            }
-
-            startActivity(Intent.createChooser(intent, "Choose App to open file"))
         }
     }
 
-    private fun recyclerSelectEvent(explorerItem: ExplorerItem, position: Int) {
-        if (explorerViewModel.selectedItems.contains(explorerItem)) {
-            explorerViewModel.selectedItems.remove(explorerItem)
-            explorerViewModel.recyclerSelectUpdate(explorerItem, position, recyclerAdapter, binding)
+    private fun checkViewVisibility(listSize: Int) = with(binding) {
+        if (listSize == 0) {
+            explorerRecycler.hide()
+            loadingTextView.show()
         } else {
-            val newItem = explorerViewModel.recyclerSelectUpdate(explorerItem, position, recyclerAdapter, binding)
-            explorerViewModel.selectedItems.add(newItem)
-        }
-        updateToolbar()
-    }
-
-    private fun updateToolbar() = with(binding) {
-        if (explorerViewModel.selectedItems.isEmpty()) {
-            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp, getColor(R.color.explorerToolbarIconTint)))
-            (activity as AdvancedActivity).supportActionBar?.title = safeContext.getString(R.string.app_name)
-            explorerBottomNavigation.hide()
-        } else {
-            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp, getColor(R.color.explorerToolbarIconTint)))
-            (activity as AdvancedActivity).supportActionBar?.title = "${explorerViewModel.selectedItems.size} Items"
-            explorerBottomNavigation.show()
-        }
-    }
-
-    private fun initBottomNavigation() = with(binding) {
-        explorerBottomNavigation.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.explorerBottomDelete -> {
-                    deleteFilesConfirmDialog()
-                    true
-                }
-                R.id.explorerBottomCopy -> {
-                    explorerViewModel.copySelectedItems()
-                    explorerViewModel.clearSelectedItems(binding = binding)
-                    updateToolbar()
-                    true
-                }
-                else -> false
-            }
-        }
-    }
-
-    private fun initSearchView() = with(binding) {
-        explorerSearchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                if (!query.isNotCleared()) {
-                    explorerViewModel.isSearching = false
-                }
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                recyclerAdapter.submitList(listOf())
-
-                if (newText.isNotCleared()) {
-                    explorerViewModel.isSearching = true
-                    val newListCopy = explorerViewModel.directoriesCopy.mutableCopyOf()
-
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val iterator = newListCopy.iterator()
-
-                        while (iterator.hasNext()) {
-                            val nextItem = iterator.next()
-                            if ((nextItem.fileItem.name?.contains(newText, true) != true) && !nextItem.fileItem.file.name.contains(newText, true)) {
-                                iterator.remove()
-                                continue
-                            }
-                        }
-                        withContext(Dispatchers.Main) {
-                            recyclerAdapter.submitList(newListCopy)
-                        }
-                    }
-                } else {
-                    explorerViewModel.isSearching = false
-                    recyclerAdapter.submitList(explorerViewModel.directoriesCopy)
-                }
-                return false
-            }
-
-            override fun onQueryTextCleared(): Boolean {
-                explorerViewModel.isSearching = false
-                recyclerAdapter.submitList(explorerViewModel.directoriesCopy)
-                return false
-            }
-        })
-    }
-
-    private fun updatePasteFAB() = with(binding) {
-        if (explorerViewModel.currentDirectory == explorerViewModel.copiedDirectory || explorerViewModel.copiedItems.isNullOrEmpty()) {
-            explorerPasteFAB.hide()
-        } else {
-            explorerPasteFAB.show()
-        }
-    }
-
-    private fun initPasteFAB() = with(binding) {
-        explorerPasteFAB.setOnClickListener {
-            val confirmActionSheet = ConfirmActionSheet.newInstance()
-            confirmActionSheet.title = "Paste files here?"
-            confirmActionSheet.text = "Are you sure that you want to paste the copied files in this directory?\n(${countSelectedFilesRecursively(explorerViewModel.copiedItems)} files copied in total)"
-            confirmActionSheet.leftText = "Cancel"
-            confirmActionSheet.rightText = "Paste"
-            confirmActionSheet.closeOnLeftClick = true
-            confirmActionSheet.closeOnRightClick = true
-            confirmActionSheet.rightClickListener = {
-                val fileProgressSheet = FileProgressSheet.newInstance()
-                fileProgressSheet.title = "Pasting files..."
-                fileProgressSheet.text = "This may take a while depending on how many files you copied"
-                fileProgressSheet.leftText = "Cancel"
-                fileProgressSheet.closeOnLeftClick = true
-                fileProgressSheet.closeOnRightClick = true
-                fileProgressSheet.updateable = {
-                    explorerViewModel.pasteCopiedItems(fileProgressSheet) {
-                        fileProgressSheet.leftText = String()
-                        fileProgressSheet.rightText = "Done"
-                        explorerViewModel.moveToPath(explorerViewModel.currentDirectory)
-                        explorerViewModel.clearSelectedItems(binding = binding)
-                        updatePasteFAB()
-                        updateToolbar()
-                    }
-                }
-
-                showBottomSheetFragment(fileProgressSheet)
-            }
-
-            showBottomSheetFragment(confirmActionSheet)
+            explorerRecycler.show()
+            loadingTextView.hide()
         }
     }
 
     private fun onBackPressedCheck(): Boolean {
-        return if (explorerViewModel.selectedItems.isEmpty()) {
-            when {
-                explorerViewModel.currentDirectory.absolutePath == "/" -> true
-                explorerViewModel.currentDirectory != explorerViewModel.startDirectory -> {
-                    explorerViewModel.moveToPath(explorerViewModel.currentDirectory.parentFile ?: explorerViewModel.currentDirectory)
-                    updatePasteFAB()
-                    false
-                }
-                else -> true
-            }
-        } else {
-            explorerViewModel.clearSelectedItems(binding = binding)
-            updateToolbar()
-            false
-        }
-    }
-
-    private fun deleteFilesProgressDialog(items: List<ExplorerItem> = explorerViewModel.selectedItems) {
-        val fileProgressSheet = FileProgressSheet.newInstance()
-
-        fileProgressSheet.title = "Delete Files..."
-        fileProgressSheet.text = "Deleting ${countSelectedFilesRecursively(items)} files..."
-        fileProgressSheet.rightText = "Close"
-        fileProgressSheet.closeOnRightClick = true
-        fileProgressSheet.leftText = "Cancel"
-        fileProgressSheet.closeOnLeftClick = true
-        fileProgressSheet.updateable = {
-            explorerViewModel.deleteSelectedItems(fileProgressSheet, items) {
-                fileProgressSheet.leftText = String()
-                fileProgressSheet.rightText = "Done"
-                explorerViewModel.moveToPath(explorerViewModel.currentDirectory)
-                explorerViewModel.clearSelectedItems(binding = binding)
-                updatePasteFAB()
-                updateToolbar()
-            }
-        }
-
-        showBottomSheetFragment(fileProgressSheet)
-    }
-
-    private fun deleteFilesConfirmDialog(items: List<ExplorerItem> = explorerViewModel.selectedItems) {
-        val confirmActionSheet = ConfirmActionSheet.newInstance()
-
-        confirmActionSheet.title = "Delete ${items.size} files"
-        confirmActionSheet.text = "This can not be undone!\nAre you sure you want to delete all selected files and folders (${countSelectedFilesRecursively(items)} in total)"
-        confirmActionSheet.leftText = "Cancel"
-        confirmActionSheet.rightText = "Delete"
-        confirmActionSheet.closeOnLeftClick = true
-        confirmActionSheet.closeOnRightClick = true
-        confirmActionSheet.rightClickListener = {
-            deleteFilesProgressDialog(items)
-        }
-
-        showBottomSheetFragment(confirmActionSheet)
-    }
-
-    private fun countSelectedFilesRecursively(items: List<ExplorerItem> = explorerViewModel.selectedItems, direction: FileWalkDirection = FileWalkDirection.TOP_DOWN): Int {
-        var count = 0
-        for (item in items) {
-            count += item.fileItem.file.countRecursively(direction)
-        }
-        return count
+        return true
     }
 
     override fun onResume() {

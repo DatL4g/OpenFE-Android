@@ -10,6 +10,7 @@ import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
+import timber.log.Timber
 
 class MainActivity : AdvancedActivity() {
 
@@ -20,7 +21,8 @@ class MainActivity : AdvancedActivity() {
 
     private fun getCurrentNavFragment(): Fragment? {
         val navHostFragment = supportFragmentManager.primaryNavigationFragment
-        return navHostFragment?.childFragmentManager?.fragments?.get(0)
+        val fragmentList = navHostFragment?.childFragmentManager?.fragments
+        return if (!fragmentList.isNullOrEmpty() && fragmentList.size >= 1) fragmentList[0] else null
     }
 
     override fun onBackPressed() {
@@ -41,14 +43,14 @@ class MainActivity : AdvancedActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.e("Result", "activity called")
+        Timber.e("activity called")
 
         when (requestCode) {
             1337 -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.e("Result", "activity granted")
+                    Timber.e("activity granted")
                 } else {
-                    Log.e("Result", "activity not granted")
+                    Timber.e("activity not granted")
                 }
             }
         }

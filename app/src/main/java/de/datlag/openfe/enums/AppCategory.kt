@@ -1,6 +1,7 @@
 package de.datlag.openfe.enums
 
 import android.content.Context
+import de.datlag.openfe.R
 
 enum class AppCategory(val associatedValue: Int) {
 
@@ -16,15 +17,15 @@ enum class AppCategory(val associatedValue: Int) {
 
     fun toString(context: Context): String {
         return when (this) {
-            GAME -> "Game"
-            AUDIO -> "Audio"
-            VIDEO -> "Video"
-            IMAGE -> "Image"
-            SOCIAL -> "Social"
-            NEWS -> "News"
-            MAPS -> "Maps"
-            PRODUCTIVITY -> "Productivity"
-            else -> "(undefined)"
+            GAME -> context.getString(R.string.app_category_game)
+            AUDIO -> context.getString(R.string.app_category_audio)
+            VIDEO -> context.getString(R.string.app_category_video)
+            IMAGE -> context.getString(R.string.app_category_image)
+            SOCIAL -> context.getString(R.string.app_category_social)
+            NEWS -> context.getString(R.string.app_category_news)
+            MAPS -> context.getString(R.string.app_category_maps)
+            PRODUCTIVITY -> context.getString(R.string.app_category_productivity)
+            else -> context.getString(R.string.app_category_undefined)
         }
     }
 }

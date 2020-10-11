@@ -7,5 +7,5 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class ExplorerFragmentStorageArgs(
     val list: List<LocationItem>,
-    val item: Int
+    val selected: Int
 ) : Parcelable

@@ -5,16 +5,17 @@ buildscript {
     repositories {
         google()
         jcenter()
+        mavenLocal()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
         maven { url = uri("https://plugins.gradle.org/m2/") }
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:${Versions.buildGradle}")
+        classpath("com.android.tools.build:gradle:${Versions.gradle}")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}")
-        classpath("com.google.dagger:hilt-android-gradle-plugin:${Versions.daggerHilt}")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:${Versions.hilt}")
         classpath("org.jmailen.gradle:kotlinter-gradle:${Versions.kotlinter}")
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -26,6 +27,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        mavenLocal()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
         maven { url = uri("https://plugins.gradle.org/m2/") }

@@ -5,6 +5,7 @@ import dagger.hilt.android.HiltAndroidApp
 import io.github.inflationx.calligraphy3.CalligraphyConfig
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor
 import io.github.inflationx.viewpump.ViewPump
+import timber.log.Timber
 
 @HiltAndroidApp
 class App : MultiDexApplication() {
@@ -12,6 +13,10 @@ class App : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         applyFont()
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
     }
 
     private fun applyFont() {

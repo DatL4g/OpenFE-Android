@@ -44,6 +44,7 @@ import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.PermissionChecker
+import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -101,7 +102,9 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
                         val action = OverviewFragmentDirections.actionOverviewFragmentToAppsActionFragment(locationList[0].usage.file.absolutePath)
                         findNavController().navigate(action)
                     }
-                    else -> findNavController().navigate(actionList[position].actionId)
+                    else -> {
+                        // findNavController().navigate(actionList[position].actionId)
+                    }
                 }
             }
             submitList(actionList)
@@ -128,14 +131,14 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         val massStorageDevices = UsbMassStorageDevice.getMassStorageDevices(safeContext)
 
         if (massStorageDevices.isEmpty()) {
-            Log.e("USB", "no device")
+            Timber.e("no device")
             return
         }
 
         val usbDevice = activity?.intent?.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as? UsbDevice?
 
         if (usbDevice != null && usbManager.hasPermission(usbDevice)) {
-            Log.e("USB", "permission")
+            Timber.e("permission")
 
             for (device in massStorageDevices) {
                 device.init()
@@ -147,9 +150,14 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
                 }
             }
         } else {
-            Log.e("USB", "no permission")
+            Timber.e("no permission")
 
-            val permissionIntent = PendingIntent.getBroadcast(safeContext, 1337, Intent("${safeContext.packageName}.USB_PERMISSION"), 0)
+            val permissionIntent = PendingIntent.getBroadcast(
+                safeContext,
+                1337,
+                Intent("${safeContext.packageName}.USB_PERMISSION"),
+                0
+            )
             for (device in massStorageDevices) {
                 usbManager.requestPermission(device.usbDevice, permissionIntent)
             }
@@ -214,14 +222,14 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        Log.e("Result", "called")
+        Timber.e("called")
 
         when (requestCode) {
             1337 -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.e("Result", "granted")
+                    Timber.e("granted")
                 } else {
-                    Log.e("Result", "not granted")
+                    Timber.e("not granted")
                 }
             }
         }
