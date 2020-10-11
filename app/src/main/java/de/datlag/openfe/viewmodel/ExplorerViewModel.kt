@@ -32,6 +32,7 @@ class ExplorerViewModel(
     var currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
     private var searchDirectoriesCopy: List<ExplorerItem> = listOf()
     private var searchJob: Job? = null
+    private var previousSearchText: String? = null
 
     private val systemAppsObserver = Observer<AppList> { list ->
         matchNewAppsToDirectories(list)
@@ -107,54 +108,62 @@ class ExplorerViewModel(
     }
 
     fun searchCurrentDirectories(text: String?, recursively: Boolean) {
+        if (previousSearchText == text || (currentSubDirectories.value.isNullOrEmpty() && searchDirectoriesCopy.isEmpty())) {
+            return
+        }
+        previousSearchText = text
         searchJob?.cancel()
         searchJob = viewModelScope.launch(Dispatchers.IO) {
-            if (currentSubDirectories.value.isNullOrEmpty() && searchDirectoriesCopy.isEmpty()) {
-                return@launch
-            } else {
-                if (text.isNotCleared()) {
-                    if (searchDirectoriesCopy.isEmpty()) {
-                        searchDirectoriesCopy = currentSubDirectories.value!!.copyOf()
-                    }
-                    withContext(Dispatchers.Main) {
-                        currentSubDirectories.value = listOf()
-                    }
+            if (text.isNotCleared()) {
+                if (searchDirectoriesCopy.isEmpty()) {
+                    searchDirectoriesCopy = currentSubDirectories.value!!.copyOf()
+                }
+                withContext(Dispatchers.Main) {
+                    currentSubDirectories.value = listOf()
+                }
 
-                    for (explorerItem in searchDirectoriesCopy) {
-                        if (recursively) {
-                            explorerItem.fileItem.file.walkTopDown().fold(true) { res, file ->
-                                val fileMatches = file.name.contains(text, true) && !file.isHidden
-                                if (fileMatches) {
-                                    withContext(Dispatchers.Main) {
-                                        currentSubDirectories.value =
-                                            (
-                                                    currentSubDirectories.value?.mutableCopyOf()
-                                                        ?: mutableListOf()
-                                                    ).apply {
-                                                    add(
-                                                        ExplorerItem.from(
-                                                            file,
-                                                            appsViewModel.systemApps.value ?: listOf()
-                                                        )
-                                                    )
-                                                }
-                                    }
-                                }
-                                (file.exists() && fileMatches) && res
-                            }
-                        } else {
-                            if (explorerItem.fileItem.name?.contains(text, true) == true || explorerItem.fileItem.file.name.contains(text, true)) {
+                for (explorerItem in searchDirectoriesCopy) {
+                    if (recursively) {
+                        explorerItem.fileItem.file.walkTopDown().fold(true) { res, file ->
+                            val fileMatches = file.name.contains(text, true) && !file.isHidden
+                            if (fileMatches) {
                                 withContext(Dispatchers.Main) {
-                                    currentSubDirectories.value = (currentSubDirectories.value?.toMutableList() ?: mutableListOf()).apply { add(explorerItem) }
+                                    currentSubDirectories.value =
+                                        (
+                                            currentSubDirectories.value?.mutableCopyOf()
+                                                ?: mutableListOf()
+                                            ).apply {
+                                            add(
+                                                ExplorerItem.from(
+                                                    file,
+                                                    appsViewModel.systemApps.value ?: listOf()
+                                                )
+                                            )
+                                        }
                                 }
+                            }
+                            (file.exists() && fileMatches) && res
+                        }
+                    } else {
+                        if (explorerItem.fileItem.name?.contains(
+                                text,
+                                true
+                            ) == true || explorerItem.fileItem.file.name.contains(text, true)
+                        ) {
+                            withContext(Dispatchers.Main) {
+                                currentSubDirectories.value =
+                                    (
+                                        currentSubDirectories.value?.toMutableList()
+                                            ?: mutableListOf()
+                                        ).apply { add(explorerItem) }
                             }
                         }
                     }
-                } else {
-                    if (searchDirectoriesCopy.isNotEmpty()) {
-                        withContext(Dispatchers.Main) {
-                            currentDirectory.value = currentDirectory.value
-                        }
+                }
+            } else {
+                if (searchDirectoriesCopy.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        currentDirectory.value = currentDirectory.value
                     }
                 }
             }
