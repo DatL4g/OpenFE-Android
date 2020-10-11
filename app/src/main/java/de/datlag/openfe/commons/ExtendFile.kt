@@ -12,6 +12,7 @@ import androidx.core.content.FileProvider
 import androidx.core.os.EnvironmentCompat
 import de.datlag.openfe.data.FilePermission
 import de.datlag.openfe.data.Usage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
@@ -194,7 +195,8 @@ fun File.copyTo(
     target: File,
     overwrite: Boolean = false,
     bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    listener: ((Float) -> Unit)? = null
+    scope: CoroutineScope? = null,
+    listener: ((Float, CoroutineScope?) -> Unit)? = null
 ): File {
     if (!this.exists()) {
         throw NoSuchFileException(this, null, "The source file doesn't exist.")
@@ -219,7 +221,7 @@ fun File.copyTo(
 
         this.inputStream().use { input ->
             target.outputStream().use { output ->
-                input.copyTo(output, bufferSize, this.length(), listener)
+                input.copyTo(output, bufferSize, this.length(), scope, listener)
             }
         }
     }
@@ -227,7 +229,7 @@ fun File.copyTo(
     return target
 }
 
-suspend fun File.deleteRecursively(listener: (Float) -> Unit): Boolean {
+suspend fun File.deleteRecursively(listener: (Float, CoroutineScope) -> Unit): Boolean {
     val totalSize = sizeRecursively(FileWalkDirection.BOTTOM_UP)
     var doneSize: Long = 0
     return walkBottomUp().fold(
@@ -235,7 +237,7 @@ suspend fun File.deleteRecursively(listener: (Float) -> Unit): Boolean {
         { res, file ->
             doneSize += file.length()
             withContext(Dispatchers.Main) {
-                listener.invoke(((doneSize * 100) / totalSize).toFloat())
+                listener.invoke(((doneSize * 100) / totalSize).toFloat(), this)
             }
             (file.delete() || !file.exists()) && res
         }

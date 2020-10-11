@@ -321,7 +321,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                 val createFileSuccess = backupFile.createNewFile()
 
                 if (createFileSuccess) {
-                    originalFile.copyTo(backupFile, true) {
+                    originalFile.copyTo(backupFile, true) { it, _ ->
                         fileProgressSheet.updateProgressList(floatArrayOf(it))
 
                         if (it == 100F) {

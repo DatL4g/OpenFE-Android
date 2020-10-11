@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="android.hardware.usb.action.ACTION_USB_PERMISSION" />
 
     <uses-feature android:name="android.hardware.usb.host" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
@@ -35,6 +36,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
+            </intent-filter>
         </activity>
 
         <provider
@@ -46,16 +51,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-
-        <receiver
-            android:name=".receiver.USBAttachementReceiver"
-            android:enabled="true"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.hardware.usb.action.ACTION_USB_PERMISSION" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

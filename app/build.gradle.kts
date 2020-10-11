@@ -112,4 +112,6 @@ dependencies {
     implementation("com.karumi:dexter:6.1.2")
     implementation("com.github.bumptech.glide:glide:4.11.0")
     kapt("com.github.bumptech.glide:compiler:4.11.0")
+
+    implementation("me.jahnen:libaums:0.7.6")
 }

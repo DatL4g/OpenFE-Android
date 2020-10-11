@@ -5,7 +5,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.bottomsheets.FileProgressSheet
+import de.datlag.openfe.commons.copyOf
 import de.datlag.openfe.commons.deleteRecursively
+import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.isInternal
 import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.parentDir
@@ -38,12 +40,15 @@ class ExplorerViewModel(
 
     var directory: FileLiveData = FileLiveData(currentDirectory)
     var directories: ExplorerLiveData = MutableLiveData()
+    var directoriesCopy = listOf<ExplorerItem>()
 
     private var systemAppsObserver = Observer<AppList> { list ->
         matchDirectoriesWithApps(list)
     }
 
     var selectedItems = mutableListOf<ExplorerItem>()
+    var copiedItems = mutableListOf<ExplorerItem>()
+    var copiedDirectory: File? = null
 
     var isSearching: Boolean = false
 
@@ -66,6 +71,9 @@ class ExplorerViewModel(
                     directories.value = explorerCopy
                 } catch (exception: Exception) {
                     directories.postValue(explorerCopy)
+                }
+                if (!isSearching) {
+                    directoriesCopy = it.copyOf()
                 }
             }
         }
@@ -132,6 +140,9 @@ class ExplorerViewModel(
             }
 
             currentDirectory = newPath
+            if (!isSearching) {
+                directories.value?.let { directoriesCopy = it.copyOf() }
+            }
 
             createExplorerDirectories(fileList)
         }
@@ -164,6 +175,9 @@ class ExplorerViewModel(
                         } else {
                             directories.value = mutableListOf(explorerItem)
                         }
+                        if (!isSearching) {
+                            directories.value?.let { directoriesCopy = it.copyOf() }
+                        }
                     }
                 }
             }
@@ -185,6 +199,9 @@ class ExplorerViewModel(
                     explorerItems.add(i, explorerItem)
 
                     directories.value = explorerItems
+                    if (!isSearching) {
+                        directories.value?.let { items -> directoriesCopy = items.copyOf() }
+                    }
                 }
             }
         }
@@ -195,7 +212,7 @@ class ExplorerViewModel(
         return explorerItem
     }
 
-    fun clearSelectedItems(copiedList: List<ExplorerItem>, binding: FragmentExplorerBinding?) =
+    fun clearSelectedItems(copiedList: List<ExplorerItem> = directoriesCopy, binding: FragmentExplorerBinding? = null) =
         with(binding) {
             selectedItems.clear()
             copiedList.let {
@@ -210,25 +227,39 @@ class ExplorerViewModel(
                 }
 
                 directories.value = explorerItems
+
+                if (!isSearching) {
+                    directories.value?.let { items ->
+                        directoriesCopy = items.copyOf()
+                    }
+                }
             }
 
             if (isSearching) {
                 isSearching = false
                 this?.explorerSearchView?.searchEditText?.text = null
                 directories.value = copiedList
+
+                if (!isSearching) {
+                    directories.value?.let { items ->
+                        directoriesCopy = items.copyOf()
+                    }
+                }
             }
         }
 
-    fun deleteSelectedItems(sheet: FileProgressSheet, items: List<ExplorerItem> = selectedItems, done: (() -> Unit)? = null): Job {
+    fun deleteSelectedItems(sheet: FileProgressSheet? = null, items: List<ExplorerItem> = selectedItems, done: (() -> Unit)? = null): Job {
         val initialList = FloatArray(items.size)
         val copyList = initialList.copyOf()
 
-        sheet.updateProgressList(initialList)
+        sheet?.updateProgressList(initialList)
         val job = viewModelScope.launch(Dispatchers.IO) {
             for (pos in items.indices) {
-                items[pos].fileItem.file.deleteRecursively { percent ->
+                items[pos].fileItem.file.deleteRecursively { percent, scope ->
                     copyList[pos] = percent
-                    sheet.updateProgressList(copyList)
+                    scope.launch(Dispatchers.Main) {
+                        sheet?.updateProgressList(copyList)
+                    }
                 }
             }
             withContext(Dispatchers.Main) {
@@ -236,10 +267,44 @@ class ExplorerViewModel(
             }
         }
 
-        sheet.leftClickListener = {
+        sheet?.leftClickListener = {
             job.cancel()
         }
-        sheet.rightClickListener = {
+        sheet?.rightClickListener = {
+            job.start()
+        }
+        return job
+    }
+
+    fun copySelectedItems(items: List<ExplorerItem> = selectedItems) {
+        copiedItems = items.mutableCopyOf()
+        copiedDirectory = currentDirectory
+    }
+
+    fun pasteCopiedItems(sheet: FileProgressSheet? = null, items: List<ExplorerItem> = copiedItems, done: (() -> Unit)? = null): Job {
+        val initialList = FloatArray(items.size)
+        val copyList = initialList.copyOf()
+
+        sheet?.updateProgressList(initialList)
+        val job = viewModelScope.launch(Dispatchers.IO) {
+            for (pos in items.indices) {
+                items[pos].fileItem.file.copyTo(File("${currentDirectory.absolutePath}${File.separator}${items[pos].fileItem.file.name}"), scope = this) { percent, scope ->
+                    copyList[pos] = percent
+                    scope?.launch(Dispatchers.Main) {
+                        sheet?.updateProgressList(copyList)
+                    }
+                }
+            }
+            copiedItems = mutableListOf()
+            withContext(Dispatchers.Main) {
+                done?.invoke()
+            }
+        }
+
+        sheet?.leftClickListener = {
+            job.cancel()
+        }
+        sheet?.rightClickListener = {
             job.start()
         }
         return job

@@ -70,6 +70,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/explorerPasteFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_baseline_file_copy_24"
+        android:tint="#ffffff"
+        app:tint="#ffffff"
+        app:iconTint="#ffffff"
+        app:fabSize="normal"
+        app:backgroundTint="@color/primaryColor"
+        app:layout_constraintBottom_toTopOf="@id/explorerBottomNavigation"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/loadingTextView"
         fontPath="fonts/Poppins-Bold.ttf"

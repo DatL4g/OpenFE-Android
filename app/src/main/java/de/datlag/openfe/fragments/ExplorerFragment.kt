@@ -59,7 +59,6 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
     private lateinit var recyclerAdapter: ExplorerRecyclerAdapter
     private lateinit var binding: FragmentExplorerBinding
-    private var copiedList = listOf<ExplorerItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,6 +89,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         initRecycler()
         initBottomNavigation()
         initSearchView()
+        initPasteFAB()
 
         explorerViewModel.directory.value?.let {
             if (it != explorerViewModel.currentDirectory) {
@@ -101,12 +101,10 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
             if (explorerViewModel.selectedItems.isNullOrEmpty()) {
                 explorerViewModel.moveToPath(dir)
             }
+            updatePasteFAB()
         }
         explorerViewModel.directories.observe(viewLifecycleOwner) { list ->
             recyclerAdapter.submitList(list)
-            if (!explorerViewModel.isSearching) {
-                copiedList = list.mutableCopyOf()
-            }
             loadingTextView.hide()
             explorerRecycler.show()
             appBar.show()
@@ -141,7 +139,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         }
     }
 
-    private fun recyclerClickEvent(explorerItem: ExplorerItem) {
+    private fun recyclerClickEvent(explorerItem: ExplorerItem) = with(binding) {
         val fileItem = explorerItem.fileItem
         val file = fileItem.file
 
@@ -151,6 +149,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
             } else {
                 explorerViewModel.moveToPath(file)
             }
+            updatePasteFAB()
         } else {
             val mime = file.getMimeType(safeContext)
             Log.e("MimeType", mime.toString())
@@ -201,6 +200,12 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
                     deleteFilesConfirmDialog()
                     true
                 }
+                R.id.explorerBottomCopy -> {
+                    explorerViewModel.copySelectedItems()
+                    explorerViewModel.clearSelectedItems(binding = binding)
+                    updateToolbar()
+                    true
+                }
                 else -> false
             }
         }
@@ -220,7 +225,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
                 if (newText.isNotCleared()) {
                     explorerViewModel.isSearching = true
-                    val newListCopy = copiedList.mutableCopyOf()
+                    val newListCopy = explorerViewModel.directoriesCopy.mutableCopyOf()
 
                     lifecycleScope.launch(Dispatchers.IO) {
                         val iterator = newListCopy.iterator()
@@ -238,17 +243,59 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
                     }
                 } else {
                     explorerViewModel.isSearching = false
-                    recyclerAdapter.submitList(copiedList)
+                    recyclerAdapter.submitList(explorerViewModel.directoriesCopy)
                 }
                 return false
             }
 
             override fun onQueryTextCleared(): Boolean {
                 explorerViewModel.isSearching = false
-                recyclerAdapter.submitList(copiedList)
+                recyclerAdapter.submitList(explorerViewModel.directoriesCopy)
                 return false
             }
         })
+    }
+
+    private fun updatePasteFAB() = with(binding) {
+        if (explorerViewModel.currentDirectory == explorerViewModel.copiedDirectory || explorerViewModel.copiedItems.isNullOrEmpty()) {
+            explorerPasteFAB.hide()
+        } else {
+            explorerPasteFAB.show()
+        }
+    }
+
+    private fun initPasteFAB() = with(binding) {
+        explorerPasteFAB.setOnClickListener {
+            val confirmActionSheet = ConfirmActionSheet.newInstance()
+            confirmActionSheet.title = "Paste files here?"
+            confirmActionSheet.text = "Are you sure that you want to paste the copied files in this directory?\n(${countSelectedFilesRecursively(explorerViewModel.copiedItems)} files copied in total)"
+            confirmActionSheet.leftText = "Cancel"
+            confirmActionSheet.rightText = "Paste"
+            confirmActionSheet.closeOnLeftClick = true
+            confirmActionSheet.closeOnRightClick = true
+            confirmActionSheet.rightClickListener = {
+                val fileProgressSheet = FileProgressSheet.newInstance()
+                fileProgressSheet.title = "Pasting files..."
+                fileProgressSheet.text = "This may take a while depending on how many files you copied"
+                fileProgressSheet.leftText = "Cancel"
+                fileProgressSheet.closeOnLeftClick = true
+                fileProgressSheet.closeOnRightClick = true
+                fileProgressSheet.updateable = {
+                    explorerViewModel.pasteCopiedItems(fileProgressSheet) {
+                        fileProgressSheet.leftText = String()
+                        fileProgressSheet.rightText = "Done"
+                        explorerViewModel.moveToPath(explorerViewModel.currentDirectory)
+                        explorerViewModel.clearSelectedItems(binding = binding)
+                        updatePasteFAB()
+                        updateToolbar()
+                    }
+                }
+
+                showBottomSheetFragment(fileProgressSheet)
+            }
+
+            showBottomSheetFragment(confirmActionSheet)
+        }
     }
 
     private fun onBackPressedCheck(): Boolean {
@@ -257,12 +304,13 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
                 explorerViewModel.currentDirectory.absolutePath == "/" -> true
                 explorerViewModel.currentDirectory != explorerViewModel.startDirectory -> {
                     explorerViewModel.moveToPath(explorerViewModel.currentDirectory.parentFile ?: explorerViewModel.currentDirectory)
+                    updatePasteFAB()
                     false
                 }
                 else -> true
             }
         } else {
-            explorerViewModel.clearSelectedItems(copiedList, binding)
+            explorerViewModel.clearSelectedItems(binding = binding)
             updateToolbar()
             false
         }
@@ -282,7 +330,8 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
                 fileProgressSheet.leftText = String()
                 fileProgressSheet.rightText = "Done"
                 explorerViewModel.moveToPath(explorerViewModel.currentDirectory)
-                explorerViewModel.clearSelectedItems(copiedList, binding)
+                explorerViewModel.clearSelectedItems(binding = binding)
+                updatePasteFAB()
                 updateToolbar()
             }
         }
