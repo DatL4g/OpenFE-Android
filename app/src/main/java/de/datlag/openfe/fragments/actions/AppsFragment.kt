@@ -278,32 +278,6 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     }
 
     private fun backupProgressDialog(item: AppItem) {
-        /*
-        val originalFile = File(viewModel.selectedApp!!.publicSourceDir)
-                    val fileName = "${viewModel.selectedApp!!.name}-Backup"
-                    val storage = File("${viewModel.storageFile.absolutePath}${File.separator}OpenFE${File.separator}Apps")
-                    val createFolderSuccess = if (!storage.exists()) { storage.mkdirs() } else { true }
-
-                    if (createFolderSuccess) {
-                        val backupFile = File(storage, "$fileName-${originalFile.name}")
-                        val createFileSuccess = backupFile.createNewFile()
-
-                        if (createFileSuccess) {
-                            val confirmSheet = ConfirmActionSheet.newInstance()
-                            confirmSheet.title = "Copy file..."
-                            confirmSheet.rightText = "Close"
-                            confirmSheet.closeOnRightClick = true
-                            showBottomSheetFragment(confirmSheet)
-                            try {
-                                originalFile.copyTo(backupFile, true) {
-                                    confirmSheet.text = "Done: $it%"
-                                }
-                            } catch (ignored: Exception) {
-                                return@checkWritePermission
-                            }
-                        }
-                    }
-         */
         val fileProgressSheet = FileProgressSheet.newInstance()
         val originalFile = File(item.publicSourceDir)
         val fileName = "${item.name}-Backup"
@@ -321,7 +295,7 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                 val createFileSuccess = backupFile.createNewFile()
 
                 if (createFileSuccess) {
-                    originalFile.copyTo(backupFile, true) { it, _ ->
+                    originalFile.copyTo(backupFile, true) {
                         fileProgressSheet.updateProgressList(floatArrayOf(it))
 
                         if (it == 100F) {

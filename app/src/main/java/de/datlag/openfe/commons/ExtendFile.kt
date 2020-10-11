@@ -196,8 +196,7 @@ fun File.copyTo(
     target: File,
     overwrite: Boolean = false,
     bufferSize: Int = DEFAULT_BUFFER_SIZE,
-    scope: CoroutineScope? = null,
-    listener: ((Float, CoroutineScope?) -> Unit)? = null
+    listener: ((Float) -> Unit)? = null
 ): File {
     if (!this.exists()) {
         throw NoSuchFileException(this, null, "The source file doesn't exist.")
@@ -222,7 +221,7 @@ fun File.copyTo(
 
         this.inputStream().use { input ->
             target.outputStream().use { output ->
-                input.copyTo(output, bufferSize, this.length(), scope, listener)
+                input.copyTo(output, bufferSize, this.length(), listener)
             }
         }
     }
