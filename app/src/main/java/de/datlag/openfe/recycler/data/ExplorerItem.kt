@@ -21,5 +21,4 @@ data class ExplorerItem(
 
         fun from(file: File, appList: AppList): ExplorerItem = from(FileItem(file), appList)
     }
-
 }

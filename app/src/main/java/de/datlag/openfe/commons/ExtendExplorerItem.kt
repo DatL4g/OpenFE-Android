@@ -16,7 +16,8 @@ fun ExplorerItem.matchWithApps(appList: AppList) {
                 fileItem.file.path.equals(appItem.dataDir, true) ||
                 fileItem.file.absolutePath.equals(appItem.sourceDir, true) ||
                 fileItem.file.absolutePath.equals(appItem.publicSourceDir, true) ||
-                fileItem.file.absolutePath.equals(appItem.dataDir, true)) {
+                fileItem.file.absolutePath.equals(appItem.dataDir, true)
+            ) {
                 this.appItem = appItem
             }
         }

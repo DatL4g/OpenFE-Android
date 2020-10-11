@@ -14,7 +14,6 @@ import de.datlag.openfe.recycler.data.FileItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
@@ -123,5 +122,4 @@ class ExplorerViewModel(
         appsViewModel.systemApps.removeObserver(systemAppsObserver)
         currentDirectory.removeObserver(currentDirectoryObserver)
     }
-
 }
