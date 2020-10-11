@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getColor
@@ -70,6 +71,7 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         }
 
         initRecyclerView()
+        initSearchView()
 
         explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
             Timber.e(dir.absolutePath)
@@ -95,6 +97,25 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
         explorerRecycler.layoutManager = LinearLayoutManagerWrapper(safeContext)
         explorerRecycler.adapter = recyclerAdapter
+    }
+
+    private fun initSearchView() = with(binding) {
+        explorerSearchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                explorerViewModel.searchCurrentDirectories(newText, true)
+                return false
+            }
+
+            override fun onQueryTextCleared(): Boolean {
+                explorerViewModel.searchCurrentDirectories(null, true)
+                return false
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                explorerViewModel.searchCurrentDirectories(query, true)
+                return false
+            }
+        })
     }
 
     private fun recyclerEvent(position: Int, longClick: Boolean) = recyclerAdapter.differ.currentList.let {

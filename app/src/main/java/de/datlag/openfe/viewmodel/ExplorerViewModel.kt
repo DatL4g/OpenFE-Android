@@ -4,7 +4,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.datlag.openfe.commons.copyOf
 import de.datlag.openfe.commons.isInternal
+import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.matchWithApps
 import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.parentDir
@@ -27,6 +29,7 @@ class ExplorerViewModel(
 
     var currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
     var currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
+    private var searchDirectoriesCopy: List<ExplorerItem> = listOf()
 
     private val systemAppsObserver = Observer<AppList> { list ->
         matchNewAppsToDirectories(list)
@@ -98,6 +101,59 @@ class ExplorerViewModel(
             newPath
         } else {
             newPath.parentDir
+        }
+    }
+
+    fun searchCurrentDirectories(text: String?, recursively: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        if (currentSubDirectories.value.isNullOrEmpty() && searchDirectoriesCopy.isEmpty()) {
+            return@launch
+        } else {
+            if (text.isNotCleared()) {
+                if (searchDirectoriesCopy.isEmpty()) {
+                    searchDirectoriesCopy = currentSubDirectories.value!!.copyOf()
+                }
+                val copy = searchDirectoriesCopy.copyOf()
+                withContext(Dispatchers.Main) {
+                    currentSubDirectories.value = listOf()
+                }
+
+                for (explorerItem in copy) {
+                    if (recursively) {
+                        explorerItem.fileItem.file.walkTopDown().fold(true) { res, file ->
+                            val fileMatches = file.name.contains(text, true) && !file.isHidden
+                            if (fileMatches) {
+                                withContext(Dispatchers.Main) {
+                                    currentSubDirectories.value =
+                                        (
+                                            currentSubDirectories.value?.mutableCopyOf()
+                                                ?: mutableListOf()
+                                            ).apply {
+                                            add(
+                                                ExplorerItem.from(
+                                                    file,
+                                                    appsViewModel.systemApps.value ?: listOf()
+                                                )
+                                            )
+                                        }
+                                }
+                            }
+                            (file.exists() && fileMatches) && res
+                        }
+                    } else {
+                        if (explorerItem.fileItem.name?.contains(text, true) == true || explorerItem.fileItem.file.name.contains(text, true)) {
+                            withContext(Dispatchers.Main) {
+                                currentSubDirectories.value = (currentSubDirectories.value?.toMutableList() ?: mutableListOf()).apply { add(explorerItem) }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (searchDirectoriesCopy.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        currentDirectory.value = currentDirectory.value
+                    }
+                }
+            }
         }
     }
 
