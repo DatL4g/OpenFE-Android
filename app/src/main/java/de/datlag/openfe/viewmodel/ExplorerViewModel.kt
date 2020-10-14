@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.commons.copyOf
+import de.datlag.openfe.commons.getRootOfStorage
 import de.datlag.openfe.commons.isInternal
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.matchWithApps
@@ -39,8 +40,9 @@ class ExplorerViewModel(
     }
 
     private val currentDirectoryObserver = Observer<File> { dir ->
+        currentSubDirectories.value = listOf()
         val fileList = dir.listFiles()?.toMutableList() ?: mutableListOf()
-        val startDirParent = startDirectory.parentDir
+        val startDirParent = File(startDirectory.getRootOfStorage()).parentDir
 
         if (dir == startDirParent) {
             for (item in explorerFragmentArgs.storage.list) {
@@ -51,9 +53,19 @@ class ExplorerViewModel(
         }
 
         if (dir == File("/")) {
+            val dataPath = File("/data")
+            if (!fileList.contains(dataPath)) {
+                fileList.add(dataPath)
+            }
+
             val storagePath = File("/storage")
             if (!fileList.contains(storagePath)) {
                 fileList.add(storagePath)
+            }
+
+            val systemPath = File("/system")
+            if (!fileList.contains(systemPath)) {
+                fileList.add(systemPath)
             }
         } else {
             val parentFile = ExplorerItem(

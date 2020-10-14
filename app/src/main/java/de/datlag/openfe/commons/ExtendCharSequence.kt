@@ -8,7 +8,7 @@ fun CharSequence?.isNotCleared(): Boolean {
     contract {
         returns(true) implies (this@isNotCleared != null)
     }
-    val data = this?.trim() ?: null
+    val data = this?.trim()
 
     return !data.isNullOrEmpty() && !data.isNullOrBlank()
 }
