@@ -2,12 +2,9 @@ package de.datlag.openfe.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -18,14 +15,14 @@ import de.datlag.openfe.R
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.intentChooser
+import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.databinding.FragmentExplorerBinding
-import de.datlag.openfe.extend.AdvancedActivity
+import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.ExplorerViewModelFactory
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import de.datlag.openfe.recycler.LinearLayoutManagerWrapper
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
@@ -36,7 +33,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @AndroidEntryPoint
-class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
+class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
     private val args: ExplorerFragmentArgs by navArgs()
     private val appsViewModel: AppsViewModel by viewModels()
@@ -44,6 +41,12 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
 
     private lateinit var recyclerAdapter: ExplorerRecyclerAdapter
     private lateinit var binding: FragmentExplorerBinding
+
+    private val navigationListener = View.OnClickListener {
+        if (onBackPressedCheck()) {
+            findNavController().navigate(R.id.action_ExplorerFragment_to_OverviewFragment)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,15 +63,11 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AdvancedActivity).setSupportActionBar(explorerToolbar)
-        (activity as AdvancedActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        (activity as AdvancedActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
+        toolbar?.menu?.clear()
+        toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
+        toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
 
-        explorerToolbar.setNavigationOnClickListener {
-            if (onBackPressedCheck()) {
-                findNavController().navigate(R.id.action_ExplorerFragment_to_OverviewFragment)
-            }
-        }
+        updateToggle(false, navigationListener)
 
         initRecyclerView()
         initSearchView()
@@ -99,8 +98,8 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
         explorerRecycler.adapter = recyclerAdapter
     }
 
-    private fun initSearchView() = with(binding) {
-        explorerSearchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
+    private fun initSearchView() {
+        searchView?.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 explorerViewModel.searchCurrentDirectories(newText, true)
                 return false
@@ -159,7 +158,16 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     }
 
     private fun onBackPressedCheck(): Boolean {
-        return true
+        return when {
+            explorerViewModel.currentDirectory.value?.absolutePath == "/" -> true
+            explorerViewModel.currentDirectory.value != explorerViewModel.startDirectory -> {
+                explorerViewModel.currentDirectory.value?.let {
+                    explorerViewModel.moveToPath(it.parentDir)
+                }
+                false
+            }
+            else -> true
+        }
     }
 
     override fun onResume() {
@@ -168,12 +176,6 @@ class ExplorerFragment : Fragment(), FragmentBackPressed, FragmentOptionsMenu {
     }
 
     override fun onBackPressed(): Boolean = onBackPressedCheck()
-
-    override fun onCreateMenu(menu: Menu?, inflater: MenuInflater): Boolean = with(binding) {
-        inflater.inflate(R.menu.explorer_toolbar_menu, menu)
-        menu?.let { explorerSearchView.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
-        return true
-    }
 
     companion object {
         fun newInstance() = ExplorerFragment()

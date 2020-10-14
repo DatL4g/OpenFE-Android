@@ -8,14 +8,11 @@ import android.os.Environment
 import android.provider.Settings
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.iterator
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -46,12 +43,13 @@ import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
+import de.datlag.openfe.commons.supportActionBar
 import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
 import de.datlag.openfe.extend.AdvancedActivity
+import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.AppsActionViewModelFactory
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import de.datlag.openfe.other.AppsSortType
 import de.datlag.openfe.recycler.adapter.AppsActionRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
@@ -67,7 +65,7 @@ import kotlin.contracts.contract
 
 @ExperimentalContracts
 @AndroidEntryPoint
-class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
+class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
 
     private val args: AppsFragmentArgs by navArgs()
     private val viewModel: AppsActionViewModel by viewModels { AppsActionViewModelFactory(args) }
@@ -77,13 +75,15 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     private var copiedList = listOf<AppItem>()
     private lateinit var adapter: AppsActionRecyclerAdapter
 
+    private val navigationListener = View.OnClickListener {
+        if (onBackPressedCheck()) {
+            findNavController().navigate(R.id.action_AppsActionFragment_to_OverviewFragment)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        if (appsViewModel.apps.value.isNullOrEmpty()) {
-            statusBarColor(getColor(R.color.appsActionLoadingStatusbarColor))
-        } else {
-            statusBarColor(getColor(R.color.appsActionStatusbarColor))
-        }
+        statusBarColor(getColor(R.color.appsActionStatusbarColor))
     }
 
     override fun onCreateView(
@@ -102,14 +102,19 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AdvancedActivity).setSupportActionBar(appsActionToolbar)
-        (activity as AdvancedActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        (activity as AdvancedActivity).supportActionBar?.setDisplayShowHomeEnabled(true)
+        updateToggle(false, navigationListener)
         updateToolbar()
 
-        appsActionToolbar.setNavigationOnClickListener {
-            if (onBackPressedCheck()) {
-                findNavController().navigate(R.id.action_AppsActionFragment_to_OverviewFragment)
+        toolbar?.menu?.clear()
+        toolbar?.inflateMenu(R.menu.apps_action_toolbar_menu)
+        toolbar?.menu?.let {
+            searchView?.setMenuItem(it.findItem(R.id.appsActionSearchItem))
+            for (item in it.iterator()) {
+                if (item.itemId != R.id.appsActionSearchItem) {
+                    item.setOnMenuItemClickListener { menuItem ->
+                        return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
+                    }
+                }
             }
         }
 
@@ -152,8 +157,8 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
     }
 
     @ExperimentalContracts
-    private fun initEditText() = with(binding) {
-        appsActionSearchView.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
+    private fun initEditText() {
+        searchView?.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -226,10 +231,8 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
                 adapter.submitList(list)
                 copiedList = list.mutableCopyOf()
                 loadingTextView.hide()
-                appBar.show()
                 appsActionRecycler.show()
                 appsActionLayoutWrapper.show()
-                statusBarColor(getColor(R.color.appsActionStatusbarColor))
             }
         }
     }
@@ -437,21 +440,6 @@ class AppsFragment : Fragment(), FragmentOptionsMenu, FragmentBackPressed, Popup
             }
         }
         return false
-    }
-
-    override fun onCreateMenu(menu: Menu?, inflater: MenuInflater): Boolean = with(binding) {
-        inflater.inflate(R.menu.apps_action_toolbar_menu, menu)
-        menu?.let {
-            appsActionSearchView.setMenuItem(it.findItem(R.id.appsActionSearchItem))
-            for (item in it.iterator()) {
-                if (item.itemId != R.id.appsActionSearchItem) {
-                    item.setOnMenuItemClickListener { menuItem ->
-                        return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
-                    }
-                }
-            }
-        }
-        return true
     }
 
     override fun onBackPressed(): Boolean {

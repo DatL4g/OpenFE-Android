@@ -14,6 +14,9 @@
     <string name="installed">Installed</string>
     <string name="updated">Updated</string>
 
+    <string name="drawer_open">Open Drawer</string>
+    <string name="drawer_close">Close Drawer</string>
+
     <string name="app_category_undefined">(UNDEFINED)</string>
     <string name="app_category_game">Game</string>
     <string name="app_category_audio">Audio</string>

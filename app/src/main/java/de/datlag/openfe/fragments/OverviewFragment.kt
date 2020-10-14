@@ -13,9 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.view.GravityCompat
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,7 +34,7 @@ import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
-import de.datlag.openfe.extend.AdvancedActivity
+import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
@@ -47,7 +45,7 @@ import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
-class OverviewFragment : Fragment(), FragmentBackPressed {
+class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
 
     lateinit var locationList: List<LocationItem>
     lateinit var actionList: List<ActionItem>
@@ -77,11 +75,8 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as AdvancedActivity).setSupportActionBar(toolBar)
-        val toggle = ActionBarDrawerToggle(requireActivity(), drawer, toolBar, R.string.app_name, R.string.app_name)
-        toggle.drawerArrowDrawable.color = getColor(R.color.overviewDrawerToggleColor)
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
+        toolbar?.menu?.clear()
+        updateToggle(true)
 
         locationRecycler.isNestedScrollingEnabled = false
         locationRecycler.layoutManager = LinearLayoutManager(safeContext)
@@ -205,9 +200,9 @@ class OverviewFragment : Fragment(), FragmentBackPressed {
         statusBarColor(getColor(R.color.overviewStatusbarColor))
     }
 
-    override fun onBackPressed(): Boolean = with(binding) {
-        return if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
+    override fun onBackPressed(): Boolean {
+        return if (drawer?.isDrawerOpen(GravityCompat.START) == true) {
+            drawer?.closeDrawer(GravityCompat.START)
             false
         } else {
             true

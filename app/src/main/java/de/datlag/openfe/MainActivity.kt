@@ -3,7 +3,14 @@ package de.datlag.openfe
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import com.ferfalk.simplesearchview.SimpleSearchView
+import de.datlag.openfe.commons.toggle
+import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
@@ -11,9 +18,34 @@ import timber.log.Timber
 
 class MainActivity : AdvancedActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
+    val toolbar: Toolbar
+        get() = binding.toolBar
+
+    val searchView: SimpleSearchView
+        get() = binding.searchview
+
+    val drawer: DrawerLayout
+        get() = binding.drawer
+
+    lateinit var toggle: ActionBarDrawerToggle
+    var toggleListener = View.OnClickListener { drawer.toggle() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        initViews()
+    }
+
+    private fun initViews() = with(binding) {
+        setSupportActionBar(toolBar)
+        toggle = ActionBarDrawerToggle(this@MainActivity, drawer, toolbar, R.string.drawer_open, R.string.drawer_close)
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
+        toggle.toolbarNavigationClickListener?.let { toggleListener = it }
     }
 
     private fun getCurrentNavFragment(): Fragment? {

@@ -5,47 +5,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/defaultBackgroundColor">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/explorerAppBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="visible">
-
-        <de.datlag.openfe.extend.ReverseFrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.ferfalk.simplesearchview.SimpleSearchView
-                android:id="@+id/explorerSearchView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/explorerToolbarColor"
-                app:type="card"
-                app:iconsTint="@color/explorerToolbarColor"
-                app:backIconTint="@color/explorerToolbarColor" />
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/explorerToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/explorerToolbarColor"
-                app:titleTextColor="@color/explorerToolbarTextColor" />
-
-        </de.datlag.openfe.extend.ReverseFrameLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/explorerRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintVertical_weight="1"
         android:background="@color/defaultBackgroundColor"
-        app:layout_constraintTop_toBottomOf="@id/explorerAppBar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintRight_toRightOf="parent"

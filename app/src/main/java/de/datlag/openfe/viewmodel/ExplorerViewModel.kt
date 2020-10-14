@@ -26,7 +26,7 @@ class ExplorerViewModel(
     private val appsViewModel: AppsViewModel
 ) : ViewModel() {
 
-    private val startDirectory: File = getStartDirectory(explorerFragmentArgs)
+    val startDirectory: File = getStartDirectory(explorerFragmentArgs)
 
     var currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
     var currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())

@@ -8,6 +8,8 @@ import android.view.WindowManager
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -15,6 +17,9 @@ import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
 
 val Fragment.safeContext: Context
     get() = this.context ?: this.activity ?: this.requireContext()
+
+val Fragment.supportActionBar: ActionBar?
+    get() = (this.activity as? AppCompatActivity?)?.supportActionBar
 
 @Suppress("DEPRECATION")
 fun Fragment.statusBarColor(@ColorInt color: Int) {
