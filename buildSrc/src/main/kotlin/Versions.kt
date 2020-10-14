@@ -8,7 +8,7 @@ object Versions {
     const val coroutines = "1.3.9"
     const val dexter = "6.1.2"
     const val glide = "4.11.0"
-    const val gradle = "4.0.1"
+    const val gradle = "4.1.0"
     const val hilt = "2.28.1-alpha"
     const val hiltAndroidX = "1.0.0-alpha02"
     const val junit = "4.13"

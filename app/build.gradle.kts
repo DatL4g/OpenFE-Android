@@ -61,7 +61,7 @@ android {
     }
 
     aaptOptions {
-        additionalParameters = listOf("--no-version-vectors")
+        additionalParameters("--no-version-vectors")
     }
 
     testOptions {
