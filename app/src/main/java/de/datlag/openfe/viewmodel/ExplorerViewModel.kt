@@ -91,7 +91,7 @@ class ExplorerViewModel(
     }
 
     private fun createSubDirectories(fileList: MutableList<File>) = viewModelScope.launch(Dispatchers.IO) {
-        fileList.sort()
+        fileList.sortWith(compareByDescending<File> { it.isDirectory }.thenBy { it.name })
         val iterator = fileList.listIterator()
 
         while (iterator.hasNext()) {
