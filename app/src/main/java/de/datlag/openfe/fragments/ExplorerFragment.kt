@@ -1,5 +1,6 @@
 package de.datlag.openfe.fragments
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,12 +14,14 @@ import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getColor
+import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.intentChooser
 import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.statusBarColor
+import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.ExplorerViewModelFactory
@@ -67,8 +70,9 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
         toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
 
-        updateToggle(false, navigationListener)
+        updateToggle(false, getColor(R.color.explorerToggleNavigationColor), navigationListener)
 
+        initBottomNavigation()
         initRecyclerView()
         initSearchView()
 
@@ -80,6 +84,20 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
             checkViewVisibility(list.size)
             recyclerAdapter.submitList(list)
         }
+    }
+
+    private fun initBottomNavigation() {
+        bottomNavigation?.menu?.clear()
+        bottomNavigation?.inflateMenu(R.menu.explorer_bottom_menu)
+        bottomNavigation?.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                else -> false
+            }
+        }
+        val iconDrawable = getDrawable(R.drawable.ic_baseline_add_24)
+        fab?.setImageDrawable(iconDrawable?.tint(Color.WHITE))
+
+        updateBottom(showBar = false, showFAB = true)
     }
 
     private fun initRecyclerView() = with(binding) {

@@ -9,6 +9,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.ferfalk.simplesearchview.SimpleSearchView
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.datlag.openfe.commons.toggle
 import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
@@ -28,6 +31,15 @@ class MainActivity : AdvancedActivity() {
 
     val drawer: DrawerLayout
         get() = binding.drawer
+
+    val bottomAppBar: BottomAppBar
+        get() = binding.bottomAppBar
+
+    val bottomNavigation: BottomNavigationView
+        get() = binding.bottomNavigation
+
+    val fab: FloatingActionButton
+        get() = binding.fab
 
     lateinit var toggle: ActionBarDrawerToggle
     var toggleListener = View.OnClickListener { drawer.toggle() }

@@ -4,13 +4,15 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 
 fun Drawable.tint(color: Int): Drawable {
-    var wrappedDrawable = this.mutate()
-    wrappedDrawable = DrawableCompat.wrap(wrappedDrawable)
+    val wrappedDrawable = DrawableCompat.wrap(this.mutate())
     DrawableCompat.setTint(wrappedDrawable, color)
     DrawableCompat.setTintMode(wrappedDrawable, PorterDuff.Mode.SRC_IN)
+    wrappedDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN)
     return wrappedDrawable
 }
 

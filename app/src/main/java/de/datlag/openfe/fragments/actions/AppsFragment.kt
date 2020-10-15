@@ -18,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.ferfalk.simplesearchview.SimpleSearchView
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -46,7 +45,6 @@ import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.supportActionBar
 import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
-import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.AppsActionViewModelFactory
 import de.datlag.openfe.interfaces.FragmentBackPressed
@@ -102,7 +100,7 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateToggle(false, navigationListener)
+        updateToggle(false, getColor(R.color.appsActionToggleNavigationColor), navigationListener)
         updateToolbar()
 
         toolbar?.menu?.clear()
@@ -132,28 +130,14 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         )
         adapter = AppsActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
-                appsActionBottomNavigation.show()
                 viewModel.selectedApp = copiedList[position]
                 appsActionLayoutWrapper.requestLayout()
                 updateToolbar()
+                updateBottom(showBar = true, showFAB = false)
             }
         }
         adapter.submitList(listOf())
         appsActionRecycler.adapter = adapter
-        appsActionRecycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0) {
-                    if (dy >= 24) {
-                        appsActionBottomNavigation.hide()
-                    }
-                } else {
-                    if (itemValid()) {
-                        appsActionBottomNavigation.show()
-                    }
-                }
-            }
-        })
     }
 
     @ExperimentalContracts
@@ -201,8 +185,12 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         })
     }
 
-    private fun initBottomNavigation() = with(binding) {
-        appsActionBottomNavigation.setOnNavigationItemSelectedListener {
+    private fun initBottomNavigation() {
+        bottomNavigation?.menu?.clear()
+        bottomNavigation?.inflateMenu(R.menu.apps_action_bottom_menu)
+        updateBottom(showBar = false, showFAB = false)
+
+        bottomNavigation?.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.appsActionBottomUninstallApp -> {
                     requestUninstall()
@@ -393,11 +381,11 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         return false
     }
 
-    private fun onBackPressedCheck(): Boolean = with(binding) {
+    private fun onBackPressedCheck(): Boolean {
         return if (itemValid()) {
             viewModel.selectedApp = null
-            appsActionBottomNavigation.hide()
             updateToolbar()
+            updateBottom(showBar = false, showFAB = false)
             false
         } else {
             true
@@ -406,8 +394,8 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
 
     private fun updateToolbar() {
         if (itemValid()) {
-            (activity as AdvancedActivity).supportActionBar?.title = viewModel.selectedApp!!.name
-            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(
+            supportActionBar?.title = viewModel.selectedApp!!.name
+            supportActionBar?.setHomeAsUpIndicator(
                 getDrawable(R.drawable.ic_close_24dp)?.apply {
                     tint(
                         getColor(
@@ -417,8 +405,8 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
                 }
             )
         } else {
-            (activity as AdvancedActivity).supportActionBar?.title = safeContext.getString(R.string.app_name)
-            (activity as AdvancedActivity).supportActionBar?.setHomeAsUpIndicator(
+            supportActionBar?.title = safeContext.getString(R.string.app_name)
+            supportActionBar?.setHomeAsUpIndicator(
                 getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
                     tint(
                         getColor(

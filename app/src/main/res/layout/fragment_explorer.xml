@@ -24,7 +24,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        style="@style/DayNight.BottomNavigationView.Colored"
         app:menu="@menu/explorer_bottom_menu"
         app:itemIconTint="@color/defaultToolBarContentColor"
         app:itemTextColor="@color/defaultToolBarContentColor"

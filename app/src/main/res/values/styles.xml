@@ -62,8 +62,8 @@
         <item name="android:radius">16dp</item>
     </style>
 
-    <style name="DayNight.BottomNavigationView.Colored" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
-        <item name="android:background">@color/defaultToolBarColor</item>
+    <style name="DayNight.BottomAppBar.Colored" parent="Widget.MaterialComponents.BottomAppBar.Colored">
+        <item name="backgroundTint">@color/defaultToolBarColor</item>
     </style>
 
     <style name="ExplorerCheckBox" parent="ExplorerFragmentTheme">

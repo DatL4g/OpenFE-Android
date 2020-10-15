@@ -47,23 +47,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/appsActionBottomNavigation"/>
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/appsActionBottomNavigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            style="@style/DayNight.BottomNavigationView.Colored"
-            app:menu="@menu/apps_action_bottom_menu"
-            app:itemIconTint="@color/defaultToolBarContentColor"
-            app:itemTextColor="@color/defaultToolBarContentColor"
-            app:labelVisibilityMode="labeled"
-            app:layout_constraintTop_toBottomOf="@id/appsActionRecycler"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

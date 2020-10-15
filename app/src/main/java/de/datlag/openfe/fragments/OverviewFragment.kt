@@ -76,7 +76,8 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         super.onViewCreated(view, savedInstanceState)
 
         toolbar?.menu?.clear()
-        updateToggle(true)
+        updateToggle(true, getColor(R.color.overviewToggleNavigationColor))
+        updateBottom(showBar = false, showFAB = false)
 
         locationRecycler.isNestedScrollingEnabled = false
         locationRecycler.layoutManager = LinearLayoutManager(safeContext)

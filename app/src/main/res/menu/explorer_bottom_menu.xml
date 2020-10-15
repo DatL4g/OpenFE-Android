@@ -16,6 +16,11 @@
         android:title="Move" />
 
     <item
+        android:id="@+id/explorerBottomPlaceholder"
+        android:enabled="false"
+        android:title="" />
+
+    <item
         android:id="@+id/explorerBottomCopy"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_file_copy_24"
