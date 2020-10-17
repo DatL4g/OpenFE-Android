@@ -6,6 +6,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     id("dagger.hilt.android.plugin")
     id("org.jmailen.kotlinter")
+    id("io.michaelrocks.paranoid")
 }
 
 android {

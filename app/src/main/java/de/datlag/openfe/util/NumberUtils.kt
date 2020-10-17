@@ -21,10 +21,12 @@ import de.datlag.openfe.enums.AppInstallLocation
 import de.datlag.openfe.enums.AppInstallLocation.AUTO
 import de.datlag.openfe.enums.AppInstallLocation.INTERNAL_ONLY
 import de.datlag.openfe.enums.AppInstallLocation.PREFER_EXTERNAL
+import io.michaelrocks.paranoid.Obfuscate
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Obfuscate
 object NumberUtils {
 
     private const val DEFAULT_DATE_FORMAT = "dd. MMM YYYY"

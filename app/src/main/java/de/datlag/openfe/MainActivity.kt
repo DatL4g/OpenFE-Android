@@ -17,8 +17,10 @@ import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
+import io.michaelrocks.paranoid.Obfuscate
 import timber.log.Timber
 
+@Obfuscate
 class MainActivity : AdvancedActivity() {
 
     private lateinit var binding: ActivityMainBinding

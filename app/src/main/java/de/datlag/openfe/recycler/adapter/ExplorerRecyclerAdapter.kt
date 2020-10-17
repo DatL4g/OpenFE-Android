@@ -23,6 +23,7 @@ import de.datlag.openfe.commons.uri
 import de.datlag.openfe.databinding.ExplorerItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,7 @@ import kotlinx.coroutines.withContext
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
+@Obfuscate
 class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : ClickRecyclerAdapter<ExplorerRecyclerAdapter.ViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<ExplorerItem>() {

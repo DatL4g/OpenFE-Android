@@ -24,6 +24,7 @@ object Versions {
     const val material = "1.2.1"
     const val multidex = "2.0.1"
     const val navigation = "2.3.0"
+    const val paranoid = "0.3.2"
     const val recyclerview = "1.1.0"
     const val searchview = "0.1.5"
     const val testJunit = "1.1.2"

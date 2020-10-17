@@ -54,6 +54,7 @@ import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.util.PermissionChecker
 import de.datlag.openfe.viewmodel.AppsActionViewModel
 import de.datlag.openfe.viewmodel.AppsViewModel
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,6 +64,7 @@ import kotlin.contracts.contract
 
 @ExperimentalContracts
 @AndroidEntryPoint
+@Obfuscate
 class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
 
     private val args: AppsFragmentArgs by navArgs()
@@ -133,7 +135,8 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
                 viewModel.selectedApp = copiedList[position]
                 appsActionLayoutWrapper.requestLayout()
                 updateToolbar()
-                updateBottom(showBar = true, showFAB = false)
+                updateBottom(true)
+                updateFAB(false)
             }
         }
         adapter.submitList(listOf())
@@ -188,7 +191,8 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
     private fun initBottomNavigation() {
         bottomNavigation?.menu?.clear()
         bottomNavigation?.inflateMenu(R.menu.apps_action_bottom_menu)
-        updateBottom(showBar = false, showFAB = false)
+        updateBottom(false)
+        updateFAB(false)
 
         bottomNavigation?.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -385,7 +389,8 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         return if (itemValid()) {
             viewModel.selectedApp = null
             updateToolbar()
-            updateBottom(showBar = false, showFAB = false)
+            updateBottom(false)
+            updateFAB(false)
             false
         } else {
             true

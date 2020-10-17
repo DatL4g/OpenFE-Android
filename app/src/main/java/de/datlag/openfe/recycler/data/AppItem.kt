@@ -11,10 +11,12 @@ import de.datlag.openfe.enums.AppCategory
 import de.datlag.openfe.enums.AppInstallLocation
 import de.datlag.openfe.util.NumberUtils.getAppCategory
 import de.datlag.openfe.util.NumberUtils.getAppInstallLocation
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
 
 @Parcelize
+@Obfuscate
 data class AppItem(
     val icon: @RawValue Drawable?,
     val name: String,

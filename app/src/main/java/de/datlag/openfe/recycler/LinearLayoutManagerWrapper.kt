@@ -3,7 +3,9 @@ package de.datlag.openfe.recycler
 import android.content.Context
 import android.util.AttributeSet
 import androidx.recyclerview.widget.LinearLayoutManager
+import io.michaelrocks.paranoid.Obfuscate
 
+@Obfuscate
 class LinearLayoutManagerWrapper : LinearLayoutManager {
 
     constructor(context: Context) : super(context)

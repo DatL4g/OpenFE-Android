@@ -2,7 +2,9 @@ package de.datlag.openfe.extend
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import io.michaelrocks.paranoid.Obfuscate
 
+@Obfuscate
 abstract class ClickRecyclerAdapter<VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>() {
 
     protected var clickListener: ((view: View, position: Int) -> Unit)? = null

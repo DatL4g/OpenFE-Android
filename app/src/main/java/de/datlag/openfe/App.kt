@@ -5,9 +5,11 @@ import dagger.hilt.android.HiltAndroidApp
 import io.github.inflationx.calligraphy3.CalligraphyConfig
 import io.github.inflationx.calligraphy3.CalligraphyInterceptor
 import io.github.inflationx.viewpump.ViewPump
+import io.michaelrocks.paranoid.Obfuscate
 import timber.log.Timber
 
 @HiltAndroidApp
+@Obfuscate
 class App : MultiDexApplication() {
 
     override fun onCreate() {

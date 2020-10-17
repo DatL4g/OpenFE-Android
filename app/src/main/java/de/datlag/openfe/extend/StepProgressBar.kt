@@ -16,7 +16,9 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getDimenInPixel
 import de.datlag.openfe.commons.mapOf
+import io.michaelrocks.paranoid.Obfuscate
 
+@Obfuscate
 class StepProgressBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

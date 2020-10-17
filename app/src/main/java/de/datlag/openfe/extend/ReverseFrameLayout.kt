@@ -3,7 +3,9 @@ package de.datlag.openfe.extend
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import io.michaelrocks.paranoid.Obfuscate
 
+@Obfuscate
 open class ReverseFrameLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
 
     init {

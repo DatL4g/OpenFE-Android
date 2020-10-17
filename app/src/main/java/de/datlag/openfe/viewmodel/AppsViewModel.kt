@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.other.AppsSortType
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.repository.AppsRepository
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -16,6 +17,7 @@ typealias AppList = List<AppItem>
 typealias MutableAppList = MutableList<AppItem>
 typealias AppLiveData = MutableLiveData<AppList>
 
+@Obfuscate
 class AppsViewModel @ViewModelInject constructor(
     private val appsRepository: AppsRepository
 ) : ViewModel() {

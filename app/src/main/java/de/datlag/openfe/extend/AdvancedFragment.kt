@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.ferfalk.simplesearchview.SimpleSearchView
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -20,9 +21,11 @@ import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.supportActionBar
 import de.datlag.openfe.commons.tint
 import de.datlag.openfe.commons.toggle
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.synthetic.main.activity_main.*
 
 @AndroidEntryPoint
+@Obfuscate
 abstract class AdvancedFragment : Fragment() {
 
     protected val toolbar: Toolbar?
@@ -125,7 +128,7 @@ abstract class AdvancedFragment : Fragment() {
         }
     }
 
-    protected fun updateBottom(showBar: Boolean, showFAB: Boolean) {
+    protected fun updateBottom(showBar: Boolean) {
         if (showBar) {
             bottomNavigation?.show()
             bottomAppBar?.show()
@@ -135,10 +138,14 @@ abstract class AdvancedFragment : Fragment() {
             bottomAppBar?.performHide()
             bottomAppBar?.invisible()
         }
+    }
 
-        if (showFAB) {
+    protected fun updateFAB(show: Boolean) {
+        if (show) {
             fab?.show()
+            fab?.let { (it.behavior as? HideBottomViewOnScrollBehavior?)?.slideUp(it) }
         } else {
+            fab?.let { (it.behavior as? HideBottomViewOnScrollBehavior?)?.slideDown(it) }
             fab?.hide()
         }
     }

@@ -1,5 +1,8 @@
 package de.datlag.openfe.enums
 
+import io.michaelrocks.paranoid.Obfuscate
+
+@Obfuscate
 enum class MarginSide {
     TOP,
     LEFT,

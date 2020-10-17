@@ -31,11 +31,13 @@ import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
+import io.michaelrocks.paranoid.Obfuscate
 import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @AndroidEntryPoint
+@Obfuscate
 class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
     private val args: ExplorerFragmentArgs by navArgs()
@@ -97,7 +99,8 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         val iconDrawable = getDrawable(R.drawable.ic_baseline_add_24)
         fab?.setImageDrawable(iconDrawable?.tint(Color.WHITE))
 
-        updateBottom(showBar = false, showFAB = true)
+        updateBottom(false)
+        updateFAB(true)
     }
 
     private fun initRecyclerView() = with(binding) {
@@ -117,6 +120,23 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
     }
 
     private fun initSearchView() {
+        searchView?.setOnSearchViewListener(object : SimpleSearchView.SearchViewListener {
+            override fun onSearchViewShown() {
+                updateFAB(false)
+            }
+
+            override fun onSearchViewShownAnimation() {
+                updateFAB(false)
+            }
+
+            override fun onSearchViewClosed() {
+                updateFAB(true)
+            }
+
+            override fun onSearchViewClosedAnimation() {
+                updateFAB(true)
+            }
+        })
         searchView?.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 explorerViewModel.searchCurrentDirectories(newText, true)

@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
+import io.michaelrocks.paranoid.Obfuscate
 
 @AndroidEntryPoint
+@Obfuscate
 abstract class AdvancedActivity : AppCompatActivity() {
 
     companion object {

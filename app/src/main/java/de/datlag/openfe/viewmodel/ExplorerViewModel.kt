@@ -14,6 +14,7 @@ import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.recycler.data.FileItem
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -22,7 +23,8 @@ import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
-class ExplorerViewModel(
+@Obfuscate
+class ExplorerViewModel constructor(
     private val explorerFragmentArgs: ExplorerFragmentArgs,
     private val appsViewModel: AppsViewModel
 ) : ViewModel() {

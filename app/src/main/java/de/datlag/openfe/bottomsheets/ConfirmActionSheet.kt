@@ -17,9 +17,11 @@ import de.datlag.openfe.commons.setMargin
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.databinding.ConfirmActionSheetBinding
 import de.datlag.openfe.enums.MarginSide
+import io.michaelrocks.paranoid.Obfuscate
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
+@Obfuscate
 class ConfirmActionSheet : BottomSheetDialogFragment() {
 
     private var binding: ConfirmActionSheetBinding? = null

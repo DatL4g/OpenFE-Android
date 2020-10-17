@@ -41,10 +41,12 @@ import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.PermissionChecker
+import io.michaelrocks.paranoid.Obfuscate
 import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
+@Obfuscate
 class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
 
     lateinit var locationList: List<LocationItem>
@@ -77,7 +79,8 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
 
         toolbar?.menu?.clear()
         updateToggle(true, getColor(R.color.overviewToggleNavigationColor))
-        updateBottom(showBar = false, showFAB = false)
+        updateBottom(false)
+        updateFAB(false)
 
         locationRecycler.isNestedScrollingEnabled = false
         locationRecycler.layoutManager = LinearLayoutManager(safeContext)

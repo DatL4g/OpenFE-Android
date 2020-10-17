@@ -12,9 +12,11 @@ import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.databinding.AppsActionInfoSheetBinding
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.util.NumberUtils.convertToDate
+import io.michaelrocks.paranoid.Obfuscate
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
+@Obfuscate
 class AppsActionInfoSheet : BottomSheetDialogFragment() {
 
     private lateinit var binding: AppsActionInfoSheetBinding

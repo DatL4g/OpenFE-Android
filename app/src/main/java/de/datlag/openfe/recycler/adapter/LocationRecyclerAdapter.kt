@@ -11,8 +11,10 @@ import de.datlag.openfe.databinding.LocationItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.toHumanReadable
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.extensions.LayoutContainer
 
+@Obfuscate
 class LocationRecyclerAdapter : ClickRecyclerAdapter<LocationRecyclerAdapter.ViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<LocationItem>() {

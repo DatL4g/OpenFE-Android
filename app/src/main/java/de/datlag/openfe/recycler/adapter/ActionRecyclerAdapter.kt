@@ -10,8 +10,10 @@ import de.datlag.openfe.R
 import de.datlag.openfe.databinding.ActionItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.extensions.LayoutContainer
 
+@Obfuscate
 class ActionRecyclerAdapter : ClickRecyclerAdapter<ActionRecyclerAdapter.ViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<ActionItem>() {

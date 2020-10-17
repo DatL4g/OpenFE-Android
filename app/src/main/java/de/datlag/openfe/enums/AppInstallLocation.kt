@@ -2,7 +2,9 @@ package de.datlag.openfe.enums
 
 import android.content.Context
 import de.datlag.openfe.R
+import io.michaelrocks.paranoid.Obfuscate
 
+@Obfuscate
 enum class AppInstallLocation(val associatedValue: Int) {
 
     AUTO(0),

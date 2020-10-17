@@ -16,9 +16,11 @@ import de.datlag.openfe.commons.setMargin
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.databinding.FileProgressSheetBinding
 import de.datlag.openfe.enums.MarginSide
+import io.michaelrocks.paranoid.Obfuscate
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
+@Obfuscate
 class FileProgressSheet : BottomSheetDialogFragment() {
 
     var binding: FileProgressSheetBinding? = null
