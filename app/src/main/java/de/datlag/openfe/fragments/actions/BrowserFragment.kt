@@ -9,11 +9,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.core.view.iterator
 import androidx.navigation.fragment.findNavController
@@ -22,6 +19,7 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getColor
+import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.invisible
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.show
@@ -49,10 +47,7 @@ class BrowserFragment : AdvancedFragment(), FragmentBackPressed {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val contextThemeWrapper = ContextThemeWrapper(safeContext, R.style.BrowserActionFragmentTheme)
-        val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
-
-        binding = FragmentBrowserActionBinding.inflate(clonedLayoutInflater, container, false)
+        binding = FragmentBrowserActionBinding.inflate(getThemedLayoutInflater(inflater), container, false)
         return binding.root
     }
 
@@ -69,7 +64,7 @@ class BrowserFragment : AdvancedFragment(), FragmentBackPressed {
                 }
             }
         }
-        updateToggle(false, getColor(R.color.browserActionToggleNavigationColor), navigationListener)
+        updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
         nightModeHelper = NightModeUtil(safeContext, activity)
 
         browserWebview.webViewClient = object : WebViewClient() {

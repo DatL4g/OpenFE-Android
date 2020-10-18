@@ -1,11 +1,9 @@
 package de.datlag.openfe.fragments
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -15,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.intentChooser
 import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.permissions
@@ -57,10 +56,8 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val contextThemeWrapper = ContextThemeWrapper(safeContext, R.style.ExplorerFragmentTheme)
-        val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
 
-        binding = FragmentExplorerBinding.inflate(clonedLayoutInflater, container, false)
+        binding = FragmentExplorerBinding.inflate(getThemedLayoutInflater(inflater), container, false)
         return binding.root
     }
 
@@ -71,7 +68,7 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
         toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
 
-        updateToggle(false, getColor(R.color.explorerToggleNavigationColor), navigationListener)
+        updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
 
         initBottomNavigation()
         initRecyclerView()
@@ -107,7 +104,7 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
             }
         }
         val iconDrawable = getDrawable(R.drawable.ic_baseline_add_24)
-        fab?.setImageDrawable(iconDrawable?.tint(Color.WHITE))
+        fab?.setImageDrawable(iconDrawable?.tint(getColor(R.color.defaultFabContentColor)))
 
         updateBottom(false)
         updateFAB(true)
@@ -196,6 +193,7 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
     }
 
     private fun onBackPressedCheck(): Boolean {
+        searchView?.onBackPressed()
         return when {
             explorerViewModel.currentDirectory.value?.absolutePath == "/" -> true
             explorerViewModel.currentDirectory.value != explorerViewModel.startDirectory -> {
@@ -210,7 +208,7 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
     override fun onResume() {
         super.onResume()
-        statusBarColor(getColor(R.color.explorerStatusbarColor))
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
     }
 
     override fun onBackPressed(): Boolean = onBackPressedCheck()

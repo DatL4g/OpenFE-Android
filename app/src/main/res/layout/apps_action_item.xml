@@ -21,7 +21,7 @@
         app:cardCornerRadius="5dp"
         app:cardMaxElevation="4dp"
         app:cardElevation="4dp"
-        app:cardBackgroundColor="@color/appsActionCardDefaultColor"
+        app:cardBackgroundColor="@color/coloredCardDefaultColor"
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:clickable="true">
@@ -55,7 +55,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/appsActionTextColor"
+                android:textColor="@color/defaultContentColor"
                 android:paddingLeft="2dp"
                 android:paddingStart="2dp"
                 android:paddingRight="2dp"

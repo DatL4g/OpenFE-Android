@@ -85,7 +85,7 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
         val fileName = item.fileItem.name ?: file.name
         val context = holder.containerView?.context ?: holder.itemView.context
         val fallback = (if (fileIsApk) ContextCompat.getDrawable(context, R.drawable.ic_adb_24dp) else ContextCompat.getDrawable(context, R.drawable.ic_baseline_insert_drive_file_24))?.apply {
-            tint(ContextCompat.getColor(context, R.color.explorerIconTint))
+            tint(ContextCompat.getColor(context, R.color.coloredIconTint))
         }
 
         // this fixes random icons for files of previous folders
@@ -95,13 +95,13 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
         when {
             file.isDirectory -> {
                 Glide.with(context)
-                    .load(ContextCompat.getDrawable(context, R.drawable.ic_baseline_folder_24)?.apply { tint(ContextCompat.getColor(context, R.color.explorerIconTint)) })
+                    .load(ContextCompat.getDrawable(context, R.drawable.ic_baseline_folder_24)?.apply { tint(ContextCompat.getColor(context, R.color.coloredIconTint)) })
                     .into(binding.explorerIcon)
 
                 Glide.with(context)
                     .asBitmap()
                     .placeholder(null)
-                    .load(item.appItem?.icon?.toBitmap()?.fillTransparent()?.applyBorder(10F, ContextCompat.getColor(context, R.color.explorerFileDefaultColor)))
+                    .load(item.appItem?.icon?.toBitmap()?.fillTransparent()?.applyBorder(15F, ContextCompat.getColor(context, R.color.explorerCardDefaultColor)))
                     .apply(RequestOptions.circleCropTransform())
                     .into(binding.explorerAppIcon)
             }

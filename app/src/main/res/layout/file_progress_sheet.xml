@@ -74,7 +74,7 @@
         android:layout_marginLeft="@dimen/fileProgressSheetButtonSideMargin"
         android:layout_marginStart="@dimen/fileProgressSheetButtonSideMargin"
         android:background="@drawable/confirm_button_right_selector"
-        android:textColor="@color/highlightTextColor"
+        android:textColor="@color/highlightColor"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintTop_toBottomOf="@id/fileProgressBar"

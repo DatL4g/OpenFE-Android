@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -33,6 +32,7 @@ import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
@@ -83,7 +83,7 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
 
     override fun onResume() {
         super.onResume()
-        statusBarColor(getColor(R.color.appsActionStatusbarColor))
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
     }
 
     override fun onCreateView(
@@ -91,18 +91,14 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val contextThemeWrapper = ContextThemeWrapper(safeContext, R.style.AppsActionFragmentTheme)
-        val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
-
-        safeContext.theme.applyStyle(R.style.AppsActionFragmentTheme, true)
-        binding = FragmentAppsActionBinding.inflate(clonedLayoutInflater, container, false)
+        binding = FragmentAppsActionBinding.inflate(getThemedLayoutInflater(inflater), container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateToggle(false, getColor(R.color.appsActionToggleNavigationColor), navigationListener)
+        updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
         updateToolbar()
 
         toolbar?.menu?.clear()
@@ -386,6 +382,7 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
     }
 
     private fun onBackPressedCheck(): Boolean {
+        searchView?.onBackPressed()
         return if (itemValid()) {
             viewModel.selectedApp = null
             updateToolbar()
@@ -404,7 +401,7 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
                 getDrawable(R.drawable.ic_close_24dp)?.apply {
                     tint(
                         getColor(
-                            R.color.appsActionToolbarIconTint
+                            R.color.defaultNavigationColor
                         )
                     )
                 }
@@ -415,7 +412,7 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
                 getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
                     tint(
                         getColor(
-                            R.color.appsActionToolbarIconTint
+                            R.color.defaultNavigationColor
                         )
                     )
                 }

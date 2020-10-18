@@ -28,18 +28,18 @@
                 android:id="@+id/searchview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/explorerToolbarColor"
+                android:background="@color/defaultToolBarColor"
                 android:visibility="gone"
                 app:type="card"
-                app:iconsTint="@color/explorerToolbarColor"
-                app:backIconTint="@color/explorerToolbarColor" />
+                app:iconsTint="@color/defaultToolBarContentColor"
+                app:backIconTint="@color/defaultToolBarColor" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/explorerToolbarColor"
-                app:titleTextColor="@color/explorerToolbarTextColor" />
+                android:background="@color/defaultToolBarColor"
+                app:titleTextColor="@color/defaultToolBarContentColor" />
 
         </de.datlag.openfe.extend.ReverseFrameLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -94,13 +94,13 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:tint="@color/highlightTextColor"
-        app:backgroundTint="@color/defaultStatusBarColor"
+        android:tint="@color/defaultFabContentColor"
+        app:backgroundTint="@color/defaultFabBackgroundColor"
         app:elevation="2dp"
         app:fabSize="normal"
         app:layout_anchor="@id/bottomAppBar"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"
-        app:tint="@color/highlightTextColor" />
+        app:tint="@color/defaultFabContentColor" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

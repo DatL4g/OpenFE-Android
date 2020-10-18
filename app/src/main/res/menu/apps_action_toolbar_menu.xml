@@ -4,14 +4,14 @@
     <item
         android:id="@+id/appsActionSearchItem"
         android:icon="@drawable/ic_search_24dp"
-        app:iconTint="@color/appsActionToolbarIconTint"
+        app:iconTint="@color/defaultToolBarContentColor"
         android:title="@string/search"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/appsActionFilterItem"
         android:icon="@drawable/ic_baseline_filter_list_24"
-        app:iconTint="@color/appsActionToolbarIconTint"
+        app:iconTint="@color/defaultToolBarContentColor"
         android:title="@string/filter"
         app:showAsAction="ifRoom" />
 </menu>

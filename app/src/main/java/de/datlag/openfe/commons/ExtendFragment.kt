@@ -3,17 +3,21 @@ package de.datlag.openfe.commons
 
 import android.content.Context
 import android.os.Build
+import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import de.datlag.openfe.R
 import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
 import io.michaelrocks.paranoid.Obfuscate
 
@@ -22,6 +26,12 @@ val Fragment.safeContext: Context
 
 val Fragment.supportActionBar: ActionBar?
     get() = (this.activity as? AppCompatActivity?)?.supportActionBar
+
+fun Fragment.getThemedLayoutInflater(inflater: LayoutInflater = this.layoutInflater, @StyleRes themeResId: Int = R.style.FragmentTheme): LayoutInflater {
+    val contextThemeWrapper = ContextThemeWrapper(safeContext, themeResId)
+    safeContext.theme.applyStyle(themeResId, true)
+    return inflater.cloneInContext(contextThemeWrapper)
+}
 
 @Suppress("DEPRECATION")
 fun Fragment.statusBarColor(@ColorInt color: Int) {

@@ -14,44 +14,13 @@
         <item name="colorPrimary">@android:color/transparent</item>
     </style>
 
-    <style name="OverviewFragmentTheme" parent="AppTheme">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/overviewStatusbarColor</item>
-        <item name="drawerArrowStyle">@style/OverviewNavigationStyle</item>
-    </style>
-
-    <style name="OverviewNavigationStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/overviewToggleNavigationColor</item>
-    </style>
-
-    <style name="ExplorerFragmentTheme" parent="AppTheme">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/explorerStatusbarColor</item>
-        <item name="drawerArrowStyle">@style/ExplorerNavigationStyle</item>
-    </style>
-
-    <style name="ExplorerNavigationStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/explorerToggleNavigationColor</item>
-    </style>
-
-    <style name="ActionFragmentTheme" parent="AppTheme">
+    <style name="FragmentTheme" parent="AppTheme">
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/defaultStatusBarColor</item>
+        <item name="drawerArrowStyle">@style/NavigationStyle</item>
     </style>
 
-    <style name="AppsActionFragmentTheme" parent="ActionFragmentTheme">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/appsActionStatusbarColor</item>
-        <item name="drawerArrowStyle">@style/AppsActionNavigationStyle</item>
-    </style>
-
-    <style name="AppsActionNavigationStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/appsActionToggleNavigationColor</item>
-    </style>
-
-    <style name="BrowserActionFragmentTheme" parent="ActionFragmentTheme">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">@color/browserActionStatusbarColor</item>
-        <item name="drawerArrowStyle">@style/BrowserActionNavigationStyle</item>
-    </style>
-
-    <style name="BrowserActionNavigationStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/browserActionToggleNavigationColor</item>
+    <style name="NavigationStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/defaultNavigationColor</item>
     </style>
 
     <style name="Divider">
@@ -75,11 +44,11 @@
         <item name="backgroundTint">@color/defaultToolBarColor</item>
     </style>
 
-    <style name="ExplorerCheckBox" parent="ExplorerFragmentTheme">
+    <style name="ExplorerCheckBox" parent="FragmentTheme">
         <item name="colorControlNormal">@android:color/transparent</item>
-        <item name="colorControlActivated">@color/explorerCheckBoxColor</item>
+        <item name="colorControlActivated">@color/highlightColor</item>
         <item name="android:colorControlNormal" tools:targetApi="lollipop">@android:color/transparent</item>
-        <item name="android:colorControlActivated" tools:targetApi="lollipop">@color/explorerCheckBoxColor</item>
+        <item name="android:colorControlActivated" tools:targetApi="lollipop">@color/highlightColor</item>
     </style>
 
     <declare-styleable name="ClickableCardView">

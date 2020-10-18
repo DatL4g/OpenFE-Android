@@ -5,14 +5,14 @@
         android:id="@+id/explorerBottomDelete"
         android:enabled="true"
         android:icon="@drawable/ic_delete_forever_24dp"
-        app:iconTint="@color/explorerToolbarIconTint"
+        app:iconTint="@color/defaultToolBarContentColor"
         android:title="Delete" />
 
     <item
         android:id="@+id/explorerBottomMove"
         android:enabled="true"
         android:icon="@drawable/ic_open_in_browser_24dp"
-        app:iconTint="@color/explorerToolbarIconTint"
+        app:iconTint="@color/defaultToolBarContentColor"
         android:title="Move" />
 
     <item
@@ -24,13 +24,13 @@
         android:id="@+id/explorerBottomCopy"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_file_copy_24"
-        app:iconTint="@color/explorerToolbarIconTint"
+        app:iconTint="@color/defaultToolBarContentColor"
         android:title="Copy" />
 
     <item
         android:id="@+id/explorerBottomInfo"
         android:enabled="true"
         android:icon="@drawable/ic_info_outline_24dp"
-        app:iconTint="@color/explorerToolbarIconTint"
+        app:iconTint="@color/defaultToolBarContentColor"
         android:title="Info" />
 </menu>

@@ -6,61 +6,32 @@
 
     <color name="defaultBackgroundColor">#ffffff</color>
     <color name="defaultContentColor">#000000</color>
-    <color name="highlightTextColor">#ffffff</color>
     <color name="defaultStatusBarColor">@color/primaryColor</color>
-    <color name="loadingStatusBarColor">#ffffff</color>
-    <color name="loadingTextColor">#000000</color>
     <color name="defaultToolBarColor">@color/primaryColor</color>
     <color name="defaultToolBarContentColor">#ffffff</color>
     <color name="defaultCardColor">#ffffff</color>
     <color name="defaultCardSelectedColor">#a9a9a9</color>
+    <color name="defaultNavigationColor">#ffffff</color>
+    <color name="defaultFabBackgroundColor">@color/primaryColor</color>
+    <color name="defaultFabContentColor">#ffffff</color>
 
-    <color name="overviewToolbarTextColor">@color/defaultToolBarContentColor</color>
-    <color name="overviewStatusbarColor">@color/defaultStatusBarColor</color>
-    <color name="overviewToolbarColor">@color/defaultToolBarColor</color>
-    <color name="overviewToggleNavigationColor">@color/defaultToolBarContentColor</color>
+    <color name="highlightColor">#ffffff</color>
+    <color name="coloredCardDefaultColor">@color/primaryColor</color>
+    <color name="coloredCardSelectedColor">@color/primaryDarkColor</color>
+    <color name="coloredCardSelectedHighlightColor">@color/primaryLightColor</color>
+    <color name="coloredCardHighlight">#ffffff</color>
+    <color name="coloredIconTint">@color/primaryColor</color>
 
-    <color name="locationCardBackground">@color/primaryDarkColor</color>
-    <color name="locationCardDefaultColor">@color/primaryColor</color>
-    <color name="locationCardSelectedColor">@color/primaryLightColor</color>
-    <color name="locationCardTextColor">@color/highlightTextColor</color>
-    <color name="locationCardProgressColor">@color/highlightTextColor</color>
+    <color name="locationRecyclerBackground">@color/primaryDarkColor</color>
 
-    <color name="actionCardDefaultColor">@color/primaryColor</color>
-    <color name="actionCardSelectedColor">@color/primaryDarkColor</color>
-    <color name="actionCardIconTint">@color/highlightTextColor</color>
-    <color name="actionCardTextColor">@color/highlightTextColor</color>
+    <color name="explorerCardDefaultColor">@color/defaultCardColor</color>
+    <color name="explorerCardSelectedColor">@color/defaultCardSelectedColor</color>
 
-    <color name="appsActionCardDefaultColor">@color/defaultCardColor</color>
-    <color name="appsActionCardSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="appsActionTextColor">@color/defaultContentColor</color>
-    <color name="appsActionStatusbarColor">@color/defaultStatusBarColor</color>
-    <color name="appsActionToolbarTextColor">@color/defaultToolBarContentColor</color>
-    <color name="appsActionToolbarColor">@color/defaultToolBarColor</color>
-    <color name="appsActionToolbarIconTint">@color/defaultToolBarContentColor</color>
-    <color name="appsActionToggleNavigationColor">@color/defaultToolBarContentColor</color>
-
-    <color name="explorerIconTint">@color/primaryColor</color>
-    <color name="explorerToolbarTextColor">@color/defaultToolBarContentColor</color>
-    <color name="explorerToolbarColor">@color/defaultToolBarColor</color>
-    <color name="explorerToolbarIconTint">@color/defaultToolBarContentColor</color>
-    <color name="explorerStatusbarColor">@color/defaultStatusBarColor</color>
-    <color name="explorerFileDefaultColor">@color/defaultCardColor</color>
-    <color name="explorerFileSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="explorerFileTextColor">@color/defaultContentColor</color>
-    <color name="explorerLoadingTextColor">@color/loadingTextColor</color>
-    <color name="explorerCheckBoxColor">@color/primaryColor</color>
-    <color name="explorerToggleNavigationColor">@color/defaultToolBarContentColor</color>
-
-    <color name="browserActionStatusbarColor">@color/defaultStatusBarColor</color>
-    <color name="browserActionToolbarIconTint">@color/defaultToolBarContentColor</color>
-    <color name="browserActionToggleNavigationColor">@color/defaultToolBarContentColor</color>
-
-    <color name="confirmSheetButtonBackgroundColorPrimary">@color/primaryColor</color>
-    <color name="confirmSheetButtonBackgroundColorSecondary">@color/primaryColor</color>
-    <color name="confirmSheetButtonBackgroundColorDark">@color/primaryDarkColor</color>
-    <color name="confirmSheetButtonLeftTextColorPrimary">@color/primaryColor</color>
-    <color name="confirmSheetButtonLeftTextColorSecondary">@color/highlightTextColor</color>
+    <color name="sheetButtonBackgroundColorPrimary">@color/primaryColor</color>
+    <color name="sheetButtonBackgroundColorSecondary">@color/primaryColor</color>
+    <color name="sheetButtonBackgroundColorDark">@color/primaryDarkColor</color>
+    <color name="sheetButtonLeftTextColorPrimary">@color/primaryColor</color>
+    <color name="sheetButtonLeftTextColorSecondary">@color/highlightColor</color>
 
     <color name="fileProgressBarColor">@color/primaryColor</color>
 </resources>

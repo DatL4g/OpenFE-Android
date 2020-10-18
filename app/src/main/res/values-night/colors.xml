@@ -2,36 +2,29 @@
 <resources>
     <color name="defaultBackgroundColor">#121212</color>
     <color name="defaultContentColor">#ffffff</color>
-    <color name="highlightTextColor">#000000</color>
     <color name="defaultStatusBarColor">#323232</color>
-    <color name="loadingStatusBarColor">#121212</color>
-    <color name="loadingTextColor">#ffffff</color>
     <color name="defaultToolBarColor">#323232</color>
     <color name="defaultToolBarContentColor">#ffffff</color>
     <color name="defaultCardColor">#323232</color>
     <color name="defaultCardSelectedColor">#444444</color>
+    <color name="defaultFabBackgroundColor">#323232</color>
 
-    <color name="locationCardBackground">@color/defaultBackgroundColor</color>
-    <color name="locationCardDefaultColor">@color/defaultCardColor</color>
-    <color name="locationCardSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="locationCardTextColor">@color/defaultContentColor</color>
-    <color name="locationCardProgressColor">@color/defaultContentColor</color>
+    <color name="highlightColor">#000000</color>
+    <color name="coloredCardDefaultColor">@color/defaultCardColor</color>
+    <color name="coloredCardSelectedColor">@color/defaultCardSelectedColor</color>
+    <color name="coloredCardSelectedHighlightColor">@color/defaultCardSelectedColor</color>
+    <color name="coloredIconTint">@color/defaultContentColor</color>
 
-    <color name="actionCardDefaultColor">@color/defaultCardColor</color>
-    <color name="actionCardSelectedColor">@color/defaultCardSelectedColor</color>
-    <color name="actionCardIconTint">@color/defaultContentColor</color>
-    <color name="actionCardTextColor">@color/defaultContentColor</color>
+    <color name="locationRecyclerBackground">@color/defaultBackgroundColor</color>
 
-    <color name="explorerIconTint">@color/defaultContentColor</color>
-    <color name="explorerFileDefaultColor">@color/defaultBackgroundColor</color>
-    <color name="explorerFileSelectedColor">@color/defaultCardColor</color>
-    <color name="explorerCheckBoxColor">@color/defaultContentColor</color>
+    <color name="explorerCardDefaultColor">@color/defaultBackgroundColor</color>
+    <color name="explorerCardSelectedColor">@color/defaultCardColor</color>
 
-    <color name="confirmSheetButtonBackgroundColorPrimary">@color/defaultContentColor</color>
-    <color name="confirmSheetButtonBackgroundColorSecondary">@color/defaultContentColor</color>
-    <color name="confirmSheetButtonBackgroundColorDark">#dcdcdc</color>
-    <color name="confirmSheetButtonLeftTextColorPrimary">@color/defaultContentColor</color>
-    <color name="confirmSheetButtonLeftTextColorSecondary">@color/highlightTextColor</color>
+    <color name="sheetButtonBackgroundColorPrimary">@color/defaultContentColor</color>
+    <color name="sheetButtonBackgroundColorSecondary">@color/defaultContentColor</color>
+    <color name="sheetButtonBackgroundColorDark">#dcdcdc</color>
+    <color name="sheetButtonLeftTextColorPrimary">@color/defaultContentColor</color>
+    <color name="sheetButtonLeftTextColorSecondary">@color/highlightColor</color>
 
     <color name="fileProgressBarColor">@color/defaultContentColor</color>
 </resources>

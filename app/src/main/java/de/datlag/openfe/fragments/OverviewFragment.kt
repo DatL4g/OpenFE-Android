@@ -8,7 +8,6 @@ import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +27,7 @@ import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDisplayName
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getStorageVolumes
+import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
@@ -67,11 +67,7 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val contextThemeWrapper = ContextThemeWrapper(safeContext, R.style.OverviewFragmentTheme)
-        val clonedLayoutInflater = inflater.cloneInContext(contextThemeWrapper)
-
-        safeContext.theme.applyStyle(R.style.OverviewFragmentTheme, true)
-        binding = FragmentOverviewBinding.inflate(clonedLayoutInflater, container, false)
+        binding = FragmentOverviewBinding.inflate(getThemedLayoutInflater(inflater), container, false)
         return binding.root
     }
 
@@ -79,7 +75,7 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         super.onViewCreated(view, savedInstanceState)
 
         toolbar?.menu?.clear()
-        updateToggle(true, getColor(R.color.overviewToggleNavigationColor))
+        updateToggle(true, getColor(R.color.defaultNavigationColor))
         updateBottom(false)
         updateFAB(false)
 
@@ -158,13 +154,13 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
     private fun getActionItems(): List<ActionItem> {
         val actionList = mutableListOf<ActionItem>()
 
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_music_note_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Music", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_image_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Images", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_local_movies_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Videos", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_insert_drive_file_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Documents", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_archive_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Archives", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_adb_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Apps", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_github)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "GitHub", githubUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_music_note_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Music", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_image_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Images", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_local_movies_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Videos", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_insert_drive_file_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Documents", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_archive_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Archives", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_adb_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Apps", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_github)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "GitHub", githubUnit()))
 
         return actionList
     }
@@ -203,7 +199,7 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
 
     override fun onResume() {
         super.onResume()
-        statusBarColor(getColor(R.color.overviewStatusbarColor))
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
     }
 
     override fun onBackPressed(): Boolean {

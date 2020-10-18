@@ -4,7 +4,7 @@
     <item
         android:id="@+id/browserActionOpenWithItem"
         android:icon="@drawable/ic_baseline_open_in_browser_24"
-        app:iconTint="@color/browserActionToolbarIconTint"
+        app:iconTint="@color/defaultToolBarContentColor"
         android:title="@string/open_with"
         app:showAsAction="always" />
 </menu>

@@ -22,7 +22,7 @@
         app:cardCornerRadius="5dp"
         app:cardMaxElevation="4dp"
         app:cardElevation="4dp"
-        app:cardBackgroundColor="@color/actionCardDefaultColor"
+        app:cardBackgroundColor="@color/coloredCardDefaultColor"
         android:focusable="true"
         android:focusableInTouchMode="false"
         android:clickable="true">
@@ -46,7 +46,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/actionName"
-                app:tint="@color/actionCardIconTint"
+                app:tint="@color/coloredCardHighlight"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:clickable="false"/>
@@ -57,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/actionCardTextColor"
+                android:textColor="@color/coloredCardHighlight"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"

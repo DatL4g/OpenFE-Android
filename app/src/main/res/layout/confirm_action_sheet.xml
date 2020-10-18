@@ -62,7 +62,7 @@
         android:layout_marginLeft="@dimen/confirmSheetButtonSideMargin"
         android:layout_marginStart="@dimen/confirmSheetButtonSideMargin"
         android:background="@drawable/confirm_button_right_selector"
-        android:textColor="@color/highlightTextColor"
+        android:textColor="@color/highlightColor"
         android:foreground="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintTop_toBottomOf="@id/confirmSheetText"
