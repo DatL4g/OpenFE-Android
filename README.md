@@ -1,8 +1,6 @@
 # OpenFE-Android
 
-![Android Kotlinter CI](https://github.com/DATL4G/OpenFE-Android/workflows/Android%20Kotlinter%20CI/badge.svg)
-![Android Unit Test CI](https://github.com/DATL4G/OpenFE-Android/workflows/Android%20Unit%20Test%20CI/badge.svg)
-![Android Build CI](https://github.com/DATL4G/OpenFE-Android/workflows/Android%20Build%20CI/badge.svg)
+![Android CI/CD](https://github.com/DATL4G/OpenFE-Android/workflows/Android%20CI/CD/badge.svg?branch=code-cleanup)
 
 [![Stars](https://img.shields.io/github/stars/DATL4G/OpenFE-Android.svg)](https://github.com/DATL4G/OpenFE-Android)
 
