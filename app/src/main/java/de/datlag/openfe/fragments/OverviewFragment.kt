@@ -32,6 +32,7 @@ import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
+import de.datlag.openfe.commons.tint
 import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
@@ -95,15 +96,7 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         actionRecycler.layoutManager = GridLayoutManager(safeContext, if (safeContext.packageManager.isTelevision()) 5 else 3)
         actionRecycler.adapter = ActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
-                when (actionList[position].actionId) {
-                    R.id.action_OverviewFragment_to_AppsActionFragment -> {
-                        val action = OverviewFragmentDirections.actionOverviewFragmentToAppsActionFragment(locationList[0].usage.file.absolutePath)
-                        findNavController().navigate(action)
-                    }
-                    else -> {
-                        // findNavController().navigate(actionList[position].actionId)
-                    }
-                }
+                actionList[position].action.invoke()
             }
             submitList(actionList)
         }
@@ -165,14 +158,23 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
     private fun getActionItems(): List<ActionItem> {
         val actionList = mutableListOf<ActionItem>()
 
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_music_note_24dp), "Music", 0))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_image_24dp), "Images", 1))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_local_movies_24dp), "Videos", 2))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_insert_drive_file_24dp), "Documents", 3))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_archive_24dp), "Archives", 4))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_adb_24dp), "Apps", R.id.action_OverviewFragment_to_AppsActionFragment))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_music_note_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Music", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_image_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Images", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_local_movies_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Videos", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_insert_drive_file_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Documents", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_archive_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Archives", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_adb_24dp)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "Apps", appFragmentUnit()))
+        actionList.add(ActionItem(getDrawable(R.drawable.ic_github)?.apply { tint(getColor(R.color.actionCardIconTint)) }, "GitHub", githubUnit()))
 
         return actionList
+    }
+
+    private fun appFragmentUnit(): () -> Unit = {
+        findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToAppsActionFragment(locationList[0].usage.file.absolutePath))
+    }
+
+    private fun githubUnit(): () -> Unit = {
+        findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToBrowserFragment(getString(R.string.github_repo)))
     }
 
     private fun checkReadPermission(position: Int) {

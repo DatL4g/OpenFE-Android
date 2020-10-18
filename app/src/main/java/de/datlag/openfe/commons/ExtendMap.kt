@@ -1,4 +1,7 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
+
+import io.michaelrocks.paranoid.Obfuscate
 
 @Throws(IllegalArgumentException::class)
 fun <K, V> MutableMap<K, V>.putAll(pair: Pair<Array<K>, Array<V>>) {

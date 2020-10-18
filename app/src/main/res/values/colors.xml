@@ -52,6 +52,10 @@
     <color name="explorerCheckBoxColor">@color/primaryColor</color>
     <color name="explorerToggleNavigationColor">@color/defaultToolBarContentColor</color>
 
+    <color name="browserActionStatusbarColor">@color/defaultStatusBarColor</color>
+    <color name="browserActionToolbarIconTint">@color/defaultToolBarContentColor</color>
+    <color name="browserActionToggleNavigationColor">@color/defaultToolBarContentColor</color>
+
     <color name="confirmSheetButtonBackgroundColorPrimary">@color/primaryColor</color>
     <color name="confirmSheetButtonBackgroundColorSecondary">@color/primaryColor</color>
     <color name="confirmSheetButtonBackgroundColorDark">@color/primaryDarkColor</color>

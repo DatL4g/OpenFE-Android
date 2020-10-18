@@ -15,11 +15,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
-import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.intentChooser
 import de.datlag.openfe.commons.parentDir
+import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.commons.safeContext
-import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentExplorerBinding
@@ -79,11 +78,22 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         initSearchView()
 
         explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
-            Timber.e(dir.absolutePath)
+            if (explorerViewModel.searchEnabled.value == true) {
+                updateFAB(false)
+            } else {
+                updateFAB(dir.permissions.writeable)
+            }
+        }
+
+        explorerViewModel.searchEnabled.observe(viewLifecycleOwner) { enabled ->
+            if (enabled) {
+                updateFAB(false)
+            } else {
+                updateFAB(explorerViewModel.currentDirectory.value?.permissions?.writeable ?: false)
+            }
         }
 
         explorerViewModel.currentSubDirectories.observe(viewLifecycleOwner) { list ->
-            checkViewVisibility(list.size)
             recyclerAdapter.submitList(list)
         }
     }
@@ -122,19 +132,19 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
     private fun initSearchView() {
         searchView?.setOnSearchViewListener(object : SimpleSearchView.SearchViewListener {
             override fun onSearchViewShown() {
-                updateFAB(false)
+                explorerViewModel.searchEnabled.value = true
             }
 
             override fun onSearchViewShownAnimation() {
-                updateFAB(false)
+                explorerViewModel.searchEnabled.value = true
             }
 
             override fun onSearchViewClosed() {
-                updateFAB(true)
+                explorerViewModel.searchEnabled.value = false
             }
 
             override fun onSearchViewClosedAnimation() {
-                updateFAB(true)
+                explorerViewModel.searchEnabled.value = false
             }
         })
         searchView?.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
@@ -182,16 +192,6 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
             } catch (exception: Exception) {
                 Timber.e("error when creating intent")
             }
-        }
-    }
-
-    private fun checkViewVisibility(listSize: Int) = with(binding) {
-        if (listSize == 0) {
-            explorerRecycler.hide()
-            loadingTextView.show()
-        } else {
-            explorerRecycler.show()
-            loadingTextView.hide()
         }
     }
 

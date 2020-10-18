@@ -1,7 +1,9 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppList
+import io.michaelrocks.paranoid.Obfuscate
 
 fun ExplorerItem.matchWithApps(appList: AppList) {
     val fileItem = this.fileItem

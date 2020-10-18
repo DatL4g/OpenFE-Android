@@ -85,6 +85,7 @@ dependencies {
     implementation("androidx.legacy:legacy-support-v4:${Versions.legacySupportV4}")
     implementation("com.google.android.material:material:${Versions.material}")
     implementation("com.jakewharton.timber:timber:${Versions.timber}")
+    implementation("androidx.webkit:webkit:${Versions.webkit}")
 
     implementation("androidx.core:core-ktx:${Versions.ktxCore}")
     implementation("androidx.activity:activity-ktx:${Versions.ktxActivity}")

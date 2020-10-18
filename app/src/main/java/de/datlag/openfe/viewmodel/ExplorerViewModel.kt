@@ -31,8 +31,10 @@ class ExplorerViewModel constructor(
 
     val startDirectory: File = getStartDirectory(explorerFragmentArgs)
 
-    var currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
-    var currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
+    val currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
+    val currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
+    val searchEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
+
     private var searchDirectoriesCopy: List<ExplorerItem> = listOf()
     private var searchJob: Job? = null
     private var previousSearchText: String? = null
@@ -43,6 +45,7 @@ class ExplorerViewModel constructor(
 
     private val currentDirectoryObserver = Observer<File> { dir ->
         currentSubDirectories.value = listOf()
+
         val fileList = dir.listFiles()?.toMutableList() ?: mutableListOf()
         val startDirParent = File(startDirectory.getRootOfStorage()).parentDir
 

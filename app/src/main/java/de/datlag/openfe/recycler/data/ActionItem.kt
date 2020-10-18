@@ -11,5 +11,5 @@ import kotlinx.android.parcel.RawValue
 data class ActionItem(
     val icon: @RawValue Drawable?,
     val name: String,
-    val actionId: Int
+    val action: @RawValue () -> Unit
 ) : Parcelable

@@ -1,5 +1,7 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
+import io.michaelrocks.paranoid.Obfuscate
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 

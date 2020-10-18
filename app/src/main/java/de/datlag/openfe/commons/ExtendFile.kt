@@ -1,3 +1,4 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
 import android.content.ContentResolver
@@ -13,6 +14,7 @@ import androidx.core.content.FileProvider
 import androidx.core.os.EnvironmentCompat
 import de.datlag.openfe.data.FilePermission
 import de.datlag.openfe.data.Usage
+import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">OpenFE</string>
     <string name="font_path" translatable="false">fonts/Poppins-Regular.ttf</string>
+    <string name="github_repo" translatable="false">https://github.com/DatL4g/OpenFE-Android</string>
 
     <string name="loading_apps">Loading Apps…</string>
 
@@ -9,6 +10,7 @@
     <string name="loading">Loading…</string>
     <string name="search">Search</string>
     <string name="filter">Filter</string>
+    <string name="open_with">Open With</string>
 
     <string name="name">Name</string>
     <string name="installed">Installed</string>

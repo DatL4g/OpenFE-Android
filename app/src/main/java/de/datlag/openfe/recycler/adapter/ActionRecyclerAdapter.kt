@@ -18,7 +18,7 @@ class ActionRecyclerAdapter : ClickRecyclerAdapter<ActionRecyclerAdapter.ViewHol
 
     private val diffCallback = object : DiffUtil.ItemCallback<ActionItem>() {
         override fun areItemsTheSame(oldItem: ActionItem, newItem: ActionItem): Boolean {
-            return oldItem.actionId == newItem.actionId
+            return oldItem == newItem
         }
 
         override fun areContentsTheSame(oldItem: ActionItem, newItem: ActionItem): Boolean {
@@ -26,7 +26,7 @@ class ActionRecyclerAdapter : ClickRecyclerAdapter<ActionRecyclerAdapter.ViewHol
         }
     }
 
-    val differ = AsyncListDiffer(this, diffCallback)
+    private val differ = AsyncListDiffer(this, diffCallback)
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener, LayoutContainer {
 

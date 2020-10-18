@@ -1,8 +1,10 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
 import androidx.lifecycle.LiveDataScope
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
+import io.michaelrocks.paranoid.Obfuscate
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 

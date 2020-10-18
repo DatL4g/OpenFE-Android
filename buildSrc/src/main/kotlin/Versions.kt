@@ -31,4 +31,5 @@ object Versions {
     const val testEspresso = "3.3.0"
     const val timber = "4.7.1"
     const val viewpump = "2.0.3"
+    const val webkit = "1.3.0"
 }

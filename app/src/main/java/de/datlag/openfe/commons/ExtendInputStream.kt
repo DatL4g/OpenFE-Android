@@ -1,5 +1,7 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
+import io.michaelrocks.paranoid.Obfuscate
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream

@@ -1,3 +1,4 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
 import android.graphics.Bitmap
@@ -7,6 +8,7 @@ import android.graphics.drawable.Drawable
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import io.michaelrocks.paranoid.Obfuscate
 
 fun Drawable.tint(color: Int): Drawable {
     val wrappedDrawable = DrawableCompat.wrap(this.mutate())

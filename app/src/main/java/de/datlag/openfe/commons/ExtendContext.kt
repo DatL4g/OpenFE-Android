@@ -1,3 +1,4 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
 import android.app.usage.StorageStatsManager
@@ -10,6 +11,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import de.datlag.openfe.data.Usage
+import io.michaelrocks.paranoid.Obfuscate
 import java.io.File
 
 fun Context.getStorageVolumes(): Array<Usage> {

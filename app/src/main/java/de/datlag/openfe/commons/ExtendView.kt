@@ -1,3 +1,4 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
 import android.view.View
@@ -7,6 +8,7 @@ import de.datlag.openfe.enums.MarginSide.BOTTOM
 import de.datlag.openfe.enums.MarginSide.LEFT
 import de.datlag.openfe.enums.MarginSide.RIGHT
 import de.datlag.openfe.enums.MarginSide.TOP
+import io.michaelrocks.paranoid.Obfuscate
 
 fun View.setMargin(value: Int, side: MarginSide) {
     if (this.layoutParams is ViewGroup.MarginLayoutParams) {

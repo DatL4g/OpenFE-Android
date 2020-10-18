@@ -1,3 +1,4 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
 import android.content.Context
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
+import io.michaelrocks.paranoid.Obfuscate
 
 val Fragment.safeContext: Context
     get() = this.context ?: this.activity ?: this.requireContext()

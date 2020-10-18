@@ -1,5 +1,7 @@
+@file:Obfuscate
 package de.datlag.openfe.commons
 
+import io.michaelrocks.paranoid.Obfuscate
 import java.util.Locale
 
 fun String.toLower() = this.toLowerCase(Locale.getDefault())
