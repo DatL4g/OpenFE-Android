@@ -15,6 +15,7 @@ import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.intentChooser
+import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.commons.safeContext
@@ -76,14 +77,14 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         initSearchView()
 
         explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
-            if (explorerViewModel.searchEnabled.value == true) {
+            if (explorerViewModel.searchShown.value == true) {
                 updateFAB(false)
             } else {
                 updateFAB(dir.permissions.writeable)
             }
         }
 
-        explorerViewModel.searchEnabled.observe(viewLifecycleOwner) { enabled ->
+        explorerViewModel.searchShown.observe(viewLifecycleOwner) { enabled ->
             if (enabled) {
                 updateFAB(false)
             } else {
@@ -136,34 +137,37 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
     private fun initSearchView() {
         searchView?.setOnSearchViewListener(object : SimpleSearchView.SearchViewListener {
             override fun onSearchViewShown() {
-                explorerViewModel.searchEnabled.value = true
+                explorerViewModel.searchShown.value = true
             }
 
             override fun onSearchViewShownAnimation() {
-                explorerViewModel.searchEnabled.value = true
+                explorerViewModel.searchShown.value = true
             }
 
             override fun onSearchViewClosed() {
-                explorerViewModel.searchEnabled.value = false
+                explorerViewModel.searchShown.value = false
             }
 
             override fun onSearchViewClosedAnimation() {
-                explorerViewModel.searchEnabled.value = false
+                explorerViewModel.searchShown.value = false
             }
         })
         searchView?.setOnQueryTextListener(object : SimpleSearchView.OnQueryTextListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 explorerViewModel.searchCurrentDirectories(newText, true)
+                explorerViewModel.searched = newText.isNotCleared()
                 return false
             }
 
             override fun onQueryTextCleared(): Boolean {
                 explorerViewModel.searchCurrentDirectories(null, true)
+                explorerViewModel.searched = false
                 return false
             }
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 explorerViewModel.searchCurrentDirectories(query, true)
+                explorerViewModel.searched = query.isNotCleared()
                 return false
             }
         })
@@ -216,25 +220,32 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
     private fun onBackPressedCheck(): Boolean {
         searchView?.onBackPressed()
-        return if (explorerViewModel.selectedItems.value.isNullOrEmpty()) {
-            when {
-                explorerViewModel.currentDirectory.value?.absolutePath == "/" -> true
-                explorerViewModel.currentDirectory.value != explorerViewModel.startDirectory -> {
-                    explorerViewModel.currentDirectory.value?.let {
-                        explorerViewModel.moveToPath(it.parentDir)
+        return when {
+            explorerViewModel.selectedItems.value.isNullOrEmpty() && !explorerViewModel.searched -> {
+                when {
+                    explorerViewModel.currentDirectory.value?.absolutePath == "/" -> true
+                    explorerViewModel.currentDirectory.value != explorerViewModel.startDirectory -> {
+                        explorerViewModel.currentDirectory.value?.let {
+                            explorerViewModel.moveToPath(it.parentDir)
+                        }
+                        false
                     }
-                    false
+                    else -> true
                 }
-                else -> true
             }
-        } else {
-            val list =  recyclerAdapter.differ.currentList
-            for (i in list.indices) {
-                recyclerHolderCheckboxSelected(i, false)
+            explorerViewModel.searched -> {
+                searchView?.searchEditText?.setText(null)
+                false
             }
-            explorerViewModel.clearAllSelectedItems()
-            updateToolbar()
-            false
+            else -> {
+                val list = recyclerAdapter.differ.currentList
+                for (i in list.indices) {
+                    recyclerHolderCheckboxSelected(i, false)
+                }
+                explorerViewModel.clearAllSelectedItems()
+                updateToolbar()
+                false
+            }
         }
     }
 

@@ -36,13 +36,23 @@ class ExplorerViewModel constructor(
 
     val selectedItems = MutableLiveData<List<ExplorerItem>>()
 
-    val searchEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
+    val searchShown: MutableLiveData<Boolean> = MutableLiveData(false)
+    var searched: Boolean = false
     private var searchDirectoriesCopy: List<ExplorerItem> = listOf()
     private var searchJob: Job? = null
     private var previousSearchText: String? = null
 
     private val systemAppsObserver = Observer<AppList> { list ->
-        matchNewAppsToDirectories(list)
+        viewModelScope.launch(Dispatchers.IO) {
+            val matchedAppItems = matchNewAppsToDirectories(list)
+            withContext(Dispatchers.Main) {
+                try {
+                    currentSubDirectories.value = matchedAppItems
+                } catch (exception: Exception) {
+                    currentSubDirectories.postValue(matchedAppItems)
+                }
+            }
+        }
     }
 
     private val currentDirectoryObserver = Observer<File> { dir ->
@@ -87,17 +97,9 @@ class ExplorerViewModel constructor(
         createSubDirectories(fileList)
     }
 
-    private val selectedItemsObserver = Observer<List<ExplorerItem>> { selectedItems ->
+    private val selectedItemsObserver = Observer<List<ExplorerItem>> {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentSubDirs = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
-            for (selected in selectedItems) {
-                for (pos in 0 until currentSubDirs.size) {
-                    if (currentSubDirs[pos].fileItem == selected.fileItem) {
-                        currentSubDirs.removeAt(pos)
-                        currentSubDirs.add(pos, selected)
-                    }
-                }
-            }
+            val currentSubDirs = matchSelectedWithCurrentSubDirs()
             withContext(Dispatchers.Main) {
                 currentSubDirectories.value = currentSubDirs
             }
@@ -160,7 +162,7 @@ class ExplorerViewModel constructor(
                 }
 
                 for (explorerItem in searchDirectoriesCopy) {
-                    if (recursively) {
+                    if (recursively && selectedItems.value.isNullOrEmpty()) {
                         explorerItem.fileItem.file.walkTopDown().fold(true) { res, file ->
                             val fileMatches = file.name.contains(text, true) && !file.isHidden
                             if (fileMatches) {
@@ -204,23 +206,35 @@ class ExplorerViewModel constructor(
                     }
                 }
             }
+
+            val currentSubDirs = matchSelectedWithCurrentSubDirs()
+            withContext(Dispatchers.Main) {
+                currentSubDirectories.value = currentSubDirs
+            }
         }
     }
 
-    private fun matchNewAppsToDirectories(list: AppList) = viewModelScope.launch(Dispatchers.IO) {
+    private fun matchSelectedWithCurrentSubDirs(): List<ExplorerItem> {
+        val selectedList = selectedItems.value ?: listOf()
+        val currentSubDirs = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
+        for (selected in selectedList) {
+            for (pos in 0 until currentSubDirs.size) {
+                if (currentSubDirs[pos].fileItem == selected.fileItem) {
+                    currentSubDirs.removeAt(pos)
+                    currentSubDirs.add(pos, selected)
+                }
+            }
+        }
+        return currentSubDirs
+    }
+
+    private fun matchNewAppsToDirectories(list: AppList): List<ExplorerItem> {
         val copy = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
 
         for (explorerItem in copy) {
             explorerItem.matchWithApps(list)
         }
-
-        withContext(Dispatchers.Main) {
-            try {
-                currentSubDirectories.value = copy
-            } catch (exception: Exception) {
-                currentSubDirectories.postValue(copy)
-            }
-        }
+        return copy
     }
 
     fun selectItem(explorerItem: ExplorerItem): Boolean {
@@ -250,8 +264,8 @@ class ExplorerViewModel constructor(
         }
 
         withContext(Dispatchers.Main) {
-            currentSubDirectories.value = copy
             selectedItems.value = listOf()
+            currentSubDirectories.value = copy
         }
     }
 
