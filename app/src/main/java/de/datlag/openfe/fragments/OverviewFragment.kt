@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
@@ -73,8 +74,6 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        toolbar?.menu?.clear()
         updateToggle(true, getColor(R.color.defaultNavigationColor))
         updateBottom(false)
         updateFAB(false)
@@ -197,9 +196,19 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         )
     }
 
+    private fun initToolbar() {
+        toolbar?.menu?.clear()
+    }
+
     override fun onResume() {
         super.onResume()
         statusBarColor(getColor(R.color.defaultStatusBarColor))
+        initToolbar()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        initToolbar()
     }
 
     override fun onBackPressed(): Boolean {

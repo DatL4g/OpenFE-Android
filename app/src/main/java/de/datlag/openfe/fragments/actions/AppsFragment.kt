@@ -1,6 +1,7 @@
 package de.datlag.openfe.fragments.actions
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -81,11 +82,6 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        statusBarColor(getColor(R.color.defaultStatusBarColor))
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -97,22 +93,8 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
         updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
         updateToolbar()
-
-        toolbar?.menu?.clear()
-        toolbar?.inflateMenu(R.menu.apps_action_toolbar_menu)
-        toolbar?.menu?.let {
-            searchView?.setMenuItem(it.findItem(R.id.appsActionSearchItem))
-            for (item in it.iterator()) {
-                if (item.itemId != R.id.appsActionSearchItem) {
-                    item.setOnMenuItemClickListener { menuItem ->
-                        return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
-                    }
-                }
-            }
-        }
 
         initRecycler()
         initEditText()
@@ -418,6 +400,32 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
                 }
             )
         }
+    }
+
+    private fun initToolbar() {
+        toolbar?.menu?.clear()
+        toolbar?.inflateMenu(R.menu.apps_action_toolbar_menu)
+        toolbar?.menu?.let {
+            searchView?.setMenuItem(it.findItem(R.id.appsActionSearchItem))
+            for (item in it.iterator()) {
+                if (item.itemId != R.id.appsActionSearchItem) {
+                    item.setOnMenuItemClickListener { menuItem ->
+                        return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
+        initToolbar()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        initToolbar()
     }
 
     override fun onMenuItemClick(p0: MenuItem?): Boolean {

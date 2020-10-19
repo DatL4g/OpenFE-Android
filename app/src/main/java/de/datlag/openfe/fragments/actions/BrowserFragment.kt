@@ -2,6 +2,7 @@ package de.datlag.openfe.fragments.actions
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -54,16 +55,6 @@ class BrowserFragment : AdvancedFragment(), FragmentBackPressed {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        toolbar?.menu?.clear()
-        toolbar?.inflateMenu(R.menu.browser_action_toolbar_menu)
-        toolbar?.menu?.let {
-            for (item in it.iterator()) {
-                item.setOnMenuItemClickListener { menuItem ->
-                    return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
-                }
-            }
-        }
         updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
         nightModeHelper = NightModeUtil(safeContext, activity)
 
@@ -96,6 +87,28 @@ class BrowserFragment : AdvancedFragment(), FragmentBackPressed {
             }
         }
         return false
+    }
+
+    private fun initToolbar() {
+        toolbar?.menu?.clear()
+        toolbar?.inflateMenu(R.menu.browser_action_toolbar_menu)
+        toolbar?.menu?.let {
+            for (item in it.iterator()) {
+                item.setOnMenuItemClickListener { menuItem ->
+                    return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initToolbar()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        initToolbar()
     }
 
     override fun onBackPressed(): Boolean = true

@@ -31,7 +31,8 @@
         android:networkSecurityConfig="@xml/network_security">
         <activity android:name=".MainActivity"
             android:clearTaskOnLaunch="true"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance"
+            android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

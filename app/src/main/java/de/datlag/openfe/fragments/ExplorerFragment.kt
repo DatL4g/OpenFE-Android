@@ -1,5 +1,6 @@
 package de.datlag.openfe.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -65,10 +66,6 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-
-        toolbar?.menu?.clear()
-        toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
-        toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
 
         updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
 
@@ -218,6 +215,12 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         holder?.binding?.explorerCheckbox?.isChecked = isChecked
     }
 
+    private fun initToolbar() {
+        toolbar?.menu?.clear()
+        toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
+        toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
+    }
+
     private fun onBackPressedCheck(): Boolean {
         searchView?.onBackPressed()
         return when {
@@ -252,6 +255,12 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
     override fun onResume() {
         super.onResume()
         statusBarColor(getColor(R.color.defaultStatusBarColor))
+        initToolbar()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        initToolbar()
     }
 
     override fun onBackPressed(): Boolean = onBackPressedCheck()
