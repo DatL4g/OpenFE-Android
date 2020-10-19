@@ -33,8 +33,10 @@ class ExplorerViewModel constructor(
 
     val currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
     val currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
-    val searchEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    val selectedItems = MutableLiveData<List<ExplorerItem>>()
+
+    val searchEnabled: MutableLiveData<Boolean> = MutableLiveData(false)
     private var searchDirectoriesCopy: List<ExplorerItem> = listOf()
     private var searchJob: Job? = null
     private var previousSearchText: String? = null
@@ -85,9 +87,27 @@ class ExplorerViewModel constructor(
         createSubDirectories(fileList)
     }
 
+    private val selectedItemsObserver = Observer<List<ExplorerItem>> { selectedItems ->
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentSubDirs = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
+            for (selected in selectedItems) {
+                for (pos in 0 until currentSubDirs.size) {
+                    if (currentSubDirs[pos].fileItem == selected.fileItem) {
+                        currentSubDirs.removeAt(pos)
+                        currentSubDirs.add(pos, selected)
+                    }
+                }
+            }
+            withContext(Dispatchers.Main) {
+                currentSubDirectories.value = currentSubDirs
+            }
+        }
+    }
+
     init {
         appsViewModel.systemApps.observeForever(systemAppsObserver)
         currentDirectory.observeForever(currentDirectoryObserver)
+        selectedItems.observeForever(selectedItemsObserver)
     }
 
     private fun getStartDirectory(args: ExplorerFragmentArgs = explorerFragmentArgs): File {
@@ -203,9 +223,42 @@ class ExplorerViewModel constructor(
         }
     }
 
+    fun selectItem(explorerItem: ExplorerItem): Boolean {
+        val selectedItemsList = selectedItems.value?.mutableCopyOf() ?: mutableListOf()
+
+        if (selectedItemsList.contains(explorerItem)) {
+            selectedItemsList.remove(explorerItem)
+        }
+
+        if (explorerItem.selectable) {
+            explorerItem.selected = !explorerItem.selected
+        } else {
+            explorerItem.selected = false
+        }
+
+        if (explorerItem.selected) {
+            selectedItemsList.add(explorerItem)
+        }
+        selectedItems.value = selectedItemsList
+        return explorerItem.selected
+    }
+
+    fun clearAllSelectedItems() = viewModelScope.launch(Dispatchers.IO) {
+        val copy = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
+        for (item in copy) {
+            item.selected = false
+        }
+
+        withContext(Dispatchers.Main) {
+            currentSubDirectories.value = copy
+            selectedItems.value = listOf()
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         appsViewModel.systemApps.removeObserver(systemAppsObserver)
         currentDirectory.removeObserver(currentDirectoryObserver)
+        selectedItems.removeObserver(selectedItemsObserver)
     }
 }

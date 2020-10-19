@@ -19,6 +19,7 @@ import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.statusBarColor
+import de.datlag.openfe.commons.supportActionBar
 import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.extend.AdvancedFragment
@@ -93,6 +94,11 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         explorerViewModel.currentSubDirectories.observe(viewLifecycleOwner) { list ->
             recyclerAdapter.submitList(list)
         }
+
+        explorerViewModel.selectedItems.observe(viewLifecycleOwner) { list ->
+            updateBottom(list.isNotEmpty())
+            updateToolbar(list)
+        }
     }
 
     private fun initBottomNavigation() {
@@ -124,6 +130,7 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
         explorerRecycler.layoutManager = LinearLayoutManagerWrapper(safeContext)
         explorerRecycler.adapter = recyclerAdapter
+        explorerRecycler.setHasFixedSize(true)
     }
 
     private fun initSearchView() {
@@ -169,11 +176,11 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
         val explorerItem = it[position]
 
-        // ToDo("check selected items")
-        if (!longClick) {
+        if (!longClick && explorerViewModel.selectedItems.value.isNullOrEmpty()) {
             recyclerClickEvent(explorerItem)
         } else {
-            // ToDO("select")
+            val selected = explorerViewModel.selectItem(explorerItem)
+            recyclerHolderCheckboxSelected(position, selected)
         }
     }
 
@@ -192,17 +199,42 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         }
     }
 
+    private fun updateToolbar(list: List<ExplorerItem>? = explorerViewModel.selectedItems.value) {
+        if (list.isNullOrEmpty()) {
+            supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp, getColor(R.color.defaultNavigationColor)))
+            supportActionBar?.title = safeContext.getString(R.string.app_name)
+        } else {
+            supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp, getColor(R.color.defaultNavigationColor)))
+            supportActionBar?.title = "${list.size} Items"
+        }
+    }
+
+    private fun recyclerHolderCheckboxSelected(position: Int, isChecked: Boolean) {
+        val holder = binding.explorerRecycler.findViewHolderForAdapterPosition(position) as? ExplorerRecyclerAdapter.ViewHolder?
+        holder?.binding?.explorerCheckbox?.isChecked = isChecked
+    }
+
     private fun onBackPressedCheck(): Boolean {
         searchView?.onBackPressed()
-        return when {
-            explorerViewModel.currentDirectory.value?.absolutePath == "/" -> true
-            explorerViewModel.currentDirectory.value != explorerViewModel.startDirectory -> {
-                explorerViewModel.currentDirectory.value?.let {
-                    explorerViewModel.moveToPath(it.parentDir)
+        return if (explorerViewModel.selectedItems.value.isNullOrEmpty()) {
+            when {
+                explorerViewModel.currentDirectory.value?.absolutePath == "/" -> true
+                explorerViewModel.currentDirectory.value != explorerViewModel.startDirectory -> {
+                    explorerViewModel.currentDirectory.value?.let {
+                        explorerViewModel.moveToPath(it.parentDir)
+                    }
+                    false
                 }
-                false
+                else -> true
             }
-            else -> true
+        } else {
+            val list =  recyclerAdapter.differ.currentList
+            for (i in list.indices) {
+                recyclerHolderCheckboxSelected(i, false)
+            }
+            explorerViewModel.clearAllSelectedItems()
+            updateToolbar()
+            false
         }
     }
 
