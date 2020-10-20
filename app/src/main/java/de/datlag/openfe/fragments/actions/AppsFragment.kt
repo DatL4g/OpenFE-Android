@@ -236,14 +236,7 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
     }
 
     private fun backupConfirmDialog(item: AppItem) {
-        val confirmActionSheet = ConfirmActionSheet.newInstance()
-
-        confirmActionSheet.title = "Backup ${item.name}"
-        confirmActionSheet.text = "The backup file is created in the folder OpenFE/Apps/${item.name}-Backup and can be installed and shared from there"
-        confirmActionSheet.leftText = "Cancel"
-        confirmActionSheet.rightText = "Backup"
-        confirmActionSheet.closeOnLeftClick = true
-        confirmActionSheet.closeOnRightClick = true
+        val confirmActionSheet = ConfirmActionSheet.backupInstance(item.name)
         confirmActionSheet.rightClickListener = {
             backupProgressDialog(item)
         }

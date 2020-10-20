@@ -44,7 +44,7 @@
         app:cornerRadius="10dp"
         app:stepDoneColor="@color/fileProgressBarColor"
         app:stepMargin="8dp"
-        app:stepUndoneColor="#dedede"
+        app:stepUndoneColor="@android:color/transparent"
         app:layout_constraintTop_toBottomOf="@id/fileProgressSheetText"/>
 
     <androidx.appcompat.widget.AppCompatButton

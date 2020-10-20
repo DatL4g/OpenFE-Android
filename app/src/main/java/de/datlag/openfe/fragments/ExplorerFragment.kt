@@ -12,6 +12,8 @@ import androidx.navigation.fragment.navArgs
 import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
+import de.datlag.openfe.bottomsheets.ConfirmActionSheet
+import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getThemedLayoutInflater
@@ -20,9 +22,9 @@ import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.commons.safeContext
+import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.supportActionBar
-import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.ExplorerViewModelFactory
@@ -104,11 +106,14 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         bottomNavigation?.inflateMenu(R.menu.explorer_bottom_menu)
         bottomNavigation?.setOnNavigationItemSelectedListener {
             when (it.itemId) {
+                R.id.explorerBottomDelete -> {
+                    deleteAction()
+                    true
+                }
                 else -> false
             }
         }
-        val iconDrawable = getDrawable(R.drawable.ic_baseline_add_24)
-        fab?.setImageDrawable(iconDrawable?.tint(getColor(R.color.defaultFabContentColor)))
+        fab?.setImageDrawable(getDrawable(R.drawable.ic_baseline_add_24, getColor(R.color.defaultFabContentColor)))
 
         updateBottom(false)
         updateFAB(true)
@@ -219,6 +224,30 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         toolbar?.menu?.clear()
         toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
         toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
+    }
+
+    private fun deleteAction() {
+        val selectedItemSize = explorerViewModel.countSelectedItems()
+        val confirmActionSheet = ConfirmActionSheet.deleteInstance(selectedItemSize > 1, selectedItemSize)
+        confirmActionSheet.rightClickListener = {
+            val fileProgressSheet = FileProgressSheet.deleteInstance(selectedItemSize)
+            showBottomSheetFragment(fileProgressSheet)
+
+            fileProgressSheet.updateable = {
+                val job = explorerViewModel.deleteSelectedItems({
+                    fileProgressSheet.updateProgressList(it)
+                }) {
+                    fileProgressSheet.leftText = String()
+                    fileProgressSheet.rightText = "Done"
+                    explorerViewModel.afterDeleteItems()
+                }
+
+                fileProgressSheet.leftClickListener = {
+                    job.cancel()
+                }
+            }
+        }
+        showBottomSheetFragment(confirmActionSheet)
     }
 
     private fun onBackPressedCheck(): Boolean {

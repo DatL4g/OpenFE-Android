@@ -165,5 +165,16 @@ class FileProgressSheet : BottomSheetDialogFragment() {
 
     companion object {
         fun newInstance() = FileProgressSheet()
+
+        fun deleteInstance(itemSize: Int): FileProgressSheet {
+            val instance = FileProgressSheet()
+            instance.title = "Delete File${if (itemSize > 1) "s" else String()}..."
+            instance.text = "Deleting $itemSize file${if (itemSize > 1) "s" else String()}.\nPlease wait..."
+            instance.leftText = "Cancel"
+            instance.rightText = "Background"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
     }
 }

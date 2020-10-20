@@ -162,5 +162,38 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
 
     companion object {
         fun newInstance() = ConfirmActionSheet()
+
+        fun backupInstance(name: String): ConfirmActionSheet {
+            val instance = ConfirmActionSheet()
+            instance.title = "Backup $name"
+            instance.text = "The Backup file is created in the OpenFE folder of your Internal Storage"
+            instance.leftText = "Cancel"
+            instance.rightText = "Backup"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
+
+        fun pasteInstance(multiple: Boolean): ConfirmActionSheet {
+            val instance = ConfirmActionSheet()
+            instance.title = "Paste File${if (multiple) "s" else String()} here?"
+            instance.text = "Are you sure that you want to paste the copied file${if (multiple) "s" else String()} in this directory?"
+            instance.leftText = "Cancel"
+            instance.rightText = "Paste"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
+
+        fun deleteInstance(multiple: Boolean, itemSize: Int = 0): ConfirmActionSheet {
+            val instance = ConfirmActionSheet()
+            instance.title = "Delete File${if (multiple) "s" else String()}"
+            instance.text = "This can not be undone!\nAre you sure you want to delete these files and folders${if (itemSize > 0) "\nTotal size: $itemSize" else String()}"
+            instance.leftText = "Cancel"
+            instance.rightText = "Delete"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
     }
 }

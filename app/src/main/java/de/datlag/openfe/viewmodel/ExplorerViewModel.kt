@@ -5,6 +5,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.commons.copyOf
+import de.datlag.openfe.commons.countRecursively
+import de.datlag.openfe.commons.deleteRecursively
 import de.datlag.openfe.commons.getRootOfStorage
 import de.datlag.openfe.commons.isInternal
 import de.datlag.openfe.commons.isNotCleared
@@ -117,24 +119,26 @@ class ExplorerViewModel constructor(
         return if (file.isDirectory) file else file.parentDir
     }
 
-    private fun createSubDirectories(fileList: MutableList<File>) = viewModelScope.launch(Dispatchers.IO) {
-        fileList.sortWith(compareByDescending<File> { it.isDirectory }.thenBy { it.name })
-        val iterator = fileList.listIterator()
+    private fun createSubDirectories(fileList: MutableList<File>) =
+        viewModelScope.launch(Dispatchers.IO) {
+            fileList.sortWith(compareByDescending<File> { it.isDirectory }.thenBy { it.name })
+            val iterator = fileList.listIterator()
 
-        while (iterator.hasNext()) {
-            val file = iterator.next()
+            while (iterator.hasNext()) {
+                val file = iterator.next()
 
-            if (!file.isHidden) {
-                val explorerItem = ExplorerItem.from(file, appsViewModel.systemApps.value ?: listOf())
-                val copy = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
-                copy.add(explorerItem)
+                if (!file.isHidden) {
+                    val explorerItem =
+                        ExplorerItem.from(file, appsViewModel.systemApps.value ?: listOf())
+                    val copy = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
+                    copy.add(explorerItem)
 
-                withContext(Dispatchers.Main) {
-                    currentSubDirectories.value = copy
+                    withContext(Dispatchers.Main) {
+                        currentSubDirectories.value = copy
+                    }
                 }
             }
         }
-    }
 
     fun moveToPath(path: File, force: Boolean = false) {
         val newPath = if (path.isInternal() && !force) startDirectory else path
@@ -267,6 +271,47 @@ class ExplorerViewModel constructor(
             selectedItems.value = listOf()
             currentSubDirectories.value = copy
         }
+    }
+
+    fun countSelectedItems(
+        direction: FileWalkDirection = FileWalkDirection.TOP_DOWN
+    ): Int {
+        val items = selectedItems.value ?: listOf()
+        var count = 0
+        for (item in items) {
+            count += item.fileItem.file.countRecursively(direction)
+        }
+        return count
+    }
+
+    fun deleteSelectedItems(
+        listener: ((progress: FloatArray) -> Unit)? = null,
+        done: (() -> Unit)? = null
+    ): Job {
+        val items: List<ExplorerItem> = selectedItems.value ?: listOf()
+        val initialList = FloatArray(items.size)
+        val copyList = initialList.copyOf()
+
+        listener?.invoke(initialList)
+
+        return viewModelScope.launch(Dispatchers.IO) {
+            for (pos in items.indices) {
+                items[pos].fileItem.file.deleteRecursively { percent, scope ->
+                    copyList[pos] = percent
+                    scope.launch(Dispatchers.Main) {
+                        listener?.invoke(copyList)
+                    }
+                }
+            }
+            withContext(Dispatchers.Main) {
+                done?.invoke()
+            }
+        }
+    }
+
+    fun afterDeleteItems() {
+        currentDirectory.value = currentDirectory.value
+        clearAllSelectedItems()
     }
 
     override fun onCleared() {
