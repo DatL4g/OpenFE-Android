@@ -48,7 +48,11 @@ class BrowserFragment : AdvancedFragment(), FragmentBackPressed {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentBrowserActionBinding.inflate(getThemedLayoutInflater(inflater), container, false)
+        binding = FragmentBrowserActionBinding.inflate(
+            getThemedLayoutInflater(inflater),
+            container,
+            false
+        )
         return binding.root
     }
 
@@ -78,15 +82,9 @@ class BrowserFragment : AdvancedFragment(), FragmentBackPressed {
         }
     }
 
-    private fun setupMenuItemClickListener(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.browserActionOpenWithItem -> {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(args.url))
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                ContextCompat.startActivity(safeContext, Intent.createChooser(intent, "Choose Browser"), null)
-            }
-        }
-        return false
+    override fun onResume() {
+        super.onResume()
+        initToolbar()
     }
 
     private fun initToolbar() {
@@ -101,9 +99,19 @@ class BrowserFragment : AdvancedFragment(), FragmentBackPressed {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        initToolbar()
+    private fun setupMenuItemClickListener(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.browserActionOpenWithItem -> {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(args.url))
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                ContextCompat.startActivity(
+                    safeContext,
+                    Intent.createChooser(intent, "Choose Browser"),
+                    null
+                )
+            }
+        }
+        return false
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

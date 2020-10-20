@@ -68,7 +68,8 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentOverviewBinding.inflate(getThemedLayoutInflater(inflater), container, false)
+        binding =
+            FragmentOverviewBinding.inflate(getThemedLayoutInflater(inflater), container, false)
         return binding.root
     }
 
@@ -88,7 +89,8 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         }
 
         actionRecycler.isNestedScrollingEnabled = false
-        actionRecycler.layoutManager = GridLayoutManager(safeContext, if (safeContext.packageManager.isTelevision()) 5 else 3)
+        actionRecycler.layoutManager =
+            GridLayoutManager(safeContext, if (safeContext.packageManager.isTelevision()) 5 else 3)
         actionRecycler.adapter = ActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
                 actionList[position].action.invoke()
@@ -97,13 +99,28 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
+        initToolbar()
+    }
+
+    private fun initToolbar() {
+        toolbar?.menu?.clear()
+    }
+
     private fun getLocationItems(): List<LocationItem> {
         val usageStats = safeContext.getStorageVolumes()
         val locationList = mutableListOf<LocationItem>()
 
         for (usageStat in usageStats) {
             if (usageStat.max != 0L && usageStat.current != 0L) {
-                locationList.add(LocationItem(usageStat.file.getDisplayName(safeContext), usageStat))
+                locationList.add(
+                    LocationItem(
+                        usageStat.file.getDisplayName(safeContext),
+                        usageStat
+                    )
+                )
             }
         }
 
@@ -121,7 +138,8 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
             return
         }
 
-        val usbDevice = activity?.intent?.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as? UsbDevice?
+        val usbDevice =
+            activity?.intent?.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as? UsbDevice?
 
         if (usbDevice != null && usbManager.hasPermission(usbDevice)) {
             Timber.e("permission")
@@ -153,23 +171,84 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
     private fun getActionItems(): List<ActionItem> {
         val actionList = mutableListOf<ActionItem>()
 
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_music_note_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Music", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_image_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Images", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_local_movies_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Videos", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_insert_drive_file_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Documents", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_archive_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Archives", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_adb_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "Apps", appFragmentUnit()))
-        actionList.add(ActionItem(getDrawable(R.drawable.ic_github)?.apply { tint(getColor(R.color.coloredCardHighlight)) }, "GitHub", githubUnit()))
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_music_note_24dp)?.apply {
+                    tint(
+                        getColor(
+                            R.color.coloredCardHighlight
+                        )
+                    )
+                },
+                "Music", appFragmentUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_image_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                "Images",
+                appFragmentUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_local_movies_24dp)?.apply {
+                    tint(
+                        getColor(R.color.coloredCardHighlight)
+                    )
+                },
+                "Videos", appFragmentUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_insert_drive_file_24dp)?.apply {
+                    tint(
+                        getColor(R.color.coloredCardHighlight)
+                    )
+                },
+                "Documents", appFragmentUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_archive_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                "Archives",
+                appFragmentUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_adb_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                "Apps",
+                appFragmentUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_github)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                "GitHub",
+                githubUnit()
+            )
+        )
 
         return actionList
     }
 
     private fun appFragmentUnit(): () -> Unit = {
-        findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToAppsActionFragment(locationList[0].usage.file.absolutePath))
+        findNavController().navigate(
+            OverviewFragmentDirections.actionOverviewFragmentToAppsActionFragment(
+                locationList[0].usage.file.absolutePath
+            )
+        )
     }
 
     private fun githubUnit(): () -> Unit = {
-        findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToBrowserFragment(getString(R.string.github_repo)))
+        findNavController().navigate(
+            OverviewFragmentDirections.actionOverviewFragmentToBrowserFragment(
+                getString(R.string.github_repo)
+            )
+        )
     }
 
     private fun checkReadPermission(position: Int) {
@@ -177,9 +256,10 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
             safeContext,
             object : PermissionListener {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-                    val action = OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
-                        ExplorerFragmentStorageArgs(locationList, position)
-                    )
+                    val action =
+                        OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
+                            ExplorerFragmentStorageArgs(locationList, position)
+                        )
                     findNavController().navigate(action)
                 }
 
@@ -187,23 +267,18 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
                     p0: PermissionRequest?,
                     p1: PermissionToken?
                 ) {
-                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(safeContext, p1))
+                    showBottomSheetFragment(
+                        PermissionChecker.storagePermissionSheet(
+                            safeContext,
+                            p1
+                        )
+                    )
                 }
 
                 override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
                 }
             }
         )
-    }
-
-    private fun initToolbar() {
-        toolbar?.menu?.clear()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        statusBarColor(getColor(R.color.defaultStatusBarColor))
-        initToolbar()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

@@ -28,9 +28,9 @@
         android:title="Copy" />
 
     <item
-        android:id="@+id/explorerBottomInfo"
+        android:id="@+id/explorerBottomExtendMenu"
         android:enabled="true"
-        android:icon="@drawable/ic_info_outline_24dp"
-        app:iconTint="@color/defaultToolBarContentColor"
-        android:title="Info" />
+        android:icon="@drawable/ic_baseline_more_vert_24"
+        android:iconTint="@color/defaultToolBarContentColor"
+        android:title="More" />
 </menu>

@@ -87,7 +87,8 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentAppsActionBinding.inflate(getThemedLayoutInflater(inflater), container, false)
+        binding =
+            FragmentAppsActionBinding.inflate(getThemedLayoutInflater(inflater), container, false)
         return binding.root
     }
 
@@ -100,6 +101,53 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         initEditText()
         initBottomNavigation()
         loadAppsAsync()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
+        initToolbar()
+    }
+
+    private fun initToolbar() {
+        toolbar?.menu?.clear()
+        toolbar?.inflateMenu(R.menu.apps_action_toolbar_menu)
+        toolbar?.menu?.let {
+            searchView?.setMenuItem(it.findItem(R.id.appsActionSearchItem))
+            for (item in it.iterator()) {
+                if (item.itemId != R.id.appsActionSearchItem) {
+                    item.setOnMenuItemClickListener { menuItem ->
+                        return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateToolbar() {
+        if (itemValid()) {
+            supportActionBar?.title = viewModel.selectedApp!!.name
+            supportActionBar?.setHomeAsUpIndicator(
+                getDrawable(R.drawable.ic_close_24dp)?.apply {
+                    tint(
+                        getColor(
+                            R.color.defaultNavigationColor
+                        )
+                    )
+                }
+            )
+        } else {
+            supportActionBar?.title = safeContext.getString(R.string.app_name)
+            supportActionBar?.setHomeAsUpIndicator(
+                getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
+                    tint(
+                        getColor(
+                            R.color.defaultNavigationColor
+                        )
+                    )
+                }
+            )
+        }
     }
 
     @ExperimentalContracts
@@ -247,8 +295,13 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         val fileProgressSheet = FileProgressSheet.newInstance()
         val originalFile = File(item.publicSourceDir)
         val fileName = "${item.name}-Backup"
-        val storage = File("${viewModel.storageFile.absolutePath}${File.separator}OpenFE${File.separator}Apps")
-        val createFolderSuccess = if (!storage.exists()) { storage.mkdirs() } else { true }
+        val storage =
+            File("${viewModel.storageFile.absolutePath}${File.separator}OpenFE${File.separator}Apps")
+        val createFolderSuccess = if (!storage.exists()) {
+            storage.mkdirs()
+        } else {
+            true
+        }
 
         fileProgressSheet.title = "Backup ${item.name}"
         fileProgressSheet.text = "Creating Backup file in OpenFE/Apps/${item.name}-Backup..."
@@ -323,10 +376,15 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
                     p0: PermissionRequest?,
                     p1: PermissionToken?
                 ) {
-                    showBottomSheetFragment(PermissionChecker.storagePermissionSheet(safeContext, p1))
+                    showBottomSheetFragment(
+                        PermissionChecker.storagePermissionSheet(
+                            safeContext,
+                            p1
+                        )
+                    )
                 }
 
-                override fun onPermissionDenied(p0: PermissionDeniedResponse?) { }
+                override fun onPermissionDenied(p0: PermissionDeniedResponse?) {}
             }
         )
     }
@@ -369,53 +427,6 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         }
     }
 
-    private fun updateToolbar() {
-        if (itemValid()) {
-            supportActionBar?.title = viewModel.selectedApp!!.name
-            supportActionBar?.setHomeAsUpIndicator(
-                getDrawable(R.drawable.ic_close_24dp)?.apply {
-                    tint(
-                        getColor(
-                            R.color.defaultNavigationColor
-                        )
-                    )
-                }
-            )
-        } else {
-            supportActionBar?.title = safeContext.getString(R.string.app_name)
-            supportActionBar?.setHomeAsUpIndicator(
-                getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
-                    tint(
-                        getColor(
-                            R.color.defaultNavigationColor
-                        )
-                    )
-                }
-            )
-        }
-    }
-
-    private fun initToolbar() {
-        toolbar?.menu?.clear()
-        toolbar?.inflateMenu(R.menu.apps_action_toolbar_menu)
-        toolbar?.menu?.let {
-            searchView?.setMenuItem(it.findItem(R.id.appsActionSearchItem))
-            for (item in it.iterator()) {
-                if (item.itemId != R.id.appsActionSearchItem) {
-                    item.setOnMenuItemClickListener { menuItem ->
-                        return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        statusBarColor(getColor(R.color.defaultStatusBarColor))
-        initToolbar()
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         initToolbar()
@@ -425,7 +436,9 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         p0?.let {
             when (it.itemId) {
                 R.id.appsActionPopupFilterName -> appsViewModel.sortType = AppsSortType.NAME
-                R.id.appsActionPopupFilterInstalled -> appsViewModel.sortType = AppsSortType.INSTALLED
+                R.id.appsActionPopupFilterInstalled ->
+                    appsViewModel.sortType =
+                        AppsSortType.INSTALLED
                 R.id.appsActionPopupFilterUpdated -> appsViewModel.sortType = AppsSortType.UPDATED
                 else -> appsViewModel.sortType = AppsSortType.NAME
             }

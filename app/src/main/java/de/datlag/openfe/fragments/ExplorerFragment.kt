@@ -45,7 +45,12 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
 
     private val args: ExplorerFragmentArgs by navArgs()
     private val appsViewModel: AppsViewModel by viewModels()
-    private val explorerViewModel: ExplorerViewModel by viewModels { ExplorerViewModelFactory(args, appsViewModel) }
+    private val explorerViewModel: ExplorerViewModel by viewModels {
+        ExplorerViewModelFactory(
+            args,
+            appsViewModel
+        )
+    }
 
     private lateinit var recyclerAdapter: ExplorerRecyclerAdapter
     private lateinit var binding: FragmentExplorerBinding
@@ -62,7 +67,8 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         savedInstanceState: Bundle?
     ): View? {
 
-        binding = FragmentExplorerBinding.inflate(getThemedLayoutInflater(inflater), container, false)
+        binding =
+            FragmentExplorerBinding.inflate(getThemedLayoutInflater(inflater), container, false)
         return binding.root
     }
 
@@ -101,6 +107,38 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
+        initToolbar()
+    }
+
+    private fun initToolbar() {
+        toolbar?.menu?.clear()
+        toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
+        toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
+    }
+
+    private fun updateToolbar(list: List<ExplorerItem>? = explorerViewModel.selectedItems.value) {
+        if (list.isNullOrEmpty()) {
+            supportActionBar?.setHomeAsUpIndicator(
+                getDrawable(
+                    R.drawable.ic_arrow_back_24dp,
+                    getColor(R.color.defaultNavigationColor)
+                )
+            )
+            supportActionBar?.title = safeContext.getString(R.string.app_name)
+        } else {
+            supportActionBar?.setHomeAsUpIndicator(
+                getDrawable(
+                    R.drawable.ic_close_24dp,
+                    getColor(R.color.defaultNavigationColor)
+                )
+            )
+            supportActionBar?.title = "${list.size} Items"
+        }
+    }
+
     private fun initBottomNavigation() {
         bottomNavigation?.menu?.clear()
         bottomNavigation?.inflateMenu(R.menu.explorer_bottom_menu)
@@ -113,7 +151,12 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
                 else -> false
             }
         }
-        fab?.setImageDrawable(getDrawable(R.drawable.ic_baseline_add_24, getColor(R.color.defaultFabContentColor)))
+        fab?.setImageDrawable(
+            getDrawable(
+                R.drawable.ic_baseline_add_24,
+                getColor(R.color.defaultFabContentColor)
+            )
+        )
 
         updateBottom(false)
         updateFAB(true)
@@ -175,20 +218,21 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         })
     }
 
-    private fun recyclerEvent(position: Int, longClick: Boolean) = recyclerAdapter.differ.currentList.let {
-        if (position < 0) {
-            return@let
-        }
+    private fun recyclerEvent(position: Int, longClick: Boolean) =
+        recyclerAdapter.differ.currentList.let {
+            if (position < 0) {
+                return@let
+            }
 
-        val explorerItem = it[position]
+            val explorerItem = it[position]
 
-        if (!longClick && explorerViewModel.selectedItems.value.isNullOrEmpty()) {
-            recyclerClickEvent(explorerItem)
-        } else {
-            val selected = explorerViewModel.selectItem(explorerItem)
-            recyclerHolderCheckboxSelected(position, selected)
+            if (!longClick && explorerViewModel.selectedItems.value.isNullOrEmpty()) {
+                recyclerClickEvent(explorerItem)
+            } else {
+                val selected = explorerViewModel.selectItem(explorerItem)
+                recyclerHolderCheckboxSelected(position, selected)
+            }
         }
-    }
 
     private fun recyclerClickEvent(explorerItem: ExplorerItem) = with(binding) {
         val fileItem = explorerItem.fileItem
@@ -205,30 +249,16 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         }
     }
 
-    private fun updateToolbar(list: List<ExplorerItem>? = explorerViewModel.selectedItems.value) {
-        if (list.isNullOrEmpty()) {
-            supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_arrow_back_24dp, getColor(R.color.defaultNavigationColor)))
-            supportActionBar?.title = safeContext.getString(R.string.app_name)
-        } else {
-            supportActionBar?.setHomeAsUpIndicator(getDrawable(R.drawable.ic_close_24dp, getColor(R.color.defaultNavigationColor)))
-            supportActionBar?.title = "${list.size} Items"
-        }
-    }
-
     private fun recyclerHolderCheckboxSelected(position: Int, isChecked: Boolean) {
-        val holder = binding.explorerRecycler.findViewHolderForAdapterPosition(position) as? ExplorerRecyclerAdapter.ViewHolder?
+        val holder =
+            binding.explorerRecycler.findViewHolderForAdapterPosition(position) as? ExplorerRecyclerAdapter.ViewHolder?
         holder?.binding?.explorerCheckbox?.isChecked = isChecked
-    }
-
-    private fun initToolbar() {
-        toolbar?.menu?.clear()
-        toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
-        toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
     }
 
     private fun deleteAction() {
         val selectedItemSize = explorerViewModel.countSelectedItems()
-        val confirmActionSheet = ConfirmActionSheet.deleteInstance(selectedItemSize > 1, selectedItemSize)
+        val confirmActionSheet =
+            ConfirmActionSheet.deleteInstance(selectedItemSize > 1, selectedItemSize)
         confirmActionSheet.rightClickListener = {
             val fileProgressSheet = FileProgressSheet.deleteInstance(selectedItemSize)
             showBottomSheetFragment(fileProgressSheet)
@@ -279,12 +309,6 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
                 false
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        statusBarColor(getColor(R.color.defaultStatusBarColor))
-        initToolbar()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
