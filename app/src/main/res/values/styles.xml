@@ -10,6 +10,14 @@
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/defaultBackgroundColor</item>
     </style>
 
+    <style name="ViewerAppTheme" parent="AppTheme">
+        <item name="android:windowDrawsSystemBarBackgrounds" tools:targetApi="lollipop">true</item>
+        <item name="android:windowTranslucentStatus" tools:targetApi="lollipop">false</item>
+        <item name="android:windowTranslucentNavigation" tools:targetApi="lollipop">false</item>
+        <item name="android:statusBarColor" tools:targetApi="lollipop">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@android:color/transparent</item>
+    </style>
+
     <style name="AppTheme.Overlay" parent="AppTheme">
         <item name="colorPrimary">@android:color/transparent</item>
     </style>
@@ -17,10 +25,15 @@
     <style name="FragmentTheme" parent="AppTheme">
         <item name="android:statusBarColor" tools:targetApi="lollipop">@color/defaultStatusBarColor</item>
         <item name="drawerArrowStyle">@style/NavigationStyle</item>
+        <item name="android:popupMenuStyle">@style/PopupMenuStyle</item>
     </style>
 
     <style name="NavigationStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="color">@color/defaultNavigationColor</item>
+    </style>
+
+    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@color/defaultPopupMenuBackgroundColor</item>
     </style>
 
     <style name="Divider">

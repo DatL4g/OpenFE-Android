@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/explorerBottomExtendedInfo"
+        android:title="Info"
+        android:icon="@drawable/ic_info_outline_24dp"
+        android:iconTint="@color/defaultToolBarContentColor" />
+
+    <item
+        android:id="@+id/explorerBottomExtendedArchive"
+        android:title="Archive"
+        android:icon="@drawable/ic_archive_24dp"
+        android:iconTint="@color/defaultToolBarContentColor" />
+</menu>

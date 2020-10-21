@@ -2,6 +2,7 @@ package de.datlag.openfe.recycler.data
 
 import android.os.Parcelable
 import de.datlag.openfe.commons.matchWithApps
+import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.viewmodel.AppList
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.parcel.Parcelize
@@ -18,7 +19,7 @@ data class ExplorerItem(
 
     companion object {
         fun from(fileItem: FileItem, appList: AppList): ExplorerItem {
-            return ExplorerItem(fileItem).apply { matchWithApps(appList) }
+            return ExplorerItem(fileItem, selectable = fileItem.file.permissions.readable).apply { matchWithApps(appList) }
         }
 
         fun from(file: File, appList: AppList): ExplorerItem = from(FileItem(file), appList)

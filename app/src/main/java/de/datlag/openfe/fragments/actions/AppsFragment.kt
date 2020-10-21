@@ -7,10 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.iterator
 import androidx.fragment.app.viewModels
@@ -18,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.ferfalk.simplesearchview.SimpleSearchView
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -33,7 +32,6 @@ import de.datlag.openfe.commons.androidGreaterOr
 import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
-import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
@@ -44,7 +42,6 @@ import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.supportActionBar
-import de.datlag.openfe.commons.tint
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.AppsActionViewModelFactory
@@ -66,12 +63,12 @@ import kotlin.contracts.contract
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
-class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
+class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
 
     private val args: AppsFragmentArgs by navArgs()
     private val viewModel: AppsActionViewModel by viewModels { AppsActionViewModelFactory(args) }
     private val appsViewModel: AppsViewModel by viewModels()
-    private lateinit var binding: FragmentAppsActionBinding
+    private val binding: FragmentAppsActionBinding by viewBinding()
 
     private var copiedList = listOf<AppItem>()
     private lateinit var adapter: AppsActionRecyclerAdapter
@@ -80,16 +77,6 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         if (onBackPressedCheck()) {
             findNavController().navigate(R.id.action_AppsActionFragment_to_OverviewFragment)
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding =
-            FragmentAppsActionBinding.inflate(getThemedLayoutInflater(inflater), container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
@@ -128,24 +115,12 @@ class AppsFragment : AdvancedFragment(), FragmentBackPressed, PopupMenu.OnMenuIt
         if (itemValid()) {
             supportActionBar?.title = viewModel.selectedApp!!.name
             supportActionBar?.setHomeAsUpIndicator(
-                getDrawable(R.drawable.ic_close_24dp)?.apply {
-                    tint(
-                        getColor(
-                            R.color.defaultNavigationColor
-                        )
-                    )
-                }
+                getDrawable(R.drawable.ic_close_24dp, getColor(R.color.defaultNavigationColor))
             )
         } else {
             supportActionBar?.title = safeContext.getString(R.string.app_name)
             supportActionBar?.setHomeAsUpIndicator(
-                getDrawable(R.drawable.ic_arrow_back_24dp)?.apply {
-                    tint(
-                        getColor(
-                            R.color.defaultNavigationColor
-                        )
-                    )
-                }
+                getDrawable(R.drawable.ic_arrow_back_24dp, getColor(R.color.defaultNavigationColor))
             )
         }
     }

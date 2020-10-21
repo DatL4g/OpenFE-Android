@@ -86,6 +86,7 @@ dependencies {
     implementation("com.google.android.material:material:${Versions.material}")
     implementation("com.jakewharton.timber:timber:${Versions.timber}")
     implementation("androidx.webkit:webkit:${Versions.webkit}")
+    implementation("com.kirich1409.viewbindingpropertydelegate:viewbindingpropertydelegate:${Versions.viewBindingDelegate}")
 
     implementation("androidx.core:core-ktx:${Versions.ktxCore}")
     implementation("androidx.activity:activity-ktx:${Versions.ktxActivity}")
@@ -101,6 +102,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:${Versions.constraintlayout}")
     implementation("androidx.recyclerview:recyclerview:${Versions.recyclerview}")
     implementation("androidx.cardview:cardview:${Versions.cardview}")
+    implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}")
@@ -122,6 +124,7 @@ dependencies {
     implementation("com.karumi:dexter:${Versions.dexter}")
     implementation("com.github.bumptech.glide:glide:${Versions.glide}")
     kapt("com.github.bumptech.glide:compiler:${Versions.glide}")
+    implementation("com.github.chrisbanes:PhotoView:${Versions.photoView}")
 
     implementation("me.jahnen:libaums:${Versions.libaums}")
 }

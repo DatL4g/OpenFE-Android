@@ -1,7 +1,11 @@
 package de.datlag.openfe.extend
 
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -15,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.MainActivity
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.invisible
 import de.datlag.openfe.commons.show
@@ -26,7 +31,19 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 @AndroidEntryPoint
 @Obfuscate
-abstract class AdvancedFragment : Fragment() {
+abstract class AdvancedFragment : Fragment {
+
+    constructor() : super() { }
+
+    constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId) { }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return super.onCreateView(getThemedLayoutInflater(inflater), container, savedInstanceState)
+    }
 
     protected val toolbar: Toolbar?
         get() {

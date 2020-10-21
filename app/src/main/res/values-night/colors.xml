@@ -8,6 +8,7 @@
     <color name="defaultCardColor">#323232</color>
     <color name="defaultCardSelectedColor">#444444</color>
     <color name="defaultFabBackgroundColor">#323232</color>
+    <color name="defaultPopupMenuBackgroundColor">#444444</color>
 
     <color name="highlightColor">#000000</color>
     <color name="coloredCardDefaultColor">@color/defaultCardColor</color>

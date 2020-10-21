@@ -9,14 +9,13 @@ import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.github.mjdev.libaums.UsbMassStorageDevice
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -28,7 +27,6 @@ import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDisplayName
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getStorageVolumes
-import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
@@ -49,12 +47,12 @@ import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
 @Obfuscate
-class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
+class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentBackPressed {
 
     lateinit var locationList: List<LocationItem>
     lateinit var actionList: List<ActionItem>
 
-    private lateinit var binding: FragmentOverviewBinding
+    private val binding: FragmentOverviewBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,18 +61,9 @@ class OverviewFragment : AdvancedFragment(), FragmentBackPressed {
         actionList = getActionItems()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding =
-            FragmentOverviewBinding.inflate(getThemedLayoutInflater(inflater), container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
+
         updateToggle(true, getColor(R.color.defaultNavigationColor))
         updateBottom(false)
         updateFAB(false)

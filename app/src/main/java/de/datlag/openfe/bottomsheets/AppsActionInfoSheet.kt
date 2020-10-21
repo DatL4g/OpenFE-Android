@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import de.datlag.openfe.R
 import de.datlag.openfe.commons.expand
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
@@ -19,22 +21,20 @@ import kotlin.contracts.ExperimentalContracts
 @Obfuscate
 class AppsActionInfoSheet : BottomSheetDialogFragment() {
 
-    private lateinit var binding: AppsActionInfoSheetBinding
+    private val binding: AppsActionInfoSheetBinding by viewBinding()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = AppsActionInfoSheetBinding.inflate(inflater, container, false)
-
         if (safeContext.packageManager.isTelevision()) {
             dialog?.setOnShowListener {
                 it.expand()
             }
         }
 
-        return binding.root
+        return inflater.inflate(R.layout.apps_action_info_sheet, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {

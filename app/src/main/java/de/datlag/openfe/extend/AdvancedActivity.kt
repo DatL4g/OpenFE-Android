@@ -1,6 +1,7 @@
 package de.datlag.openfe.extend
 
 import android.content.Context
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.AndroidEntryPoint
@@ -9,7 +10,10 @@ import io.michaelrocks.paranoid.Obfuscate
 
 @AndroidEntryPoint
 @Obfuscate
-abstract class AdvancedActivity : AppCompatActivity() {
+abstract class AdvancedActivity : AppCompatActivity {
+
+    constructor() : super() { }
+    constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId) { }
 
     companion object {
         init {

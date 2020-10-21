@@ -3,6 +3,8 @@ package de.datlag.openfe.commons
 
 import android.app.usage.StorageStatsManager
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Parcel
 import android.os.storage.StorageManager
@@ -101,3 +103,22 @@ fun Context.getPath(storageVolume: StorageVolume): String? {
 }
 
 fun Context.getDimenInPixel(@DimenRes res: Int) = this.resources.getDimensionPixelSize(res)
+
+fun Context.isNetworkAvailable(): Boolean {
+    val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    if (androidGreaterOr(Build.VERSION_CODES.M)) {
+        val network = connectivityManager.activeNetwork ?: return false
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return when {
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
+            activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_DUN) -> true
+            else -> false
+        }
+    } else {
+        val networkinfo = connectivityManager.activeNetworkInfo ?: return false
+        return networkinfo.isConnectedOrConnecting
+    }
+}

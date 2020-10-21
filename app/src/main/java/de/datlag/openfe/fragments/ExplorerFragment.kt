@@ -2,13 +2,13 @@ package de.datlag.openfe.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
@@ -16,7 +16,6 @@ import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
-import de.datlag.openfe.commons.getThemedLayoutInflater
 import de.datlag.openfe.commons.intentChooser
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.parentDir
@@ -41,7 +40,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
-class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
+class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentBackPressed {
 
     private val args: ExplorerFragmentArgs by navArgs()
     private val appsViewModel: AppsViewModel by viewModels()
@@ -53,23 +52,12 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
     }
 
     private lateinit var recyclerAdapter: ExplorerRecyclerAdapter
-    private lateinit var binding: FragmentExplorerBinding
+    private val binding: FragmentExplorerBinding by viewBinding()
 
     private val navigationListener = View.OnClickListener {
         if (onBackPressedCheck()) {
             findNavController().navigate(R.id.action_ExplorerFragment_to_OverviewFragment)
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        binding =
-            FragmentExplorerBinding.inflate(getThemedLayoutInflater(inflater), container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
@@ -84,16 +72,22 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
         explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
             if (explorerViewModel.searchShown.value == true) {
                 updateFAB(false)
+                bottomNavigation?.menu?.getItem(2)?.isVisible = false
             } else {
-                updateFAB(dir.permissions.writeable)
+                val permission = dir.permissions.writeable
+                updateFAB(permission)
+                bottomNavigation?.menu?.getItem(2)?.isVisible = permission
             }
         }
 
         explorerViewModel.searchShown.observe(viewLifecycleOwner) { enabled ->
             if (enabled) {
                 updateFAB(false)
+                bottomNavigation?.menu?.getItem(2)?.isVisible = false
             } else {
-                updateFAB(explorerViewModel.currentDirectory.value?.permissions?.writeable ?: false)
+                val permission = explorerViewModel.currentDirectory.value?.permissions?.writeable ?: false
+                updateFAB(permission)
+                bottomNavigation?.menu?.getItem(2)?.isVisible = permission
             }
         }
 
@@ -146,6 +140,10 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
             when (it.itemId) {
                 R.id.explorerBottomDelete -> {
                     deleteAction()
+                    true
+                }
+                R.id.explorerBottomExtendMenu -> {
+                    moreAction(it.actionView ?: requireView().rootView.findViewById(it.itemId))
                     true
                 }
                 else -> false
@@ -278,6 +276,12 @@ class ExplorerFragment : AdvancedFragment(), FragmentBackPressed {
             }
         }
         showBottomSheetFragment(confirmActionSheet)
+    }
+
+    private fun moreAction(anchor: View) {
+        val popupMenu = PopupMenu(safeContext, anchor)
+        popupMenu.inflate(R.menu.explorer_bottom_extended_menu)
+        popupMenu.show()
     }
 
     private fun onBackPressedCheck(): Boolean {

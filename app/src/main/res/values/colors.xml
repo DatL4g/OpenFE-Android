@@ -14,6 +14,7 @@
     <color name="defaultNavigationColor">#ffffff</color>
     <color name="defaultFabBackgroundColor">@color/primaryColor</color>
     <color name="defaultFabContentColor">#ffffff</color>
+    <color name="defaultPopupMenuBackgroundColor">#ffffff</color>
 
     <color name="highlightColor">#ffffff</color>
     <color name="coloredCardDefaultColor">@color/primaryColor</color>
