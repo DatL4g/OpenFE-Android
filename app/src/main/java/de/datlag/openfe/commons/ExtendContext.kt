@@ -9,7 +9,10 @@ import android.os.Build
 import android.os.Parcel
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import de.datlag.openfe.data.Usage
@@ -122,3 +125,12 @@ fun Context.isNetworkAvailable(): Boolean {
         return networkinfo.isConnectedOrConnecting
     }
 }
+
+fun Context.getColorCompat(@ColorRes color: Int) = ContextCompat.getColor(this, color)
+
+fun Context.getDrawableCompat(@DrawableRes drawable: Int) = ContextCompat.getDrawable(
+    this,
+    drawable
+)
+
+fun Context.getDrawableCompat(@DrawableRes drawable: Int, @ColorInt tint: Int) = this.getDrawableCompat(drawable)?.tint(tint)

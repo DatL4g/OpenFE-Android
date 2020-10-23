@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<de.datlag.openfe.extend.ClickableCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/backupCard"
+    app:cardBackgroundSelector="@color/explorer_file_selector"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp"
+    app:cardMaxElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/backupIcon"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/backupName"
+            app:layout_constraintEnd_toStartOf="@id/backupName"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/backupName"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:text="Test"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/backupIcon"
+            app:layout_constraintStart_toEndOf="@id/backupIcon"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</de.datlag.openfe.extend.ClickableCardView>

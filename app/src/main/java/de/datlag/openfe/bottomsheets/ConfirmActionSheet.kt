@@ -163,6 +163,19 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
     companion object {
         fun newInstance() = ConfirmActionSheet()
 
+        fun removeAdInstance(): ConfirmActionSheet {
+            val instance = ConfirmActionSheet()
+            instance.title = "Remove Ad"
+            instance.text = "There are several ways to remove ads.\n" +
+                "One possibility is to become a contributor so that this open source project can be improved and at the same time give something back.\n" +
+                "The other option is to sponsor me on GitHub."
+            instance.leftText = "Close"
+            instance.rightText = "Login"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
+
         fun backupInstance(name: String): ConfirmActionSheet {
             val instance = ConfirmActionSheet()
             instance.title = "Backup $name"

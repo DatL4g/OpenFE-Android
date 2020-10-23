@@ -23,6 +23,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import de.datlag.openfe.R
+import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDisplayName
 import de.datlag.openfe.commons.getDrawable
@@ -31,7 +32,6 @@ import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
-import de.datlag.openfe.commons.tint
 import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
@@ -159,65 +159,66 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
 
     private fun getActionItems(): List<ActionItem> {
         val actionList = mutableListOf<ActionItem>()
+        val iconTint = getColor(R.color.coloredCardHighlight)
 
         actionList.add(
             ActionItem(
-                getDrawable(R.drawable.ic_music_note_24dp)?.apply {
-                    tint(
-                        getColor(
-                            R.color.coloredCardHighlight
-                        )
-                    )
-                },
+                getDrawable(R.drawable.ic_music_note_24dp, iconTint),
                 "Music", appFragmentUnit()
             )
         )
         actionList.add(
             ActionItem(
-                getDrawable(R.drawable.ic_image_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                getDrawable(R.drawable.ic_image_24dp, iconTint),
                 "Images",
                 appFragmentUnit()
             )
         )
         actionList.add(
             ActionItem(
-                getDrawable(R.drawable.ic_local_movies_24dp)?.apply {
-                    tint(
-                        getColor(R.color.coloredCardHighlight)
-                    )
-                },
+                getDrawable(R.drawable.ic_local_movies_24dp, iconTint),
                 "Videos", appFragmentUnit()
             )
         )
         actionList.add(
             ActionItem(
-                getDrawable(R.drawable.ic_insert_drive_file_24dp)?.apply {
-                    tint(
-                        getColor(R.color.coloredCardHighlight)
-                    )
-                },
+                getDrawable(R.drawable.ic_insert_drive_file_24dp, iconTint),
                 "Documents", appFragmentUnit()
             )
         )
         actionList.add(
             ActionItem(
-                getDrawable(R.drawable.ic_archive_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                getDrawable(R.drawable.ic_archive_24dp, iconTint),
                 "Archives",
                 appFragmentUnit()
             )
         )
         actionList.add(
             ActionItem(
-                getDrawable(R.drawable.ic_adb_24dp)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                getDrawable(R.drawable.ic_adb_24dp, iconTint),
                 "Apps",
                 appFragmentUnit()
             )
         )
         actionList.add(
             ActionItem(
-                getDrawable(R.drawable.ic_github)?.apply { tint(getColor(R.color.coloredCardHighlight)) },
+                getDrawable(R.drawable.ic_baseline_delete_24, iconTint),
+                "Clean",
+                cleanFragmentUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_github, iconTint),
                 "GitHub",
                 githubUnit()
+            )
+        )
+        actionList.add(
+            ActionItem(
+                getDrawable(R.drawable.ic_baseline_cancel_presentation_24, iconTint),
+                "Remove Ad",
+                removeAdUnit()
             )
         )
 
@@ -232,12 +233,23 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         )
     }
 
+    private fun cleanFragmentUnit(): () -> Unit = {
+        findNavController().navigate(
+            OverviewFragmentDirections.actionOverviewFragmentToCleanActionFragment()
+        )
+    }
+
     private fun githubUnit(): () -> Unit = {
         findNavController().navigate(
-            OverviewFragmentDirections.actionOverviewFragmentToBrowserFragment(
+            OverviewFragmentDirections.actionOverviewFragmentToBrowserActionFragment(
                 getString(R.string.github_repo)
             )
         )
+    }
+
+    private fun removeAdUnit(): () -> Unit = {
+        val removeAdSheet = ConfirmActionSheet.removeAdInstance()
+        showBottomSheetFragment(removeAdSheet)
     }
 
     private fun checkReadPermission(position: Int) {

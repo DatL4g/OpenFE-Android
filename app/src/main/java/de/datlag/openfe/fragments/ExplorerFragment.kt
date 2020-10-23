@@ -32,6 +32,7 @@ import de.datlag.openfe.recycler.LinearLayoutManagerWrapper
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppsViewModel
+import de.datlag.openfe.viewmodel.BackupViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import timber.log.Timber
@@ -44,10 +45,12 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
 
     private val args: ExplorerFragmentArgs by navArgs()
     private val appsViewModel: AppsViewModel by viewModels()
+    private val backupViewModel: BackupViewModel by viewModels()
     private val explorerViewModel: ExplorerViewModel by viewModels {
         ExplorerViewModelFactory(
             args,
-            appsViewModel
+            appsViewModel,
+            backupViewModel
         )
     }
 
@@ -262,16 +265,21 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
             showBottomSheetFragment(fileProgressSheet)
 
             fileProgressSheet.updateable = {
-                val job = explorerViewModel.deleteSelectedItems({
-                    fileProgressSheet.updateProgressList(it)
-                }) {
-                    fileProgressSheet.leftText = String()
-                    fileProgressSheet.rightText = "Done"
-                    explorerViewModel.afterDeleteItems()
-                }
+                explorerViewModel.backupSelectedItems(safeContext) {
+                    Timber.e("Backup created: $it")
+                    /*
+                    val job = explorerViewModel.deleteSelectedItems({
+                        fileProgressSheet.updateProgressList(it)
+                    }) {
+                        fileProgressSheet.leftText = String()
+                        fileProgressSheet.rightText = "Done"
+                        explorerViewModel.afterDeleteItems()
+                    }
 
-                fileProgressSheet.leftClickListener = {
-                    job.cancel()
+                    fileProgressSheet.leftClickListener = {
+                        job.cancel()
+                    }
+                     */
                 }
             }
         }

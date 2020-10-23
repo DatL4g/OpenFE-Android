@@ -2,6 +2,7 @@
     <string name="app_name">OpenFE</string>
     <string name="font_path" translatable="false">fonts/Poppins-Regular.ttf</string>
     <string name="github_repo" translatable="false">https://github.com/DatL4g/OpenFE-Android</string>
+    <string name="backup_database" translatable="false">backup_db</string>
 
     <string name="loading_apps">Loading Apps…</string>
 

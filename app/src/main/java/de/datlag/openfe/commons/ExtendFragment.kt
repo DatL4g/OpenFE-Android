@@ -14,7 +14,6 @@ import androidx.annotation.StyleRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.R
@@ -54,19 +53,11 @@ fun Fragment.statusBarColor(@ColorInt color: Int) {
     }
 }
 
-fun Fragment.getColor(@ColorRes color: Int) = ContextCompat.getColor(safeContext, color)
+fun Fragment.getColor(@ColorRes color: Int) = safeContext.getColorCompat(color)
 
-fun Fragment.getDrawable(@DrawableRes drawable: Int) = ContextCompat.getDrawable(
-    safeContext,
-    drawable
-)
+fun Fragment.getDrawable(@DrawableRes drawable: Int) = safeContext.getDrawableCompat(drawable)
 
-fun Fragment.getDrawable(@DrawableRes drawable: Int, @ColorInt tint: Int) = this.getDrawable(drawable)?.tint(tint)
-
-fun Fragment.getColorStateList(@ColorRes colorStateList: Int) = ContextCompat.getColorStateList(
-    safeContext,
-    colorStateList
-)
+fun Fragment.getDrawable(@DrawableRes drawable: Int, @ColorInt tint: Int) = safeContext.getDrawableCompat(drawable, tint)
 
 fun Fragment.showBottomSheetFragment(bottomSheet: BottomSheetDialogFragment) = bottomSheet.show(
     childFragmentManager,

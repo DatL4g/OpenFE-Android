@@ -10,8 +10,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.webkit.MimeTypeMap
+import androidx.annotation.ColorRes
 import androidx.core.content.FileProvider
 import androidx.core.os.EnvironmentCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import de.datlag.openfe.R
 import de.datlag.openfe.data.FilePermission
 import de.datlag.openfe.data.Usage
 import io.michaelrocks.paranoid.Obfuscate
@@ -299,4 +305,65 @@ fun File.intentChooser(context: Context): Intent {
     }
 
     return Intent.createChooser(intent, "Choose App to open file")
+}
+
+@ExperimentalContracts
+fun File.getIcon(context: Context, isApkChecked: Pair<Boolean, Boolean>, @ColorRes tint: Int, result: (Drawable?) -> Unit) {
+    val isApk = if (isApkChecked.first) {
+        isApkChecked.second
+    } else {
+        this.isAPK()
+    }
+
+    val fallback = if (isApk) {
+        context.getDrawableCompat(R.drawable.ic_adb_24dp, context.getColorCompat(tint))
+    } else {
+        context.getDrawableCompat(R.drawable.ic_baseline_insert_drive_file_24, context.getColorCompat(tint))
+    }
+
+    val fileTarget = object : CustomTarget<Drawable>() {
+        override fun onLoadStarted(placeholder: Drawable?) {
+            super.onLoadStarted(placeholder)
+            result.invoke(placeholder)
+        }
+
+        override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+            result.invoke(resource)
+        }
+
+        override fun onLoadCleared(placeholder: Drawable?) {
+            result.invoke(placeholder)
+        }
+
+        override fun onLoadFailed(errorDrawable: Drawable?) {
+            super.onLoadFailed(errorDrawable)
+            result.invoke(errorDrawable)
+        }
+    }
+
+    when {
+        this.isDirectory -> {
+            Glide.with(context)
+                .load(context.getDrawableCompat(R.drawable.ic_baseline_folder_24, context.getColorCompat(tint)))
+                .into(fileTarget)
+        }
+        isApk -> {
+            val icon = this.getAPKImage(context, true)
+            Glide.with(context)
+                .load(icon)
+                .fallback(fallback)
+                .placeholder(fallback)
+                .error(fallback)
+                .apply(RequestOptions.circleCropTransform())
+                .into(fileTarget)
+        }
+        else -> {
+            Glide.with(context)
+                .load(this.uri)
+                .fallback(fallback)
+                .placeholder(fallback)
+                .error(fallback)
+                .into(fileTarget)
+        }
+    }
 }

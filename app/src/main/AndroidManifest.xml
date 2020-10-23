@@ -26,6 +26,7 @@
         android:name=".App"
         android:allowBackup="true"
         android:appCategory="productivity"
+        android:largeHeap="true"
         android:banner="@drawable/tv_banner"
         android:description="@string/app_name"
         android:icon="@mipmap/ic_launcher"

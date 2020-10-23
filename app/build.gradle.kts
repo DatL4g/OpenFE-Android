@@ -87,11 +87,14 @@ dependencies {
     implementation("com.jakewharton.timber:timber:${Versions.timber}")
     implementation("androidx.webkit:webkit:${Versions.webkit}")
     implementation("com.kirich1409.viewbindingpropertydelegate:viewbindingpropertydelegate:${Versions.viewBindingDelegate}")
+    implementation("androidx.room:room-runtime:${Versions.room}")
+    kapt("androidx.room:room-compiler:${Versions.room}")
 
     implementation("androidx.core:core-ktx:${Versions.ktxCore}")
     implementation("androidx.activity:activity-ktx:${Versions.ktxActivity}")
     implementation("androidx.fragment:fragment-ktx:${Versions.ktxFragment}")
     implementation("androidx.collection:collection-ktx:${Versions.ktxCollection}")
+    implementation("androidx.room:room-ktx:${Versions.room}")
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
     implementation("androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}")

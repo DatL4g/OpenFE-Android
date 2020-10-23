@@ -28,11 +28,12 @@ object Versions {
     const val paranoid = "0.3.2"
     const val photoView = "2.0.0"
     const val recyclerview = "1.1.0"
+    const val room = "2.2.5"
     const val searchview = "0.1.5"
     const val testJunit = "1.1.2"
     const val testEspresso = "3.3.0"
     const val timber = "4.7.1"
-    const val viewBindingDelegate = "1.2.2"
+    const val viewBindingDelegate = "1.3.0"
     const val viewpump = "2.0.3"
     const val webkit = "1.3.0"
 }

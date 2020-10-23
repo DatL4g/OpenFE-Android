@@ -18,8 +18,12 @@
             app:destination="@id/ExplorerFragment" />
 
         <action
-            android:id="@+id/action_OverviewFragment_to_BrowserFragment"
+            android:id="@+id/action_OverviewFragment_to_BrowserActionFragment"
             app:destination="@id/BrowserActionFragment" />
+
+        <action
+            android:id="@+id/action_OverviewFragment_to_CleanActionFragment"
+            app:destination="@id/CleanActionFragment" />
     </fragment>
     <fragment android:id="@+id/ExplorerFragment"
         android:name="de.datlag.openfe.fragments.ExplorerFragment"
@@ -59,5 +63,13 @@
             app:argType="string"
             app:nullable="false" />
     </fragment>
+    <fragment
+        android:id="@+id/CleanActionFragment"
+        android:name="de.datlag.openfe.fragments.actions.CleanFragment"
+        tools:layout="@layout/fragment_clean_action">
 
+        <action
+            android:id="@+id/action_CleanActionFragment_to_OverviewFragment"
+            app:destination="@id/OverviewFragment" />
+    </fragment>
 </navigation>

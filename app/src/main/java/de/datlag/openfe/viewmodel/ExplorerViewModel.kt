@@ -1,5 +1,6 @@
 package de.datlag.openfe.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.matchWithApps
 import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.parentDir
+import de.datlag.openfe.commons.usage
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.recycler.data.FileItem
@@ -28,7 +30,8 @@ import kotlin.contracts.ExperimentalContracts
 @Obfuscate
 class ExplorerViewModel constructor(
     private val explorerFragmentArgs: ExplorerFragmentArgs,
-    private val appsViewModel: AppsViewModel
+    private val appsViewModel: AppsViewModel,
+    private val backupViewModel: BackupViewModel
 ) : ViewModel() {
 
     val startDirectory: File = getStartDirectory(explorerFragmentArgs)
@@ -306,6 +309,27 @@ class ExplorerViewModel constructor(
             withContext(Dispatchers.Main) {
                 done?.invoke()
             }
+        }
+    }
+
+    fun backupSelectedItems(context: Context, done: (Boolean) -> Unit) {
+        val items: List<ExplorerItem> = selectedItems.value ?: listOf()
+
+        for (item in items) {
+            val maxStorage = explorerFragmentArgs.storage.list[0].rootFile.usage.max - 5000000000
+            val usableStorage = maxStorage - explorerFragmentArgs.storage.list[0].rootFile.usage.current
+
+            if (item.fileItem.file.length() < usableStorage) {
+                backupItem(context, item.fileItem.file, done)
+            } else {
+                done.invoke(false)
+            }
+        }
+    }
+
+    private fun backupItem(context: Context, file: File, done: ((Boolean) -> Unit)) {
+        backupViewModel.createBackup(context, file) {
+            backupViewModel.insertBackup(it, done)
         }
     }
 
