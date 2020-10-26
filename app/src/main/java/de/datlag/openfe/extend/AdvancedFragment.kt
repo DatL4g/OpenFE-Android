@@ -28,7 +28,9 @@ import de.datlag.openfe.commons.tint
 import de.datlag.openfe.commons.toggle
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
 abstract class AdvancedFragment : Fragment {

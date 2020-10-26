@@ -1,12 +1,21 @@
+import com.google.protobuf.gradle.builtins
+import com.google.protobuf.gradle.generateProtoTasks
+import com.google.protobuf.gradle.id
+import com.google.protobuf.gradle.plugins
+import com.google.protobuf.gradle.protoc
+
 plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
+    kotlin("plugin.serialization")
     id("androidx.navigation.safeargs.kotlin")
     id("dagger.hilt.android.plugin")
     id("org.jmailen.kotlinter")
     id("io.michaelrocks.paranoid")
+    id("placeholder-resolver")
+    id("com.google.protobuf")
 }
 
 android {
@@ -89,6 +98,7 @@ dependencies {
     implementation("com.kirich1409.viewbindingpropertydelegate:viewbindingpropertydelegate:${Versions.viewBindingDelegate}")
     implementation("androidx.room:room-runtime:${Versions.room}")
     kapt("androidx.room:room-compiler:${Versions.room}")
+    implementation("com.google.android.gms:play-services-ads:${Versions.admob}")
 
     implementation("androidx.core:core-ktx:${Versions.ktxCore}")
     implementation("androidx.activity:activity-ktx:${Versions.ktxActivity}")
@@ -106,6 +116,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:${Versions.recyclerview}")
     implementation("androidx.cardview:cardview:${Versions.cardview}")
     implementation("com.google.android.exoplayer:exoplayer:${Versions.exoplayer}")
+    implementation("com.github.chrisbanes:PhotoView:${Versions.photoView}")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}")
@@ -127,7 +138,28 @@ dependencies {
     implementation("com.karumi:dexter:${Versions.dexter}")
     implementation("com.github.bumptech.glide:glide:${Versions.glide}")
     kapt("com.github.bumptech.glide:compiler:${Versions.glide}")
-    implementation("com.github.chrisbanes:PhotoView:${Versions.photoView}")
+    implementation("com.squareup.retrofit2:retrofit:${Versions.retrofit}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinSerialization}")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:${Versions.retrofitKotlinSerialization}")
+    implementation("androidx.datastore:datastore-core:${Versions.datastore}")
+    implementation("com.google.protobuf:protobuf-javalite:${Versions.protobuf}")
 
     implementation("me.jahnen:libaums:${Versions.libaums}")
+}
+
+protobuf.protobuf.run {
+
+    protoc {
+        artifact = "com.google.protobuf:protoc:${Versions.protobuf}"
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

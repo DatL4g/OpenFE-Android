@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">OpenFE</string>
     <string name="font_path" translatable="false">fonts/Poppins-Regular.ttf</string>
-    <string name="github_repo" translatable="false">https://github.com/DatL4g/OpenFE-Android</string>
+    <string name="github_owner" translatable="false">DatL4g</string>
+    <string name="github_repo" translatable="false">OpenFE-Android</string>
+    <string name="template_github_repo_url" translatable="false">https://github.com/${github_owner}/${github_repo}</string>
+    <string name="github_api_url" translatable="false">https://api.github.com</string>
+    <string name="github_callback_scheme" translatable="false">openfe</string>
+    <string name="github_callback_host" translatable="false">login</string>
+    <string name="template_github_callback_uri" translatable="false">${github_callback_scheme}://${github_callback_host}</string>
     <string name="backup_database" translatable="false">backup_db</string>
 
     <string name="loading_apps">Loading Apps…</string>

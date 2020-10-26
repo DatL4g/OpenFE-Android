@@ -6,7 +6,9 @@ import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.fragments.view.ImageFragment
 import de.datlag.openfe.fragments.view.VideoFragment
 import io.michaelrocks.paranoid.Obfuscate
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
 class ViewActivity : AdvancedActivity(R.layout.activity_view) {

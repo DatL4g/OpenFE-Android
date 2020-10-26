@@ -1,6 +1,5 @@
 package de.datlag.openfe.module
 
-import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.room.Room
@@ -21,7 +20,11 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePackageManager(app: Application): PackageManager = app.applicationContext.packageManager
+    fun provideApplicationContext(@ApplicationContext app: Context): Context = app
+
+    @Singleton
+    @Provides
+    fun providePackageManager(@ApplicationContext app: Context): PackageManager = app.packageManager
 
     @Singleton
     @Provides

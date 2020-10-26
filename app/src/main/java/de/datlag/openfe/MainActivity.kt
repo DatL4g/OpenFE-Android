@@ -1,6 +1,8 @@
 package de.datlag.openfe
 
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -17,10 +19,13 @@ import de.datlag.openfe.commons.toggle
 import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
+import de.datlag.openfe.interfaces.FragmentOAuthCallback
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import io.michaelrocks.paranoid.Obfuscate
 import timber.log.Timber
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 @Obfuscate
 class MainActivity : AdvancedActivity(R.layout.activity_main) {
 
@@ -66,6 +71,32 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
         val navHostFragment = supportFragmentManager.primaryNavigationFragment
         val fragmentList = navHostFragment?.childFragmentManager?.fragments
         return if (!fragmentList.isNullOrEmpty() && fragmentList.size >= 1) fragmentList[0] else null
+    }
+
+    fun githubOAuth() {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.Builder()
+            .scheme("https")
+            .authority("github.com")
+            .appendPath("login")
+            .appendPath("oauth")
+            .appendPath("authorize")
+            .appendQueryParameter("client_id", getString(R.string.github_secret_client_id))
+            .appendQueryParameter("redirect_uri", getString(R.string.github_callback_uri))
+            .build()
+        startActivity(intent)
+    }
+
+    override fun onNewIntent(newIntent: Intent?) {
+        super.onNewIntent(newIntent)
+        newIntent?.let {
+            it.data?.let { data ->
+                if (data.toString().startsWith(getString(R.string.github_callback_uri))) {
+                    val code = data.getQueryParameter("code")
+                    (getCurrentNavFragment() as? FragmentOAuthCallback?)?.onAuthCode(code)
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {

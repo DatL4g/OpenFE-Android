@@ -11,7 +11,9 @@ import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.databinding.FragmentImageViewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import io.michaelrocks.paranoid.Obfuscate
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
 class ImageFragment : AdvancedFragment {

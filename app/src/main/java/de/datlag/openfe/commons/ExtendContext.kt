@@ -15,7 +15,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import de.datlag.openfe.data.Usage
+import de.datlag.openfe.models.Usage
 import io.michaelrocks.paranoid.Obfuscate
 import java.io.File
 

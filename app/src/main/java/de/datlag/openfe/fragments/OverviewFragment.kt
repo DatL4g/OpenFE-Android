@@ -7,55 +7,69 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
 import android.widget.Toast
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.github.mjdev.libaums.UsbMassStorageDevice
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import de.datlag.openfe.MainActivity
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDisplayName
 import de.datlag.openfe.commons.getDrawable
 import de.datlag.openfe.commons.getStorageVolumes
+import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.safeContext
+import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.interfaces.FragmentBackPressed
+import de.datlag.openfe.interfaces.FragmentOAuthCallback
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.PermissionChecker
+import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @Obfuscate
-class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentBackPressed {
+class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentBackPressed, FragmentOAuthCallback {
 
     lateinit var locationList: List<LocationItem>
     lateinit var actionList: List<ActionItem>
 
+    private val gitHubViewModel: GitHubViewModel by viewModels()
     private val binding: FragmentOverviewBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MobileAds.initialize(safeContext)
 
         locationList = getLocationItems()
         actionList = getActionItems()
@@ -80,11 +94,23 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         actionRecycler.isNestedScrollingEnabled = false
         actionRecycler.layoutManager =
             GridLayoutManager(safeContext, if (safeContext.packageManager.isTelevision()) 5 else 3)
+
         actionRecycler.adapter = ActionRecyclerAdapter().apply {
             setOnClickListener { _, position ->
                 actionList[position].action.invoke()
             }
             submitList(actionList)
+        }
+
+        gitHubViewModel.isNoAdsPermitted.observe(viewLifecycleOwner) { permitted ->
+            if (gitHubViewModel.reposContributorListLoaded && gitHubViewModel.authenticatedUserLoaded) {
+                if (permitted) {
+                    adView.hide()
+                } else {
+                    adView.show()
+                    adView.loadAd(AdRequest.Builder().build())
+                }
+            }
         }
     }
 
@@ -242,14 +268,40 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
     private fun githubUnit(): () -> Unit = {
         findNavController().navigate(
             OverviewFragmentDirections.actionOverviewFragmentToBrowserActionFragment(
-                getString(R.string.github_repo)
+                getString(R.string.github_repo_url)
             )
         )
     }
 
     private fun removeAdUnit(): () -> Unit = {
-        val removeAdSheet = ConfirmActionSheet.removeAdInstance()
-        showBottomSheetFragment(removeAdSheet)
+        if (gitHubViewModel.authenticatedUser.value == null) {
+            val removeAdSheet = ConfirmActionSheet.removeAdInstance()
+            removeAdSheet.rightClickListener = {
+                (activity as? MainActivity?)?.githubOAuth()
+            }
+            showBottomSheetFragment(removeAdSheet)
+        } else {
+            val githubLogoutSheet = ConfirmActionSheet.githubLogoutInstance()
+            githubLogoutSheet.rightClickListener = {
+                gitHubViewModel.logout()
+                val revokeAccessSheet = ConfirmActionSheet.githubRevokeAccessInstance()
+                revokeAccessSheet.rightClickListener = {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.data = Uri.Builder()
+                        .scheme("https")
+                        .authority("github.com")
+                        .appendPath("settings")
+                        .appendPath("connections")
+                        .appendPath("applications")
+                        .appendPath(safeContext.getString(R.string.github_secret_client_id))
+                        .build()
+
+                    startActivity(intent)
+                }
+                showBottomSheetFragment(revokeAccessSheet)
+            }
+            showBottomSheetFragment(githubLogoutSheet)
+        }
     }
 
     private fun checkReadPermission(position: Int) {
@@ -314,6 +366,10 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
                 }
             }
         }
+    }
+
+    override fun onAuthCode(code: String?) {
+        gitHubViewModel.requestAccessTokenAndLogin(code)
     }
 
     companion object {

@@ -166,11 +166,31 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
         fun removeAdInstance(): ConfirmActionSheet {
             val instance = ConfirmActionSheet()
             instance.title = "Remove Ad"
-            instance.text = "There are several ways to remove ads.\n" +
-                "One possibility is to become a contributor so that this open source project can be improved and at the same time give something back.\n" +
-                "The other option is to sponsor me on GitHub."
+            instance.text = "Become a contributor so that this open source project can be improved and at the same time give something back."
             instance.leftText = "Close"
             instance.rightText = "Login"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
+
+        fun githubLogoutInstance(): ConfirmActionSheet {
+            val instance = ConfirmActionSheet()
+            instance.title = "GitHub Logout"
+            instance.text = "If you are a contributor to the project and you logout, you will be shown advertising again."
+            instance.leftText = "Close"
+            instance.rightText = "Logout"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
+
+        fun githubRevokeAccessInstance(): ConfirmActionSheet {
+            val instance = ConfirmActionSheet()
+            instance.title = "Revoke GitHub Access"
+            instance.text = "Do you want to revoke the GitHub OAuth access?\n(Required if you want to switch to another user)"
+            instance.leftText = "Close"
+            instance.rightText = "Revoke Access"
             instance.closeOnLeftClick = true
             instance.closeOnRightClick = true
             return instance

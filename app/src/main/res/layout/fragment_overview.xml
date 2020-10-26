@@ -7,6 +7,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintVertical_weight="1"
@@ -15,7 +16,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/adView"
             android:background="@color/defaultBackgroundColor">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,6 +45,7 @@
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
                     android:foregroundGravity="center"
+                    android:nestedScrollingEnabled="false"
                     app:layout_constraintVertical_weight="1"
                     app:layout_constraintTop_toBottomOf="@id/locationRecycler"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -51,7 +53,20 @@
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:background="@color/defaultBackgroundColor"/>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:adSize="BANNER"
+        app:adUnitId="@string/admob_overview_banner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nestedScrollView" />
     </androidx.constraintlayout.widget.ConstraintLayout>

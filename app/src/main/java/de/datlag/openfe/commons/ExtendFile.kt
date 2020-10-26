@@ -19,7 +19,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import de.datlag.openfe.R
 import de.datlag.openfe.data.FilePermission
-import de.datlag.openfe.data.Usage
+import de.datlag.openfe.models.Usage
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -367,3 +367,5 @@ fun File.getIcon(context: Context, isApkChecked: Pair<Boolean, Boolean>, @ColorR
         }
     }
 }
+
+fun File.moveTo(destination: File) = this.renameTo(destination)
