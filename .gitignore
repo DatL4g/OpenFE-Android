@@ -8,6 +8,10 @@
 *.ap_
 *.aab
 
+# Secret Files
+secret_strings.xml
+app/src/main/res/values/secret_strings.xml
+
 # Files for the ART/Dalvik VM
 *.dex
 
