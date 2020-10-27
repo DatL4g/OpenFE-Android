@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Obfuscate
 @Parcelize
-data class Contributor(
+data class GitHubUser(
     val login: String,
     val id: Int,
     @SerialName("node_id") val nodeId: String,
@@ -28,5 +28,18 @@ data class Contributor(
     @SerialName("received_events_url") val receivedEventsUrl: String,
     val type: String,
     @SerialName("site_admin") val siteAdmin: Boolean,
-    @SerialName("contributions") val amount: Int
+    val name: String? = null,
+    val company: String? = null,
+    val blog: String,
+    val location: String? = null,
+    val email: String? = null,
+    val hireable: Boolean? = null,
+    val bio: String? = null,
+    @SerialName("twitter_username") val twitterUsername: String? = null,
+    @SerialName("public_repos") val publicRepos: Int? = null,
+    @SerialName("public_gists") val publicGists: Int? = null,
+    val followers: Int,
+    val following: Int,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("updated_at") val updatedAt: String
 ) : Parcelable

@@ -18,7 +18,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import de.datlag.openfe.R
-import de.datlag.openfe.data.FilePermission
+import de.datlag.openfe.models.FilePermission
 import de.datlag.openfe.models.Usage
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.CoroutineScope

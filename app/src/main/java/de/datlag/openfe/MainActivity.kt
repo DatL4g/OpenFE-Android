@@ -83,6 +83,7 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
             .appendPath("authorize")
             .appendQueryParameter("client_id", getString(R.string.github_secret_client_id))
             .appendQueryParameter("redirect_uri", getString(R.string.github_callback_uri))
+            .appendQueryParameter("scope", "user:read")
             .build()
         startActivity(intent)
     }

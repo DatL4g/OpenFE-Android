@@ -39,11 +39,11 @@ import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
-import de.datlag.openfe.data.ExplorerFragmentStorageArgs
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentOAuthCallback
+import de.datlag.openfe.models.ExplorerFragmentStorageArgs
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
@@ -274,7 +274,7 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
     }
 
     private fun removeAdUnit(): () -> Unit = {
-        if (gitHubViewModel.authenticatedUser.value == null) {
+        if (gitHubViewModel.authenticatedGitHubUser.value == null) {
             val removeAdSheet = ConfirmActionSheet.removeAdInstance()
             removeAdSheet.rightClickListener = {
                 (activity as? MainActivity?)?.githubOAuth()

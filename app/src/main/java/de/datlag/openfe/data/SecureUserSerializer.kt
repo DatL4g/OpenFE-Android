@@ -12,9 +12,9 @@ class SecureUserSerializer(private val crypto: Crypto) : Serializer<UserPreferen
 
     override fun readFrom(input: InputStream): UserPreferences {
         val defaultUserPreferences = UserPreferences.newBuilder()
-                .setGithubCode(String())
-                .setGithubAccessToken(String())
-                .build()
+            .setGithubCode(String())
+            .setGithubAccessToken(String())
+            .build()
 
         return if (input.available() != 0) {
             try {

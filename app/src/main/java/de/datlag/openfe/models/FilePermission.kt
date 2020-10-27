@@ -1,4 +1,4 @@
-package de.datlag.openfe.data
+package de.datlag.openfe.models
 
 import android.os.Parcelable
 import io.michaelrocks.paranoid.Obfuscate

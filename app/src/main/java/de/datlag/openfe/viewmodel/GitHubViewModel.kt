@@ -10,9 +10,9 @@ import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.datastore.UserPreferences
 import de.datlag.openfe.helper.GitHubHelper
-import de.datlag.openfe.models.AccessToken
-import de.datlag.openfe.models.Contributor
-import de.datlag.openfe.models.User
+import de.datlag.openfe.models.GitHubAccessToken
+import de.datlag.openfe.models.GitHubContributor
+import de.datlag.openfe.models.GitHubUser
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -30,38 +30,38 @@ class GitHubViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
     private val gitHubHelper = GitHubHelper(context)
-    private val repoContributorList: MutableLiveData<List<Contributor>> = MutableLiveData()
-    val authenticatedUser: MutableLiveData<User> = MutableLiveData()
+    private val repoGitHubContributorList: MutableLiveData<List<GitHubContributor>> = MutableLiveData()
+    val authenticatedGitHubUser: MutableLiveData<GitHubUser> = MutableLiveData()
     val isNoAdsPermitted: MutableLiveData<Boolean> = MutableLiveData(false)
     var reposContributorListLoaded: Boolean = false
     var authenticatedUserLoaded: Boolean = false
 
-    private val repoContributorListObserver = Observer<List<Contributor>> { list ->
+    private val repoContributorListObserver = Observer<List<GitHubContributor>> { list ->
         reposContributorListLoaded = true
-        checkNoAdsPermission(authenticatedUser.value, list)
+        checkNoAdsPermission(authenticatedGitHubUser.value, list)
     }
 
-    private val authenticatedUserObserver = Observer<User> { user ->
+    private val authenticatedUserObserver = Observer<GitHubUser> { user ->
         authenticatedUserLoaded = true
-        checkNoAdsPermission(user, repoContributorList.value ?: listOf())
+        checkNoAdsPermission(user, repoGitHubContributorList.value ?: listOf())
     }
 
     init {
-        repoContributorList.observeForever(repoContributorListObserver)
-        authenticatedUser.observeForever(authenticatedUserObserver)
+        repoGitHubContributorList.observeForever(repoContributorListObserver)
+        authenticatedGitHubUser.observeForever(authenticatedUserObserver)
         requestAllRepoContributors()
         restoreUserFormDataStore()
     }
 
-    private fun checkNoAdsPermission(user: User?, contributorList: List<Contributor>) {
-        if (user == null) {
+    private fun checkNoAdsPermission(gitHubUser: GitHubUser?, gitHubContributorList: List<GitHubContributor>) {
+        if (gitHubUser == null) {
             isNoAdsPermitted.value = false
             return
         }
 
-        if (contributorList.isNotEmpty()) {
-            for (contributor in contributorList) {
-                if ((contributor.login == user.login || contributor.id == user.id) && contributor.amount > 0) {
+        if (gitHubContributorList.isNotEmpty()) {
+            for (contributor in gitHubContributorList) {
+                if ((contributor.login == gitHubUser.login || contributor.id == gitHubUser.id) && contributor.amount > 0) {
                     isNoAdsPermitted.value = true
                     break
                 } else {
@@ -75,7 +75,7 @@ class GitHubViewModel @ViewModelInject constructor(
 
     fun requestAllRepoContributors() {
         gitHubHelper.getAllContributors { list ->
-            repoContributorList.value = list
+            repoGitHubContributorList.value = list
         }
     }
 
@@ -89,7 +89,7 @@ class GitHubViewModel @ViewModelInject constructor(
         }
 
         if (!code.isNotCleared()) {
-            authenticatedUser.value = null
+            authenticatedGitHubUser.value = null
             return
         }
 
@@ -101,30 +101,30 @@ class GitHubViewModel @ViewModelInject constructor(
     fun requestAuthenticatedUser(token: String) {
         gitHubHelper.getUserWithToken(token) { user ->
             user?.let {
-                authenticatedUser.value = it
+                authenticatedGitHubUser.value = it
             }
         }
     }
 
-    fun onNewAccessToken(accessToken: AccessToken?) {
+    fun onNewAccessToken(gitHubAccessToken: GitHubAccessToken?) {
         viewModelScope.launch(Dispatchers.IO) {
             dataStore.updateData { preferences ->
                 preferences.toBuilder()
-                    .setGithubAccessToken(accessToken?.token ?: String())
+                    .setGithubAccessToken(gitHubAccessToken?.token ?: String())
                     .build()
             }
         }
 
-        if (accessToken == null) {
-            authenticatedUser.value = null
+        if (gitHubAccessToken == null) {
+            authenticatedGitHubUser.value = null
             return
         }
 
-        requestAuthenticatedUser(accessToken.token)
+        requestAuthenticatedUser(gitHubAccessToken.token)
     }
 
     private fun restoreUserFormDataStore() = viewModelScope.launch(Dispatchers.IO) {
-        if (authenticatedUser.value != null) {
+        if (authenticatedGitHubUser.value != null) {
             return@launch
         }
 
@@ -154,12 +154,12 @@ class GitHubViewModel @ViewModelInject constructor(
             }
         }
 
-        authenticatedUser.value = null
+        authenticatedGitHubUser.value = null
     }
 
     override fun onCleared() {
         super.onCleared()
-        repoContributorList.removeObserver(repoContributorListObserver)
-        authenticatedUser.removeObserver(authenticatedUserObserver)
+        repoGitHubContributorList.removeObserver(repoContributorListObserver)
+        authenticatedGitHubUser.removeObserver(authenticatedUserObserver)
     }
 }

@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Obfuscate
 @Parcelize
-data class AccessToken(
+data class GitHubAccessToken(
     @SerialName("access_token") val token: String,
     @SerialName("token_type") val type: String,
     val scope: String
