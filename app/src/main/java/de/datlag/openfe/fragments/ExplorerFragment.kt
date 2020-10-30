@@ -1,6 +1,5 @@
 package de.datlag.openfe.fragments
 
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
@@ -35,9 +34,11 @@ import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.BackupViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
@@ -66,7 +67,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
+        updateToggle(getColor(R.color.defaultNavigationColor), navigationListener)
 
         initBottomNavigation()
         initRecyclerView()
@@ -107,10 +108,9 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
     override fun onResume() {
         super.onResume()
         statusBarColor(getColor(R.color.defaultStatusBarColor))
-        initToolbar()
     }
 
-    private fun initToolbar() {
+    override fun initToolbar() {
         toolbar?.menu?.clear()
         toolbar?.inflateMenu(R.menu.explorer_toolbar_menu)
         toolbar?.menu?.let { searchView?.setMenuItem(it.findItem(R.id.explorerSearchItem)) }
@@ -321,11 +321,6 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                 false
             }
         }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        initToolbar()
     }
 
     override fun onBackPressed(): Boolean = onBackPressedCheck()

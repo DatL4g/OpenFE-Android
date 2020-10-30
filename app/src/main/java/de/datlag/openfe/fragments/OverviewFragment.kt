@@ -4,16 +4,15 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
-import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.core.view.GravityCompat
-import androidx.fragment.app.viewModels
+import androidx.core.view.iterator
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,9 +25,8 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
-import de.datlag.openfe.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
-import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDisplayName
 import de.datlag.openfe.commons.getDrawable
@@ -42,15 +40,19 @@ import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.FragmentOAuthCallback
-import de.datlag.openfe.models.ExplorerFragmentStorageArgs
+import de.datlag.openfe.interfaces.FragmentNoAdPermission
+import de.datlag.openfe.safeargs.StorageArgs
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.PermissionChecker
-import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
@@ -58,13 +60,19 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalSerializationApi
 @ExperimentalContracts
 @Obfuscate
-class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentBackPressed, FragmentOAuthCallback {
+@AndroidEntryPoint
+class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentBackPressed, FragmentNoAdPermission {
 
     lateinit var locationList: List<LocationItem>
     lateinit var actionList: List<ActionItem>
 
-    private val gitHubViewModel: GitHubViewModel by viewModels()
     private val binding: FragmentOverviewBinding by viewBinding()
+
+    private var toolbarMenuJob: Job? = null
+
+    private val navigationListener = View.OnClickListener {
+        (activity)?.finishAffinity()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,13 +83,44 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         actionList = getActionItems()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateToggle(true, getColor(R.color.defaultNavigationColor))
+        updateToggle(getColor(R.color.defaultNavigationColor), navigationListener)
         updateBottom(false)
         updateFAB(false)
 
+        toolbarMenuJob = lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000)
+            withContext(Dispatchers.Main) {
+                initToolbar()
+            }
+        }
+
+        initLocationRecycler()
+        initActionRecycler()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        statusBarColor(getColor(R.color.defaultStatusBarColor))
+    }
+
+    override fun initToolbar() {
+        toolbar?.let {
+            it.menu.clear()
+            it.inflateMenu(R.menu.overview_toolbar_menu)
+            it.menu.also { menu ->
+                for (item in menu.iterator()) {
+                    item.setOnMenuItemClickListener { menuItem ->
+                        return@setOnMenuItemClickListener setupMenuItemClickListener(menuItem)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initLocationRecycler() = with(binding) {
         locationRecycler.isNestedScrollingEnabled = false
         locationRecycler.layoutManager = LinearLayoutManager(safeContext)
         locationRecycler.adapter = LocationRecyclerAdapter().apply {
@@ -90,7 +129,9 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
             }
             submitList(locationList)
         }
+    }
 
+    private fun initActionRecycler() = with(binding) {
         actionRecycler.isNestedScrollingEnabled = false
         actionRecycler.layoutManager =
             GridLayoutManager(safeContext, if (safeContext.packageManager.isTelevision()) 5 else 3)
@@ -101,27 +142,15 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
             }
             submitList(actionList)
         }
+    }
 
-        gitHubViewModel.isNoAdsPermitted.observe(viewLifecycleOwner) { permitted ->
-            if (gitHubViewModel.reposContributorListLoaded && gitHubViewModel.authenticatedUserLoaded) {
-                if (permitted) {
-                    adView.hide()
-                } else {
-                    adView.show()
-                    adView.loadAd(AdRequest.Builder().build())
-                }
+    private fun setupMenuItemClickListener(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.overviewSettingsItem -> {
+                findNavController().navigate(OverviewFragmentDirections.actionOverviewFragmentToSettingsFragment())
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        statusBarColor(getColor(R.color.defaultStatusBarColor))
-        initToolbar()
-    }
-
-    private fun initToolbar() {
-        toolbar?.menu?.clear()
+        return false
     }
 
     private fun getLocationItems(): List<LocationItem> {
@@ -240,13 +269,6 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
                 githubUnit()
             )
         )
-        actionList.add(
-            ActionItem(
-                getDrawable(R.drawable.ic_baseline_cancel_presentation_24, iconTint),
-                "Remove Ad",
-                removeAdUnit()
-            )
-        )
 
         return actionList
     }
@@ -273,37 +295,6 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         )
     }
 
-    private fun removeAdUnit(): () -> Unit = {
-        if (gitHubViewModel.authenticatedGitHubUser.value == null) {
-            val removeAdSheet = ConfirmActionSheet.removeAdInstance()
-            removeAdSheet.rightClickListener = {
-                (activity as? MainActivity?)?.githubOAuth()
-            }
-            showBottomSheetFragment(removeAdSheet)
-        } else {
-            val githubLogoutSheet = ConfirmActionSheet.githubLogoutInstance()
-            githubLogoutSheet.rightClickListener = {
-                gitHubViewModel.logout()
-                val revokeAccessSheet = ConfirmActionSheet.githubRevokeAccessInstance()
-                revokeAccessSheet.rightClickListener = {
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.data = Uri.Builder()
-                        .scheme("https")
-                        .authority("github.com")
-                        .appendPath("settings")
-                        .appendPath("connections")
-                        .appendPath("applications")
-                        .appendPath(safeContext.getString(R.string.github_secret_client_id))
-                        .build()
-
-                    startActivity(intent)
-                }
-                showBottomSheetFragment(revokeAccessSheet)
-            }
-            showBottomSheetFragment(githubLogoutSheet)
-        }
-    }
-
     private fun checkReadPermission(position: Int) {
         PermissionChecker.checkReadStorage(
             safeContext,
@@ -311,7 +302,7 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                     val action =
                         OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
-                            ExplorerFragmentStorageArgs(locationList, position)
+                            StorageArgs(locationList, position)
                         )
                     findNavController().navigate(action)
                 }
@@ -334,19 +325,17 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         )
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        initToolbar()
+    override fun onNoAdPermissionChanged(permitted: Boolean) = with(binding) {
+        if (permitted) {
+            adView.hide()
+        } else {
+            adView.show()
+            adView.loadAd(AdRequest.Builder().build())
+        }
+        Timber.e("permitted: $permitted")
     }
 
-    override fun onBackPressed(): Boolean {
-        return if (drawer?.isDrawerOpen(GravityCompat.START) == true) {
-            drawer?.closeDrawer(GravityCompat.START)
-            false
-        } else {
-            true
-        }
-    }
+    override fun onBackPressed(): Boolean = true
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -368,8 +357,14 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         }
     }
 
-    override fun onAuthCode(code: String?) {
-        gitHubViewModel.requestAccessTokenAndLogin(code)
+    override fun onPause() {
+        super.onPause()
+        toolbarMenuJob?.cancel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        toolbarMenuJob?.cancel()
     }
 
     companion object {

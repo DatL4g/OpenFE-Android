@@ -1,7 +1,6 @@
 package de.datlag.openfe.fragments.actions
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -56,10 +55,12 @@ import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
@@ -81,7 +82,7 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
+        updateToggle(getColor(R.color.defaultNavigationColor), navigationListener)
         updateToolbar()
 
         initRecycler()
@@ -93,10 +94,9 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
     override fun onResume() {
         super.onResume()
         statusBarColor(getColor(R.color.defaultStatusBarColor))
-        initToolbar()
     }
 
-    private fun initToolbar() {
+    override fun initToolbar() {
         toolbar?.menu?.clear()
         toolbar?.inflateMenu(R.menu.apps_action_toolbar_menu)
         toolbar?.menu?.let {
@@ -367,15 +367,6 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
     private fun showPopupMenu(anchor: View) = with(appsViewModel) {
         val popupMenu = PopupMenu(safeContext, anchor)
         popupMenu.menuInflater.inflate(R.menu.apps_action_popup_menu, popupMenu.menu)
-        if (isAppsSortedByNameReversed) {
-            popupMenu.menu.getItem(0).title = "Name (Reversed)"
-        }
-        if (isAppsSortedByInstalledReversed) {
-            popupMenu.menu.getItem(1).title = "Name (Reversed)"
-        }
-        if (isAppsSortedByUpdatedReversed) {
-            popupMenu.menu.getItem(2).title = "Name (Reversed)"
-        }
         popupMenu.setOnMenuItemClickListener(this@AppsFragment)
         popupMenu.show()
     }
@@ -400,11 +391,6 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
         } else {
             true
         }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        initToolbar()
     }
 
     override fun onMenuItemClick(p0: MenuItem?): Boolean {

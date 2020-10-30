@@ -14,6 +14,7 @@ import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.matchWithApps
 import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.parentDir
+import de.datlag.openfe.commons.updateValue
 import de.datlag.openfe.commons.usage
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
 import de.datlag.openfe.recycler.data.ExplorerItem
@@ -61,7 +62,7 @@ class ExplorerViewModel constructor(
     }
 
     private val currentDirectoryObserver = Observer<File> { dir ->
-        currentSubDirectories.value = listOf()
+        currentSubDirectories.updateValue(listOf())
 
         val fileList = dir.listFiles()?.toMutableList() ?: mutableListOf()
         val startDirParent = File(startDirectory.getRootOfStorage()).parentDir
@@ -97,7 +98,7 @@ class ExplorerViewModel constructor(
                 ),
                 null, false, false
             )
-            currentSubDirectories.value = listOf(parentFile)
+            currentSubDirectories.updateValue(listOf(parentFile))
         }
         createSubDirectories(fileList)
     }
@@ -106,7 +107,7 @@ class ExplorerViewModel constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val currentSubDirs = matchSelectedWithCurrentSubDirs()
             withContext(Dispatchers.Main) {
-                currentSubDirectories.value = currentSubDirs
+                currentSubDirectories.updateValue(currentSubDirs)
             }
         }
     }
@@ -137,7 +138,7 @@ class ExplorerViewModel constructor(
                     copy.add(explorerItem)
 
                     withContext(Dispatchers.Main) {
-                        currentSubDirectories.value = copy
+                        currentSubDirectories.updateValue(copy)
                     }
                 }
             }
@@ -146,11 +147,13 @@ class ExplorerViewModel constructor(
     fun moveToPath(path: File, force: Boolean = false) {
         val newPath = if (path.isInternal() && !force) startDirectory else path
 
-        currentDirectory.value = if (newPath.isDirectory) {
-            newPath
-        } else {
-            newPath.parentDir
-        }
+        currentDirectory.updateValue(
+            if (newPath.isDirectory) {
+                newPath
+            } else {
+                newPath.parentDir
+            }
+        )
     }
 
     fun searchCurrentDirectories(text: String?, recursively: Boolean) {
@@ -165,7 +168,7 @@ class ExplorerViewModel constructor(
                     searchDirectoriesCopy = currentSubDirectories.value!!.copyOf()
                 }
                 withContext(Dispatchers.Main) {
-                    currentSubDirectories.value = listOf()
+                    currentSubDirectories.updateValue(listOf())
                 }
 
                 for (explorerItem in searchDirectoriesCopy) {
@@ -174,7 +177,7 @@ class ExplorerViewModel constructor(
                             val fileMatches = file.name.contains(text, true) && !file.isHidden
                             if (fileMatches) {
                                 withContext(Dispatchers.Main) {
-                                    currentSubDirectories.value =
+                                    currentSubDirectories.updateValue(
                                         (
                                             currentSubDirectories.value?.mutableCopyOf()
                                                 ?: mutableListOf()
@@ -186,6 +189,7 @@ class ExplorerViewModel constructor(
                                                 )
                                             )
                                         }
+                                    )
                                 }
                             }
                             (file.exists() && fileMatches) && res
@@ -197,11 +201,12 @@ class ExplorerViewModel constructor(
                             ) == true || explorerItem.fileItem.file.name.contains(text, true)
                         ) {
                             withContext(Dispatchers.Main) {
-                                currentSubDirectories.value =
+                                currentSubDirectories.updateValue(
                                     (
                                         currentSubDirectories.value?.toMutableList()
                                             ?: mutableListOf()
                                         ).apply { add(explorerItem) }
+                                )
                             }
                         }
                     }
@@ -216,7 +221,7 @@ class ExplorerViewModel constructor(
 
             val currentSubDirs = matchSelectedWithCurrentSubDirs()
             withContext(Dispatchers.Main) {
-                currentSubDirectories.value = currentSubDirs
+                currentSubDirectories.updateValue(currentSubDirs)
             }
         }
     }
@@ -260,7 +265,7 @@ class ExplorerViewModel constructor(
         if (explorerItem.selected) {
             selectedItemsList.add(explorerItem)
         }
-        selectedItems.value = selectedItemsList
+        selectedItems.updateValue(selectedItemsList)
         return explorerItem.selected
     }
 
@@ -271,8 +276,8 @@ class ExplorerViewModel constructor(
         }
 
         withContext(Dispatchers.Main) {
-            selectedItems.value = listOf()
-            currentSubDirectories.value = copy
+            selectedItems.updateValue(listOf())
+            currentSubDirectories.updateValue(copy)
         }
     }
 

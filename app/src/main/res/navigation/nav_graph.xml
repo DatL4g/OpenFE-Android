@@ -24,6 +24,10 @@
         <action
             android:id="@+id/action_OverviewFragment_to_CleanActionFragment"
             app:destination="@id/CleanActionFragment" />
+
+        <action
+            android:id="@+id/action_OverviewFragment_to_SettingsFragment"
+            app:destination="@id/SettingsFragment" />
     </fragment>
     <fragment android:id="@+id/ExplorerFragment"
         android:name="de.datlag.openfe.fragments.ExplorerFragment"
@@ -34,7 +38,7 @@
             app:destination="@id/OverviewFragment" />
 
         <argument android:name="storage"
-            app:argType="de.datlag.openfe.data.ExplorerFragmentStorageArgs" />
+            app:argType="de.datlag.openfe.safeargs.StorageArgs" />
     </fragment>
     <fragment android:id="@+id/AppsActionFragment"
         android:name="de.datlag.openfe.fragments.actions.AppsFragment"
@@ -71,5 +75,15 @@
         <action
             android:id="@+id/action_CleanActionFragment_to_OverviewFragment"
             app:destination="@id/OverviewFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/SettingsFragment"
+        android:name="de.datlag.openfe.fragments.SettingsFragment"
+        tools:layout="@layout/fragment_settings">
+
+        <action
+            android:id="@+id/action_SettingsFragment_to_OverviewFragment"
+            app:destination="@id/OverviewFragment" />
+
     </fragment>
 </navigation>

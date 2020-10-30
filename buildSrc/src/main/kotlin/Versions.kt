@@ -12,7 +12,7 @@ object Versions {
     const val exoplayer = "2.12.0"
     const val glide = "4.11.0"
     const val gradle = "4.1.0"
-    const val hilt = "2.28.1-alpha"
+    const val hilt = "2.29.1-alpha"
     const val hiltAndroidX = "1.0.0-alpha02"
     const val junit = "4.13"
     const val kotlin = "1.4.10"

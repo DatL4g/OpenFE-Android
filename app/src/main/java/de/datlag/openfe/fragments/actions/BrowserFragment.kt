@@ -2,7 +2,6 @@ package de.datlag.openfe.fragments.actions
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
@@ -21,6 +20,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import by.kirich1409.viewbindingdelegate.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.ConfirmActionSheet
 import de.datlag.openfe.commons.getColor
@@ -35,10 +35,13 @@ import de.datlag.openfe.helper.NightModeHelper.NightMode
 import de.datlag.openfe.helper.NightModeHelper.NightModeUtil
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @Obfuscate
+@AndroidEntryPoint
 @SuppressLint("SetJavaScriptEnabled")
 class BrowserFragment : AdvancedFragment(R.layout.fragment_browser_action), FragmentBackPressed {
 
@@ -53,7 +56,7 @@ class BrowserFragment : AdvancedFragment(R.layout.fragment_browser_action), Frag
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
-        updateToggle(false, getColor(R.color.defaultNavigationColor), navigationListener)
+        updateToggle(getColor(R.color.defaultNavigationColor), navigationListener)
         nightModeHelper = NightModeUtil(safeContext, activity)
 
         browserWebview.webViewClient = object : WebViewClient() {
@@ -99,11 +102,6 @@ class BrowserFragment : AdvancedFragment(R.layout.fragment_browser_action), Frag
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        initToolbar()
-    }
-
     private fun loadSite() = with(binding) {
         if (safeContext.isNetworkAvailable()) {
             browserWebview.loadUrl(args.url)
@@ -113,7 +111,7 @@ class BrowserFragment : AdvancedFragment(R.layout.fragment_browser_action), Frag
         }
     }
 
-    private fun initToolbar() {
+    override fun initToolbar() {
         toolbar?.menu?.clear()
         toolbar?.inflateMenu(R.menu.browser_action_toolbar_menu)
         toolbar?.menu?.let {
@@ -156,11 +154,6 @@ class BrowserFragment : AdvancedFragment(R.layout.fragment_browser_action), Frag
             Intent.createChooser(intent, "Choose Browser"),
             null
         )
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        initToolbar()
     }
 
     override fun onBackPressed(): Boolean = true

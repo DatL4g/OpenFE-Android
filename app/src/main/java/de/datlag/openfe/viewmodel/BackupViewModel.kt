@@ -6,6 +6,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.datlag.openfe.commons.copyTo
+import de.datlag.openfe.commons.updateValue
 import de.datlag.openfe.db.Backup
 import de.datlag.openfe.repository.BackupRepository
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ class BackupViewModel @ViewModelInject constructor(
 
     init {
         backups.addSource(backupsSortedByTimestamp) { result ->
-            result?.let { backups.value = it }
+            result?.let { backups.updateValue(it) }
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.datlag.openfe.commons.updateValue
 import de.datlag.openfe.other.AppsSortType
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.repository.AppsRepository
@@ -50,40 +51,27 @@ class AppsViewModel @ViewModelInject constructor(
         )
     }
 
-    var isAppsSortedByNameReversed = true
-    var isAppsSortedByInstalledReversed = false
-    var isAppsSortedByUpdatedReversed = false
-
     val apps = MediatorLiveData<List<AppItem>>()
     var sortType = AppsSortType.NAME
         set(value) {
             when (value) {
                 AppsSortType.NAME -> {
                     if (field == value) {
-                        appsSortedByName.value = appsSortedByName.value?.asReversed()
-                        isAppsSortedByNameReversed = !isAppsSortedByNameReversed
-                        isAppsSortedByInstalledReversed = false
-                        isAppsSortedByUpdatedReversed = false
+                        appsSortedByName.updateValue(appsSortedByName.value?.asReversed())
                     }
-                    appsSortedByName.value?.let { apps.value = it }
+                    appsSortedByName.value?.let { apps.updateValue(it) }
                 }
                 AppsSortType.INSTALLED -> {
                     if (field == value) {
-                        appsSortedByInstalled.value = appsSortedByInstalled.value?.asReversed()
-                        isAppsSortedByInstalledReversed = !isAppsSortedByInstalledReversed
-                        isAppsSortedByNameReversed = false
-                        isAppsSortedByUpdatedReversed = false
+                        appsSortedByInstalled.updateValue(appsSortedByInstalled.value?.asReversed())
                     }
-                    appsSortedByInstalled.value?.let { apps.value = it }
+                    appsSortedByInstalled.value?.let { apps.updateValue(it) }
                 }
                 AppsSortType.UPDATED -> {
                     if (field == value) {
-                        appsSortedByUpdated.value = appsSortedByUpdated.value?.asReversed()
-                        isAppsSortedByUpdatedReversed = !isAppsSortedByUpdatedReversed
-                        isAppsSortedByNameReversed = false
-                        isAppsSortedByInstalledReversed = false
+                        appsSortedByUpdated.updateValue(appsSortedByUpdated.value?.asReversed())
                     }
-                    appsSortedByUpdated.value?.let { apps.value = it }
+                    appsSortedByUpdated.value?.let { apps.updateValue(it) }
                 }
             }
             field = value

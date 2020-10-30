@@ -11,8 +11,10 @@ import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.databinding.FragmentImageViewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
@@ -30,6 +32,10 @@ class ImageFragment : AdvancedFragment {
         super.onViewCreated(view, savedInstanceState)
 
         initViews()
+    }
+
+    override fun initToolbar() {
+        toolbar?.menu?.clear()
     }
 
     private fun initViews() = with(binding) {

@@ -5,40 +5,35 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
-import android.view.View
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.ferfalk.simplesearchview.SimpleSearchView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import de.datlag.openfe.commons.toggle
 import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.FragmentOAuthCallback
+import de.datlag.openfe.interfaces.FragmentNoAdPermission
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @Obfuscate
 class MainActivity : AdvancedActivity(R.layout.activity_main) {
 
-    private val binding: ActivityMainBinding by viewBinding(R.id.drawer)
+    private val binding: ActivityMainBinding by viewBinding(R.id.container)
 
     val toolbar: Toolbar
         get() = binding.toolBar
 
     val searchView: SimpleSearchView
         get() = binding.searchview
-
-    val drawer: DrawerLayout
-        get() = binding.drawer
 
     val bottomAppBar: BottomAppBar
         get() = binding.bottomAppBar
@@ -49,22 +44,21 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
     val fab: FloatingActionButton
         get() = binding.fab
 
-    lateinit var toggle: ActionBarDrawerToggle
-    var toggleListener = View.OnClickListener { drawer.toggle() }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         initViews()
+
+        gitHubViewModel.isNoAdsPermitted.observe(this) { permitted ->
+            if (gitHubViewModel.reposContributorListLoaded && gitHubViewModel.authenticatedUserLoaded) {
+                (getCurrentNavFragment() as? FragmentNoAdPermission?)?.onNoAdPermissionChanged(permitted)
+            }
+        }
     }
 
     private fun initViews() = with(binding) {
         setSupportActionBar(toolBar)
-        toggle = ActionBarDrawerToggle(this@MainActivity, drawer, toolbar, R.string.drawer_open, R.string.drawer_close)
-        drawer.addDrawerListener(toggle)
-        toggle.syncState()
-        toggle.toolbarNavigationClickListener?.let { toggleListener = it }
     }
 
     private fun getCurrentNavFragment(): Fragment? {
@@ -94,7 +88,7 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
             it.data?.let { data ->
                 if (data.toString().startsWith(getString(R.string.github_callback_uri))) {
                     val code = data.getQueryParameter("code")
-                    (getCurrentNavFragment() as? FragmentOAuthCallback?)?.onAuthCode(code)
+                    gitHubViewModel.requestAccessTokenAndLogin(code)
                 }
             }
         }

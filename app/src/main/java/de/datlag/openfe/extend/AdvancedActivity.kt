@@ -1,19 +1,27 @@
 package de.datlag.openfe.extend
 
 import android.content.Context
+import androidx.activity.viewModels
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.AndroidEntryPoint
+import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
+@ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
 abstract class AdvancedActivity : AppCompatActivity {
 
     constructor() : super() { }
     constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId) { }
+
+    val gitHubViewModel: GitHubViewModel by viewModels()
 
     companion object {
         init {

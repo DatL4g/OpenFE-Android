@@ -6,8 +6,10 @@ import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.fragments.view.ImageFragment
 import de.datlag.openfe.fragments.view.VideoFragment
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate

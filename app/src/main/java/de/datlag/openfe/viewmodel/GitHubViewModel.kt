@@ -17,8 +17,10 @@ import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
+import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -80,7 +82,7 @@ class GitHubViewModel @ViewModelInject constructor(
     }
 
     fun requestAccessTokenAndLogin(code: String?) {
-        viewModelScope.launch(Dispatchers.IO) {
+        runBlocking {
             dataStore.updateData { preferences ->
                 preferences.toBuilder()
                     .setGithubCode(code ?: String())
@@ -106,8 +108,8 @@ class GitHubViewModel @ViewModelInject constructor(
         }
     }
 
-    fun onNewAccessToken(gitHubAccessToken: GitHubAccessToken?) {
-        viewModelScope.launch(Dispatchers.IO) {
+    private fun onNewAccessToken(gitHubAccessToken: GitHubAccessToken?) {
+        runBlocking {
             dataStore.updateData { preferences ->
                 preferences.toBuilder()
                     .setGithubAccessToken(gitHubAccessToken?.token ?: String())
@@ -123,7 +125,7 @@ class GitHubViewModel @ViewModelInject constructor(
         requestAuthenticatedUser(gitHubAccessToken.token)
     }
 
-    private fun restoreUserFormDataStore() = viewModelScope.launch(Dispatchers.IO) {
+    private fun restoreUserFormDataStore() = viewModelScope.launch(Dispatchers.Default) {
         if (authenticatedGitHubUser.value != null) {
             return@launch
         }

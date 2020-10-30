@@ -163,10 +163,11 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
     companion object {
         fun newInstance() = ConfirmActionSheet()
 
-        fun removeAdInstance(): ConfirmActionSheet {
+        fun githubLoginInstance(): ConfirmActionSheet {
             val instance = ConfirmActionSheet()
-            instance.title = "Remove Ad"
-            instance.text = "Become a contributor so that this open source project can be improved and at the same time give something back."
+            instance.title = "GitHub Login"
+            instance.text = "Become a contributor so that the project is improved.\n" +
+                    "At the same time, the advertising will be removed if you have worked on the project."
             instance.leftText = "Close"
             instance.rightText = "Login"
             instance.closeOnLeftClick = true

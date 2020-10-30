@@ -12,8 +12,10 @@ import de.datlag.openfe.commons.safeContext
 import de.datlag.openfe.databinding.FragmentVideoViewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
@@ -37,6 +39,10 @@ class VideoFragment : AdvancedFragment {
             player.setMediaItem(MediaItem.fromUri(it))
         }
         player.prepare()
+    }
+
+    override fun initToolbar() {
+        toolbar?.menu?.clear()
     }
 
     override fun onResume() {

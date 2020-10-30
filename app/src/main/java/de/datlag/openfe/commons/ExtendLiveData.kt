@@ -13,3 +13,10 @@ fun <T> mutableLiveData(
     timeoutInMs: Long = 5000L,
     block: suspend LiveDataScope<T>.() -> Unit
 ) = liveData<T>(context, timeoutInMs, block) as MutableLiveData<T>
+
+fun <T> MutableLiveData<T>.updateValue(value: T?) {
+    if (this.value == value) {
+        return
+    }
+    this.value = value
+}
