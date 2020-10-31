@@ -136,8 +136,7 @@ dependencies {
     implementation("com.github.Ferfalk:SimpleSearchView:${Versions.searchview}")
 
     implementation("com.karumi:dexter:${Versions.dexter}")
-    implementation("com.github.bumptech.glide:glide:${Versions.glide}")
-    kapt("com.github.bumptech.glide:compiler:${Versions.glide}")
+    implementation("io.coil-kt:coil:${Versions.coil}")
     implementation("com.squareup.retrofit2:retrofit:${Versions.retrofit}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinSerialization}")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:${Versions.retrofitKotlinSerialization}")

@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.bumptech.glide.Glide
+import coil.load
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.safeContext
@@ -40,9 +40,7 @@ class ImageFragment : AdvancedFragment {
 
     private fun initViews() = with(binding) {
         intent?.let {
-            Glide.with(safeContext)
-                .load(it.data)
-                .into(viewerImage)
+            viewerImage.load(it.data)
         }
     }
 }
