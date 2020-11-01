@@ -24,6 +24,7 @@ import de.datlag.openfe.commons.invisible
 import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.supportActionBar
 import de.datlag.openfe.commons.tint
+import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.synthetic.main.activity_main.*
@@ -141,6 +142,15 @@ abstract class AdvancedFragment : Fragment {
         get() {
             return if (activity is AdvancedActivity) {
                 (activity as AdvancedActivity).gitHubViewModel
+            } else {
+                null
+            }
+        }
+
+    protected val appsViewModel: AppsViewModel?
+        get() {
+            return if (activity is AdvancedActivity) {
+                (activity as AdvancedActivity).appsViewModel
             } else {
                 null
             }

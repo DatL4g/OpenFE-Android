@@ -197,6 +197,22 @@ class ConfirmActionSheet : BottomSheetDialogFragment() {
             return instance
         }
 
+        fun backupConfirmInstance(possible: Boolean): ConfirmActionSheet {
+            val instance = ConfirmActionSheet()
+            instance.title = "Backup"
+            if (possible) {
+                instance.text = "Do you want to create a backup?"
+                instance.rightText = "Backup"
+            } else {
+                instance.text = "Creating Backup not possible because of not enough free space. Continue?"
+                instance.rightText = "Continue"
+            }
+            instance.leftText = "Cancel"
+            instance.closeOnLeftClick = true
+            instance.closeOnRightClick = true
+            return instance
+        }
+
         fun backupInstance(name: String): ConfirmActionSheet {
             val instance = ConfirmActionSheet()
             instance.title = "Backup $name"

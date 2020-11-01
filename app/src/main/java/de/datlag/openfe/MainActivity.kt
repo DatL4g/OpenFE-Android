@@ -14,9 +14,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
+import de.datlag.openfe.interfaces.FragmentAppsLoaded
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentNoAdPermission
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
+import de.datlag.openfe.interfaces.FragmentSystemAppsLoaded
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
@@ -54,6 +56,14 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
             if (gitHubViewModel.reposContributorListLoaded && gitHubViewModel.authenticatedUserLoaded) {
                 (getCurrentNavFragment() as? FragmentNoAdPermission?)?.onNoAdPermissionChanged(permitted)
             }
+        }
+
+        appsViewModel.apps.observe(this) {
+            (getCurrentNavFragment() as? FragmentAppsLoaded?)?.onAppsLoaded(it)
+        }
+
+        appsViewModel.systemApps.observe(this) {
+            (getCurrentNavFragment() as? FragmentSystemAppsLoaded?)?.onSystemAppsLoaded(it)
         }
     }
 

@@ -17,6 +17,7 @@ import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.updateValue
 import de.datlag.openfe.commons.usage
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
+import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.recycler.data.FileItem
 import io.michaelrocks.paranoid.Obfuscate
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
@@ -31,7 +33,6 @@ import kotlin.contracts.ExperimentalContracts
 @Obfuscate
 class ExplorerViewModel constructor(
     private val explorerFragmentArgs: ExplorerFragmentArgs,
-    private val appsViewModel: AppsViewModel,
     private val backupViewModel: BackupViewModel
 ) : ViewModel() {
 
@@ -39,6 +40,8 @@ class ExplorerViewModel constructor(
 
     val currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
     val currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
+
+    val systemApps: MutableLiveData<List<AppItem>> = MutableLiveData()
 
     val selectedItems = MutableLiveData<List<ExplorerItem>>()
 
@@ -113,7 +116,7 @@ class ExplorerViewModel constructor(
     }
 
     init {
-        appsViewModel.systemApps.observeForever(systemAppsObserver)
+        systemApps.observeForever(systemAppsObserver)
         currentDirectory.observeForever(currentDirectoryObserver)
         selectedItems.observeForever(selectedItemsObserver)
     }
@@ -133,7 +136,7 @@ class ExplorerViewModel constructor(
 
                 if (!file.isHidden) {
                     val explorerItem =
-                        ExplorerItem.from(file, appsViewModel.systemApps.value ?: listOf())
+                        ExplorerItem.from(file, systemApps.value ?: listOf())
                     val copy = currentSubDirectories.value?.mutableCopyOf() ?: mutableListOf()
                     copy.add(explorerItem)
 
@@ -185,7 +188,7 @@ class ExplorerViewModel constructor(
                                             add(
                                                 ExplorerItem.from(
                                                     file,
-                                                    appsViewModel.systemApps.value ?: listOf()
+                                                    systemApps.value ?: listOf()
                                                 )
                                             )
                                         }
@@ -317,22 +320,32 @@ class ExplorerViewModel constructor(
         }
     }
 
-    fun backupSelectedItems(context: Context, done: (Boolean) -> Unit) {
+    fun backupSelectedItemsPossible(): Boolean {
         val items: List<ExplorerItem> = selectedItems.value ?: listOf()
+        var possible = true
 
         for (item in items) {
             val maxStorage = explorerFragmentArgs.storage.list[0].rootFile.usage.max - 5000000000
             val usableStorage = maxStorage - explorerFragmentArgs.storage.list[0].rootFile.usage.current
+            val enoughStorage = item.fileItem.file.length() < usableStorage
 
-            if (item.fileItem.file.length() < usableStorage) {
-                backupItem(context, item.fileItem.file, done)
-            } else {
-                done.invoke(false)
+            possible = enoughStorage
+            if (!enoughStorage) {
+                break
             }
+        }
+        return possible
+    }
+
+    fun backupSelectedItems(context: Context, done: () -> Unit) {
+        val items: List<ExplorerItem> = selectedItems.value ?: listOf()
+
+        for (item in items) {
+            backupItem(context, item.fileItem.file, done)
         }
     }
 
-    private fun backupItem(context: Context, file: File, done: ((Boolean) -> Unit)) {
+    private fun backupItem(context: Context, file: File, done: (() -> Unit)) {
         backupViewModel.createBackup(context, file) {
             backupViewModel.insertBackup(it, done)
         }
@@ -345,7 +358,7 @@ class ExplorerViewModel constructor(
 
     override fun onCleared() {
         super.onCleared()
-        appsViewModel.systemApps.removeObserver(systemAppsObserver)
+        systemApps.removeObserver(systemAppsObserver)
         currentDirectory.removeObserver(currentDirectoryObserver)
         selectedItems.removeObserver(selectedItemsObserver)
     }

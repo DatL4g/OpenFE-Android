@@ -44,6 +44,7 @@ import de.datlag.openfe.commons.supportActionBar
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.AppsActionViewModelFactory
+import de.datlag.openfe.interfaces.FragmentAppsLoaded
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.other.AppsSortType
 import de.datlag.openfe.recycler.adapter.AppsActionRecyclerAdapter
@@ -56,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
+import timber.log.Timber
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -64,11 +66,10 @@ import kotlin.contracts.contract
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
-class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
+class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBackPressed, PopupMenu.OnMenuItemClickListener, FragmentAppsLoaded {
 
     private val args: AppsFragmentArgs by navArgs()
     private val viewModel: AppsActionViewModel by viewModels { AppsActionViewModelFactory(args) }
-    private val appsViewModel: AppsViewModel by viewModels()
     private val binding: FragmentAppsActionBinding by viewBinding()
 
     private var copiedList = listOf<AppItem>()
@@ -88,12 +89,22 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
         initRecycler()
         initEditText()
         initBottomNavigation()
-        loadAppsAsync()
+        loadApps()
     }
 
     override fun onResume() {
         super.onResume()
         statusBarColor(getColor(R.color.defaultStatusBarColor))
+    }
+
+    private fun loadApps(list: List<AppItem> = appsViewModel?.apps?.value ?: listOf()) = with(binding) {
+        if (list.isNotEmpty()) {
+            adapter.submitList(list)
+            copiedList = list.mutableCopyOf()
+            loadingTextView.hide()
+            appsActionRecycler.show()
+            appsActionLayoutWrapper.show()
+        }
     }
 
     override fun initToolbar() {
@@ -214,18 +225,6 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
                     true
                 }
                 else -> false
-            }
-        }
-    }
-
-    private fun loadAppsAsync() = with(binding) {
-        appsViewModel.apps.observe(viewLifecycleOwner) { list ->
-            if (list.isNotEmpty()) {
-                adapter.submitList(list)
-                copiedList = list.mutableCopyOf()
-                loadingTextView.hide()
-                appsActionRecycler.show()
-                appsActionLayoutWrapper.show()
             }
         }
     }
@@ -396,15 +395,19 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
     override fun onMenuItemClick(p0: MenuItem?): Boolean {
         p0?.let {
             when (it.itemId) {
-                R.id.appsActionPopupFilterName -> appsViewModel.sortType = AppsSortType.NAME
+                R.id.appsActionPopupFilterName -> appsViewModel?.sortType = AppsSortType.NAME
                 R.id.appsActionPopupFilterInstalled ->
-                    appsViewModel.sortType =
+                    appsViewModel?.sortType =
                         AppsSortType.INSTALLED
-                R.id.appsActionPopupFilterUpdated -> appsViewModel.sortType = AppsSortType.UPDATED
-                else -> appsViewModel.sortType = AppsSortType.NAME
+                R.id.appsActionPopupFilterUpdated -> appsViewModel?.sortType = AppsSortType.UPDATED
+                else -> appsViewModel?.sortType = AppsSortType.NAME
             }
         }
         return false
+    }
+
+    override fun onAppsLoaded(apps: List<AppItem>) {
+        loadApps(apps)
     }
 
     override fun onBackPressed(): Boolean {

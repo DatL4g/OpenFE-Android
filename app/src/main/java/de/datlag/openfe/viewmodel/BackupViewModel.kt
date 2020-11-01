@@ -44,8 +44,8 @@ class BackupViewModel @ViewModelInject constructor(
         }
     }
 
-    fun insertBackup(backup: Backup, done: ((Boolean) -> Unit)? = null) = viewModelScope.launch {
+    fun insertBackup(backup: Backup, done: (() -> Unit)? = null) = viewModelScope.launch {
         backupRepository.insertBackup(backup)
-        done?.invoke(true)
+        done?.invoke()
     }
 }

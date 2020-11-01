@@ -27,8 +27,10 @@ import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.ExplorerViewModelFactory
 import de.datlag.openfe.interfaces.FragmentBackPressed
+import de.datlag.openfe.interfaces.FragmentSystemAppsLoaded
 import de.datlag.openfe.recycler.LinearLayoutManagerWrapper
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
+import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.recycler.data.ExplorerItem
 import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.BackupViewModel
@@ -36,21 +38,20 @@ import de.datlag.openfe.viewmodel.ExplorerViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
+import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalSerializationApi
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
-class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentBackPressed {
+class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentBackPressed, FragmentSystemAppsLoaded {
 
     private val args: ExplorerFragmentArgs by navArgs()
-    private val appsViewModel: AppsViewModel by viewModels()
     private val backupViewModel: BackupViewModel by viewModels()
     private val explorerViewModel: ExplorerViewModel by viewModels {
         ExplorerViewModelFactory(
             args,
-            appsViewModel,
             backupViewModel
         )
     }
@@ -72,6 +73,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         initBottomNavigation()
         initRecyclerView()
         initSearchView()
+        explorerViewModel.systemApps.value = appsViewModel?.systemApps?.value ?: listOf()
 
         explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
             if (explorerViewModel.searchShown.value == true) {
@@ -142,7 +144,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         bottomNavigation?.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.explorerBottomDelete -> {
-                    deleteAction()
+                    backupBeforeDelete()
                     true
                 }
                 R.id.explorerBottomExtendMenu -> {
@@ -256,34 +258,38 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         holder?.binding?.explorerCheckbox?.isChecked = isChecked
     }
 
-    private fun deleteAction() {
-        val selectedItemSize = explorerViewModel.countSelectedItems()
-        val confirmActionSheet =
-            ConfirmActionSheet.deleteInstance(selectedItemSize > 1, selectedItemSize)
-        confirmActionSheet.rightClickListener = {
-            val fileProgressSheet = FileProgressSheet.deleteInstance(selectedItemSize)
-            showBottomSheetFragment(fileProgressSheet)
+    private fun backupBeforeDelete() {
+        val backupPossible = explorerViewModel.backupSelectedItemsPossible()
+        val backupConfirmSheet = ConfirmActionSheet.backupConfirmInstance(backupPossible)
 
-            fileProgressSheet.updateable = {
+        backupConfirmSheet.rightClickListener = {
+            if (backupPossible) {
                 explorerViewModel.backupSelectedItems(safeContext) {
-                    Timber.e("Backup created: $it")
-                    /*
-                    val job = explorerViewModel.deleteSelectedItems({
-                        fileProgressSheet.updateProgressList(it)
-                    }) {
-                        fileProgressSheet.leftText = String()
-                        fileProgressSheet.rightText = "Done"
-                        explorerViewModel.afterDeleteItems()
-                    }
-
-                    fileProgressSheet.leftClickListener = {
-                        job.cancel()
-                    }
-                     */
+                    deleteAction()
                 }
+            } else {
+                deleteAction()
             }
         }
-        showBottomSheetFragment(confirmActionSheet)
+
+        showBottomSheetFragment(backupConfirmSheet)
+    }
+
+    private fun deleteAction() {
+        val selectedItemSize = explorerViewModel.countSelectedItems()
+        val deleteSheet = ConfirmActionSheet.deleteInstance(selectedItemSize > 0, selectedItemSize)
+        val fileProgressSheet = FileProgressSheet.deleteInstance(selectedItemSize)
+
+        deleteSheet.rightClickListener = {
+            fileProgressSheet.updateable = {
+                explorerViewModel.deleteSelectedItems({ progress ->
+                    fileProgressSheet.updateProgressList(progress)
+                })
+            }
+            showBottomSheetFragment(fileProgressSheet)
+        }
+
+        showBottomSheetFragment(deleteSheet)
     }
 
     private fun moreAction(anchor: View) {
@@ -324,6 +330,10 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
     }
 
     override fun onBackPressed(): Boolean = onBackPressedCheck()
+
+    override fun onSystemAppsLoaded(apps: List<AppItem>) {
+        explorerViewModel.systemApps.value = apps
+    }
 
     companion object {
         fun newInstance() = ExplorerFragment()

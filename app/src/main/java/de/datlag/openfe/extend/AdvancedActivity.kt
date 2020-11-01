@@ -5,7 +5,9 @@ import androidx.activity.viewModels
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.github.inflationx.viewpump.ViewPumpContextWrapper
 import io.michaelrocks.paranoid.Obfuscate
@@ -22,6 +24,7 @@ abstract class AdvancedActivity : AppCompatActivity {
     constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId) { }
 
     val gitHubViewModel: GitHubViewModel by viewModels()
+    val appsViewModel: AppsViewModel by viewModels()
 
     companion object {
         init {

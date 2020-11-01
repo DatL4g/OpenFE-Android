@@ -332,7 +332,6 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
             adView.show()
             adView.loadAd(AdRequest.Builder().build())
         }
-        Timber.e("permitted: $permitted")
     }
 
     override fun onBackPressed(): Boolean = true

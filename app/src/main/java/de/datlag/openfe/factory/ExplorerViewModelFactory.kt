@@ -13,12 +13,11 @@ import kotlin.contracts.ExperimentalContracts
 @Obfuscate
 class ExplorerViewModelFactory(
     private val explorerArgs: ExplorerFragmentArgs,
-    private val appsViewModel: AppsViewModel,
     private val backupViewModel: BackupViewModel
 ) : ViewModelProvider.NewInstanceFactory() {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(
         modelClass: Class<T>
-    ) = ExplorerViewModel(explorerArgs, appsViewModel, backupViewModel) as T
+    ) = ExplorerViewModel(explorerArgs, backupViewModel) as T
 }
