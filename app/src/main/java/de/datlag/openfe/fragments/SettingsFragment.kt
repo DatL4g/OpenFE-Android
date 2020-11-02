@@ -62,7 +62,7 @@ class SettingsFragment : AdvancedFragment(R.layout.fragment_settings), FragmentB
             githubAccountSubTitle.text = "Currently not logged in"
             githubAccountLogin.setOnClickListener {
                 val loginSheet = ConfirmActionSheet.githubLoginInstance()
-                loginSheet.rightClickListener = {
+                loginSheet.setRightButtonClickListener {
                     (activity as? MainActivity?)?.githubOAuth()
                 }
                 showBottomSheetFragment(loginSheet)
@@ -72,7 +72,7 @@ class SettingsFragment : AdvancedFragment(R.layout.fragment_settings), FragmentB
             githubAccountSubTitle.text = "Logged in as: ${user.login}"
             githubAccountLogin.setOnClickListener {
                 val githubLogoutSheet = ConfirmActionSheet.githubLogoutInstance()
-                githubLogoutSheet.rightClickListener = {
+                githubLogoutSheet.setRightButtonClickListener {
                     githubViewModel?.logout()
                     revokeGitHubAccess()
                 }
@@ -83,7 +83,7 @@ class SettingsFragment : AdvancedFragment(R.layout.fragment_settings), FragmentB
 
     private fun revokeGitHubAccess() {
         val revokeAccessSheet = ConfirmActionSheet.githubRevokeAccessInstance()
-        revokeAccessSheet.rightClickListener = {
+        revokeAccessSheet.setRightButtonClickListener {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.Builder()
                 .scheme("https")

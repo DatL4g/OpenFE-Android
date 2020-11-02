@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.datlag.openfe.R
-import de.datlag.openfe.databinding.LocationItemBinding
+import de.datlag.openfe.databinding.RecyclerLocationItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.util.toHumanReadable
@@ -34,7 +34,7 @@ class LocationRecyclerAdapter : ClickRecyclerAdapter<LocationRecyclerAdapter.Vie
         override val containerView: View?
             get() = itemView
 
-        val binding = LocationItemBinding.bind(containerView ?: itemView)
+        val binding = RecyclerLocationItemBinding.bind(containerView ?: itemView)
 
         init {
             binding.locationCard.setOnClickListener(this)
@@ -46,7 +46,7 @@ class LocationRecyclerAdapter : ClickRecyclerAdapter<LocationRecyclerAdapter.Vie
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.location_item, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_location_item, parent, false))
     }
 
     override fun getItemCount(): Int {
@@ -60,7 +60,7 @@ class LocationRecyclerAdapter : ClickRecyclerAdapter<LocationRecyclerAdapter.Vie
         setUsage(binding, item)
     }
 
-    private fun setUsage(binding: LocationItemBinding, item: LocationItem) {
+    private fun setUsage(binding: RecyclerLocationItemBinding, item: LocationItem) {
         val itemUsage = item.usage
 
         binding.locationProgress.progress = itemUsage.percentage

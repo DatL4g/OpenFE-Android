@@ -51,7 +51,6 @@ import de.datlag.openfe.recycler.adapter.AppsActionRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.util.PermissionChecker
 import de.datlag.openfe.viewmodel.AppsActionViewModel
-import de.datlag.openfe.viewmodel.AppsViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -259,7 +258,7 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
 
     private fun backupConfirmDialog(item: AppItem) {
         val confirmActionSheet = ConfirmActionSheet.backupInstance(item.name)
-        confirmActionSheet.rightClickListener = {
+        confirmActionSheet.setRightButtonClickListener {
             backupProgressDialog(item)
         }
         showBottomSheetFragment(confirmActionSheet)
@@ -279,9 +278,12 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
 
         fileProgressSheet.title = "Backup ${item.name}"
         fileProgressSheet.text = "Creating Backup file in OpenFE/Apps/${item.name}-Backup..."
-        fileProgressSheet.leftText = "Cancel"
+        fileProgressSheet.leftButtonText = "Cancel"
         fileProgressSheet.closeOnLeftClick = true
         fileProgressSheet.closeOnRightClick = true
+        fileProgressSheet.setOnCancelListener {
+            Timber.e("cancelled")
+        }
         fileProgressSheet.updateable = {
             if (createFolderSuccess) {
                 val backupFile = File(storage, "$fileName-${originalFile.name}")
@@ -292,8 +294,8 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
                         fileProgressSheet.updateProgressList(floatArrayOf(it))
 
                         if (it == 100F) {
-                            fileProgressSheet.leftText = String()
-                            fileProgressSheet.rightText = "Done"
+                            fileProgressSheet.leftButtonText = String()
+                            fileProgressSheet.rightButtonText = "Done"
                         }
                     }
                 }

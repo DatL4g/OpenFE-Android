@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getIcon
-import de.datlag.openfe.databinding.BackupItemBinding
+import de.datlag.openfe.databinding.RecyclerBackupItemBinding
 import de.datlag.openfe.db.Backup
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import io.michaelrocks.paranoid.Obfuscate
@@ -40,7 +40,7 @@ class BackupRecyclerAdapter : ClickRecyclerAdapter<BackupRecyclerAdapter.ViewHol
         override val containerView: View?
             get() = itemView
 
-        val binding = BackupItemBinding.bind(containerView ?: itemView)
+        val binding = RecyclerBackupItemBinding.bind(containerView ?: itemView)
 
         init {
             binding.backupCard.setOnClickListener(this)
@@ -52,7 +52,7 @@ class BackupRecyclerAdapter : ClickRecyclerAdapter<BackupRecyclerAdapter.ViewHol
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.backup_item, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_backup_item, parent, false))
     }
 
     override fun getItemCount(): Int {

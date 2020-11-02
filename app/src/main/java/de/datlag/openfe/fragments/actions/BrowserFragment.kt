@@ -127,11 +127,11 @@ class BrowserFragment : AdvancedFragment(R.layout.fragment_browser_action), Frag
         val confirmSheet = ConfirmActionSheet.newInstance()
         confirmSheet.title = "Error while loading"
         confirmSheet.text = "There was an error while loading. The page is not displayed at all or may be displayed incorrectly. Do you want to open the page in a different browser?"
-        confirmSheet.leftText = "Close"
-        confirmSheet.rightText = "Browser"
+        confirmSheet.leftButtonText = "Close"
+        confirmSheet.rightButtonText = "Browser"
         confirmSheet.closeOnLeftClick = true
         confirmSheet.closeOnRightClick = true
-        confirmSheet.rightClickListener = {
+        confirmSheet.setRightButtonClickListener {
             openInBrowser()
         }
         showBottomSheetFragment(confirmSheet)

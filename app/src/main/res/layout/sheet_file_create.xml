@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/createFileSheetTitle"
+        fontPath="fonts/Poppins-Bold.ttf"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:gravity="center_vertical|start"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMaxTextSize="26sp"
+        app:autoSizeMinTextSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/createFileSheetText"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/createFileSheetText"
+        fontPath="fonts/Poppins-Medium.ttf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/createFileSheetTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/createFileSheetCheckbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/createFileSheetText" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/createFileSheetEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:singleLine="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/createFileSheetCheckbox"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/createFileSheetButtonLeft"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginRight="@dimen/confirmSheetButtonSideMargin"
+        android:layout_marginEnd="@dimen/confirmSheetButtonSideMargin"
+        android:background="@drawable/confirm_button_left_selector"
+        android:textColor="@color/confirm_button_left_text_selector"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/createFileSheetEditText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/createFileSheetButtonRight"
+        app:layout_constraintEnd_toStartOf="@id/createFileSheetButtonRight" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/createFileSheetButtonRight"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginLeft="@dimen/confirmSheetButtonSideMargin"
+        android:layout_marginStart="@dimen/confirmSheetButtonSideMargin"
+        android:background="@drawable/confirm_button_right_selector"
+        android:textColor="@color/highlightColor"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/createFileSheetEditText"
+        app:layout_constraintLeft_toRightOf="@id/createFileSheetButtonLeft"
+        app:layout_constraintStart_toEndOf="@id/createFileSheetButtonLeft"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

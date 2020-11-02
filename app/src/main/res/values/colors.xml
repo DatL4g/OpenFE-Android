@@ -4,6 +4,7 @@
     <color name="primaryLightColor">#ff6960</color>
     <color name="primaryDarkColor">#a2000f</color>
 
+    <color name="splashScreenBackground">@color/primaryColor</color>
     <color name="defaultBackgroundColor">#ffffff</color>
     <color name="defaultContentColor">#000000</color>
     <color name="defaultStatusBarColor">@color/primaryColor</color>

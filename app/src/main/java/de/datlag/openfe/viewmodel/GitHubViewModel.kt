@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
-import timber.log.Timber
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts

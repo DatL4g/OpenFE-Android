@@ -12,6 +12,7 @@ import com.ferfalk.simplesearchview.SimpleSearchView
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.R
 import de.datlag.openfe.bottomsheets.ConfirmActionSheet
+import de.datlag.openfe.bottomsheets.FileCreateSheet
 import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
@@ -32,13 +33,11 @@ import de.datlag.openfe.recycler.LinearLayoutManagerWrapper
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.recycler.data.ExplorerItem
-import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.BackupViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
-import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalSerializationApi
@@ -160,6 +159,14 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                 getColor(R.color.defaultFabContentColor)
             )
         )
+        fab?.setOnClickListener {
+            val fileCreateSheet = FileCreateSheet()
+            fileCreateSheet.title = "Create File or Folder"
+            fileCreateSheet.text = "Do you want to create a file or folder?"
+            fileCreateSheet.leftButtonText = "Cancel"
+            fileCreateSheet.rightButtonText = "Create"
+            showBottomSheetFragment(fileCreateSheet)
+        }
 
         updateBottom(false)
         updateFAB(true)
@@ -262,25 +269,29 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         val backupPossible = explorerViewModel.backupSelectedItemsPossible()
         val backupConfirmSheet = ConfirmActionSheet.backupConfirmInstance(backupPossible)
 
-        backupConfirmSheet.rightClickListener = {
+        backupConfirmSheet.setRightButtonClickListener {
             if (backupPossible) {
                 explorerViewModel.backupSelectedItems(safeContext) {
-                    deleteAction()
+                    deleteAction(true)
                 }
             } else {
                 deleteAction()
             }
         }
 
+        backupConfirmSheet.setLeftButtonClickListener {
+            deleteAction()
+        }
+
         showBottomSheetFragment(backupConfirmSheet)
     }
 
-    private fun deleteAction() {
+    private fun deleteAction(backupCreated: Boolean = false) {
         val selectedItemSize = explorerViewModel.countSelectedItems()
-        val deleteSheet = ConfirmActionSheet.deleteInstance(selectedItemSize > 0, selectedItemSize)
+        val deleteSheet = ConfirmActionSheet.deleteInstance(selectedItemSize, backupCreated)
         val fileProgressSheet = FileProgressSheet.deleteInstance(selectedItemSize)
 
-        deleteSheet.rightClickListener = {
+        deleteSheet.setRightButtonClickListener {
             fileProgressSheet.updateable = {
                 explorerViewModel.deleteSelectedItems({ progress ->
                     fileProgressSheet.updateProgressList(progress)

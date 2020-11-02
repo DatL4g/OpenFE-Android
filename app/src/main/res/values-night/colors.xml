@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="splashScreenBackground">@color/defaultBackgroundColor</color>
     <color name="defaultBackgroundColor">#121212</color>
     <color name="defaultContentColor">#ffffff</color>
     <color name="defaultStatusBarColor">#323232</color>

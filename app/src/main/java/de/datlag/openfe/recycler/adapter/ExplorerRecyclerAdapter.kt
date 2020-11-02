@@ -13,7 +13,7 @@ import de.datlag.openfe.commons.getIcon
 import de.datlag.openfe.commons.invisible
 import de.datlag.openfe.commons.isAPK
 import de.datlag.openfe.commons.show
-import de.datlag.openfe.databinding.ExplorerItemBinding
+import de.datlag.openfe.databinding.RecyclerExplorerItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.ExplorerItem
 import io.michaelrocks.paranoid.Obfuscate
@@ -42,7 +42,7 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
         override val containerView: View?
             get() = itemView
 
-        val binding = ExplorerItemBinding.bind(containerView ?: itemView)
+        val binding = RecyclerExplorerItemBinding.bind(containerView ?: itemView)
 
         init {
             binding.explorerRoot.setOnClickListener(this)
@@ -61,7 +61,7 @@ class ExplorerRecyclerAdapter(private val coroutineScope: CoroutineScope) : Clic
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.explorer_item, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_explorer_item, parent, false))
     }
 
     override fun getItemCount(): Int {

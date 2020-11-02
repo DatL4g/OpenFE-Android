@@ -17,6 +17,7 @@ class ViewActivity : AdvancedActivity(R.layout.activity_view) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.ViewerAppTheme)
 
         val fragment = when {
             intent?.type?.startsWith("image/") == true -> ImageFragment(intent)

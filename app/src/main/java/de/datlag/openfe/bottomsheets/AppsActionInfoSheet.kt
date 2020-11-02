@@ -11,7 +11,7 @@ import de.datlag.openfe.commons.expand
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.safeContext
-import de.datlag.openfe.databinding.AppsActionInfoSheetBinding
+import de.datlag.openfe.databinding.SheetAppsActionInfoBinding
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.util.NumberUtils.convertToDate
 import io.michaelrocks.paranoid.Obfuscate
@@ -21,7 +21,7 @@ import kotlin.contracts.ExperimentalContracts
 @Obfuscate
 class AppsActionInfoSheet : BottomSheetDialogFragment() {
 
-    private val binding: AppsActionInfoSheetBinding by viewBinding()
+    private val binding: SheetAppsActionInfoBinding by viewBinding()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,7 +34,7 @@ class AppsActionInfoSheet : BottomSheetDialogFragment() {
             }
         }
 
-        return inflater.inflate(R.layout.apps_action_info_sheet, container, false)
+        return inflater.inflate(R.layout.sheet_apps_action_info, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {

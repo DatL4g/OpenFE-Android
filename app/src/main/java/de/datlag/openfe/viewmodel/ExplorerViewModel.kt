@@ -25,7 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
@@ -316,6 +315,7 @@ class ExplorerViewModel constructor(
             }
             withContext(Dispatchers.Main) {
                 done?.invoke()
+                afterDeleteItems()
             }
         }
     }

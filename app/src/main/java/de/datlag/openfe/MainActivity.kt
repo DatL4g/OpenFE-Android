@@ -48,6 +48,7 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setTheme(R.style.AppTheme)
         setContentView(binding.root)
 
         initViews()

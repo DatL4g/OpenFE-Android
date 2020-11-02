@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.datlag.openfe.R
-import de.datlag.openfe.databinding.AppsActionItemBinding
+import de.datlag.openfe.databinding.RecyclerAppsActionItemBinding
 import de.datlag.openfe.extend.ClickRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
 import io.michaelrocks.paranoid.Obfuscate
@@ -33,7 +33,7 @@ class AppsActionRecyclerAdapter : ClickRecyclerAdapter<AppsActionRecyclerAdapter
         override val containerView: View?
             get() = itemView
 
-        val binding = AppsActionItemBinding.bind(containerView ?: itemView)
+        val binding = RecyclerAppsActionItemBinding.bind(containerView ?: itemView)
 
         init {
             binding.appsActionCard.setOnClickListener(this)
@@ -45,7 +45,7 @@ class AppsActionRecyclerAdapter : ClickRecyclerAdapter<AppsActionRecyclerAdapter
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.apps_action_item, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.recycler_apps_action_item, parent, false))
     }
 
     override fun getItemCount(): Int {

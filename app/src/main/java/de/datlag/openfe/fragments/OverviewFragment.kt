@@ -41,11 +41,11 @@ import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentNoAdPermission
-import de.datlag.openfe.safeargs.StorageArgs
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
+import de.datlag.openfe.safeargs.StorageArgs
 import de.datlag.openfe.util.PermissionChecker
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
