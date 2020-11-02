@@ -13,7 +13,9 @@ import de.datlag.openfe.commons.expand
 import de.datlag.openfe.commons.isTelevision
 import de.datlag.openfe.commons.safeContext
 import io.michaelrocks.paranoid.Obfuscate
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalContracts
 @Obfuscate
 abstract class DefaultBottomSheet<T : ViewBinding> constructor(
     val type: Class<T>,

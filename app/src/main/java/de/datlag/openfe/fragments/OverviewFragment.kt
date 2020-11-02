@@ -20,6 +20,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.github.mjdev.libaums.UsbMassStorageDevice
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
@@ -269,6 +270,13 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
                 githubUnit()
             )
         )
+        actionList.add(
+            ActionItem(
+                null,
+                "Review",
+                reviewUnit()
+            )
+        )
 
         return actionList
     }
@@ -293,6 +301,20 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
                 getString(R.string.github_repo_url)
             )
         )
+    }
+
+    private fun reviewUnit(): () -> Unit = {
+        val manager = ReviewManagerFactory.create(safeContext)
+        val request = manager.requestReviewFlow()
+
+        request.addOnCompleteListener {
+            if (it.isSuccessful) {
+                val reviewInfo = it.result
+                manager.launchReviewFlow(activity, reviewInfo)
+            } else {
+                Timber.e(it.exception)
+            }
+        }
     }
 
     private fun checkReadPermission(position: Int) {

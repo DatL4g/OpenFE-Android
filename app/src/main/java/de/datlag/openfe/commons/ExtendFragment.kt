@@ -17,15 +17,26 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import de.datlag.openfe.R
+import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.util.NumberUtils.useStatusBarDarkContrast
 import io.michaelrocks.paranoid.Obfuscate
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlin.contracts.ExperimentalContracts
 
+@ExperimentalSerializationApi
+@ExperimentalContracts
 val Fragment.safeContext: Context
-    get() = this.context ?: this.activity ?: this.requireContext()
+    get() = this.context ?: this.activity ?: if (this is AdvancedFragment) {
+        injectedContext
+    } else {
+        requireContext()
+    }
 
 val Fragment.supportActionBar: ActionBar?
     get() = (this.activity as? AppCompatActivity?)?.supportActionBar
 
+@ExperimentalSerializationApi
+@ExperimentalContracts
 fun Fragment.getThemedLayoutInflater(inflater: LayoutInflater = this.layoutInflater, @StyleRes themeResId: Int = R.style.FragmentTheme): LayoutInflater {
     val contextThemeWrapper = ContextThemeWrapper(safeContext, themeResId)
     safeContext.theme.applyStyle(themeResId, true)
@@ -53,10 +64,16 @@ fun Fragment.statusBarColor(@ColorInt color: Int) {
     }
 }
 
+@ExperimentalSerializationApi
+@ExperimentalContracts
 fun Fragment.getColor(@ColorRes color: Int) = safeContext.getColorCompat(color)
 
+@ExperimentalSerializationApi
+@ExperimentalContracts
 fun Fragment.getDrawable(@DrawableRes drawable: Int) = safeContext.getDrawableCompat(drawable)
 
+@ExperimentalSerializationApi
+@ExperimentalContracts
 fun Fragment.getDrawable(@DrawableRes drawable: Int, @ColorInt tint: Int) = safeContext.getDrawableCompat(drawable, tint)
 
 fun Fragment.showBottomSheetFragment(bottomSheet: BottomSheetDialogFragment) = bottomSheet.show(

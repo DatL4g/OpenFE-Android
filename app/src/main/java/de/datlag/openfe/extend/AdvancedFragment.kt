@@ -1,5 +1,6 @@
 package de.datlag.openfe.extend
 
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,6 +30,7 @@ import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.ExperimentalSerializationApi
+import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalSerializationApi
@@ -40,6 +42,8 @@ abstract class AdvancedFragment : Fragment {
     constructor() : super() { }
 
     constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId) { }
+
+    @Inject lateinit var injectedContext: Context
 
     override fun onCreateView(
         inflater: LayoutInflater,

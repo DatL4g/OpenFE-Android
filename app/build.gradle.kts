@@ -99,6 +99,8 @@ dependencies {
     implementation("androidx.room:room-runtime:${Versions.room}")
     kapt("androidx.room:room-compiler:${Versions.room}")
     implementation("com.google.android.gms:play-services-ads:${Versions.admob}")
+    implementation("com.google.android.play:core:${Versions.playCore}")
+    implementation("com.google.android.play:core-ktx:${Versions.ktxPlayCore}")
 
     implementation("androidx.core:core-ktx:${Versions.ktxCore}")
     implementation("androidx.activity:activity-ktx:${Versions.ktxActivity}")
