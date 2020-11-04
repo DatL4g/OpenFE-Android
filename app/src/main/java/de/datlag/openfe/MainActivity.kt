@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
+import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -12,6 +13,7 @@ import com.ferfalk.simplesearchview.SimpleSearchView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.interfaces.FragmentAppsLoaded
@@ -19,6 +21,7 @@ import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentNoAdPermission
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
 import de.datlag.openfe.interfaces.FragmentSystemAppsLoaded
+import de.datlag.openfe.viewmodel.AppsViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
@@ -27,9 +30,12 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalSerializationApi
 @ExperimentalContracts
 @Obfuscate
+@AndroidEntryPoint
 class MainActivity : AdvancedActivity(R.layout.activity_main) {
 
     private val binding: ActivityMainBinding by viewBinding(R.id.container)
+
+    val appsViewModel: AppsViewModel by viewModels()
 
     val toolbar: Toolbar
         get() = binding.toolBar

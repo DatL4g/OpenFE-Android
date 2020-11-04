@@ -153,8 +153,8 @@ abstract class AdvancedFragment : Fragment {
 
     protected val appsViewModel: AppsViewModel?
         get() {
-            return if (activity is AdvancedActivity) {
-                (activity as AdvancedActivity).appsViewModel
+            return if (activity is MainActivity) {
+                (activity as MainActivity).appsViewModel
             } else {
                 null
             }
