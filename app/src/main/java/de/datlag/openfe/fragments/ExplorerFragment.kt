@@ -288,19 +288,28 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
 
     private fun deleteAction(backupCreated: Boolean = false) {
         val selectedItemSize = explorerViewModel.countSelectedItems()
+        if (backupCreated) {
+            return deleteFileProgress(selectedItemSize)
+        }
+
         val deleteSheet = ConfirmActionSheet.deleteInstance(selectedItemSize, backupCreated)
-        val fileProgressSheet = FileProgressSheet.deleteInstance(selectedItemSize)
 
         deleteSheet.setRightButtonClickListener {
-            fileProgressSheet.updateable = {
-                explorerViewModel.deleteSelectedItems({ progress ->
-                    fileProgressSheet.updateProgressList(progress)
-                })
-            }
-            showBottomSheetFragment(fileProgressSheet)
+            deleteFileProgress(selectedItemSize)
         }
 
         showBottomSheetFragment(deleteSheet)
+    }
+
+    private fun deleteFileProgress(itemSize: Int) {
+        val fileProgressSheet = FileProgressSheet.deleteInstance(itemSize)
+
+        fileProgressSheet.updateable = {
+            explorerViewModel.deleteSelectedItems({ progress ->
+                fileProgressSheet.updateProgressList(progress)
+            })
+        }
+        showBottomSheetFragment(fileProgressSheet)
     }
 
     private fun moreAction(anchor: View) {
