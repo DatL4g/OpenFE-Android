@@ -16,11 +16,13 @@ import de.datlag.openfe.bottomsheets.FileCreateSheet
 import de.datlag.openfe.bottomsheets.FileProgressSheet
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDrawable
+import de.datlag.openfe.commons.hide
 import de.datlag.openfe.commons.intentChooser
 import de.datlag.openfe.commons.isNotCleared
 import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.permissions
 import de.datlag.openfe.commons.safeContext
+import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.supportActionBar
@@ -73,6 +75,8 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         initBottomNavigation()
         initRecyclerView()
         initSearchView()
+        loadingView.startAnimation()
+
         explorerViewModel.systemApps.value = appsViewModel?.systemApps?.value ?: listOf()
 
         explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
@@ -110,6 +114,9 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
 
         explorerViewModel.currentSubDirectories.observe(viewLifecycleOwner) { list ->
             recyclerAdapter.submitList(list)
+            loadingView.stopAnimation()
+            loadingView.hide()
+            explorerRecycler.show()
         }
 
         explorerViewModel.selectedItems.observe(viewLifecycleOwner) { list ->

@@ -42,7 +42,7 @@ class ExplorerViewModel constructor(
 
     val currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
     var isObservingCurrentDirectory: Boolean = false
-    val currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
+    val currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData()
 
     val systemApps: MutableLiveData<List<AppItem>> = MutableLiveData()
 
@@ -55,13 +55,15 @@ class ExplorerViewModel constructor(
     private var previousSearchText: String? = null
 
     private val systemAppsObserver = Observer<AppList> { list ->
-        viewModelScope.launch(Dispatchers.IO) {
-            val matchedAppItems = matchNewAppsToDirectories(list)
-            withContext(Dispatchers.Main) {
-                try {
-                    currentSubDirectories.value = matchedAppItems
-                } catch (exception: Exception) {
-                    currentSubDirectories.postValue(matchedAppItems)
+        if (isObservingCurrentDirectory) {
+            viewModelScope.launch(Dispatchers.IO) {
+                val matchedAppItems = matchNewAppsToDirectories(list)
+                withContext(Dispatchers.Main) {
+                    try {
+                        currentSubDirectories.value = matchedAppItems
+                    } catch (exception: Exception) {
+                        currentSubDirectories.postValue(matchedAppItems)
+                    }
                 }
             }
         }

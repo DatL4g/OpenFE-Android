@@ -1,0 +1,65 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+  <aapt:attr name="android:drawable">
+    <vector
+        android:width="274dp"
+        android:height="296dp"
+        android:viewportWidth="274"
+        android:viewportHeight="296">
+      <path
+          android:pathData="M110.86,66.136L45.922,68.977C34.017,69.497 24.827,80.034 25.368,92.397L31.16,227.273C31.7,239.636 41.884,249.325 53.789,248.805L226.957,241.229C238.862,240.709 248.16,230.167 247.619,217.804L242.703,105.412C242.162,93.048 231.979,83.359 220.073,83.88L133.49,87.668L110.86,66.136Z"
+          android:fillColor="#A2000F"/>
+      <group
+          android:name="documentGroup"
+          android:translateY="-100">
+        <path
+            android:name="documentPath"
+            android:fillColor="@color/defaultContentColor"
+            android:fillAlpha="0"
+            android:pathData="M80.25,18.75C69.938,18.75 61.594,27.188 61.594,37.5L61.5,187.5C61.5,197.813 69.844,206.25 80.156,206.25H192.75C203.063,206.25 211.5,197.813 211.5,187.5V75L155.25,18.75H80.25ZM145.875,84.375V32.813L197.438,84.375H145.875Z" />
+      </group>
+      <path
+          android:pathData="M119.328,82.667H53.04C40.888,82.667 31.055,92.042 31.055,103.5L30.944,228.5C30.944,239.958 40.888,249.333 53.04,249.333H229.808C241.961,249.333 251.904,239.958 251.904,228.5V124.333C251.904,112.875 241.961,103.5 229.808,103.5H141.424L119.328,82.667Z"
+          android:fillColor="#DB3236"/>
+    </vector>
+  </aapt:attr>
+
+  <target android:name="documentPath">
+    <aapt:attr name="android:animation">
+      <objectAnimator
+          android:duration="3000"
+          android:propertyName="fillAlpha"
+          android:valueFrom="0"
+          android:valueTo="1" />
+    </aapt:attr>
+  </target>
+  <target android:name="documentGroup">
+    <aapt:attr name="android:animation">
+      <objectAnimator
+          android:duration="2500"
+          android:propertyName="translateY"
+          android:valueFrom="-100"
+          android:valueTo="0"/>
+    </aapt:attr>
+  </target>
+  <target android:name="documentPath">
+    <aapt:attr name="android:animation">
+      <objectAnimator
+          android:startOffset="5000"
+          android:duration="1000"
+          android:propertyName="fillAlpha"
+          android:valueFrom="1"
+          android:valueTo="0" />
+    </aapt:attr>
+  </target>
+  <target android:name="documentGroup">
+    <aapt:attr name="android:animation">
+      <objectAnimator
+          android:startOffset="7000"
+          android:duration="0"
+          android:propertyName="translateY"
+          android:valueFrom="0"
+          android:valueTo="-250" />
+    </aapt:attr>
+  </target>
+</animated-vector>
