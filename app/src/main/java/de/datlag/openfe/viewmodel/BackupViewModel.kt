@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class BackupViewModel @ViewModelInject constructor(
+    val context: Context,
     val backupRepository: BackupRepository
 ) : ViewModel() {
 
@@ -26,7 +27,7 @@ class BackupViewModel @ViewModelInject constructor(
         }
     }
 
-    fun createBackup(context: Context, file: File, done: ((Backup) -> Unit)) {
+    fun createBackup(file: File, done: ((Backup) -> Unit)) {
         val dataBackupStorage = File(context.filesDir, "backup")
         if (!dataBackupStorage.exists()) {
             dataBackupStorage.mkdir()

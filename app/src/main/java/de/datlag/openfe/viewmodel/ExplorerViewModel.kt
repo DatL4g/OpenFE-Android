@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.datlag.mimemagic.commons.getMimeData
 import de.datlag.openfe.commons.copyOf
 import de.datlag.openfe.commons.countRecursively
 import de.datlag.openfe.commons.deleteRecursively
@@ -16,6 +17,7 @@ import de.datlag.openfe.commons.mutableCopyOf
 import de.datlag.openfe.commons.parentDir
 import de.datlag.openfe.commons.updateValue
 import de.datlag.openfe.commons.usage
+import de.datlag.openfe.filter.MimeTypeFilter
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.recycler.data.ExplorerItem
@@ -31,6 +33,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @Obfuscate
 class ExplorerViewModel constructor(
+    private val context: Context,
     private val explorerFragmentArgs: ExplorerFragmentArgs,
     private val backupViewModel: BackupViewModel
 ) : ViewModel() {
@@ -38,6 +41,7 @@ class ExplorerViewModel constructor(
     val startDirectory: File = getStartDirectory(explorerFragmentArgs)
 
     val currentDirectory: MutableLiveData<File> = MutableLiveData(startDirectory)
+    var isObservingCurrentDirectory: Boolean = false
     val currentSubDirectories: MutableLiveData<List<ExplorerItem>> = MutableLiveData(listOf())
 
     val systemApps: MutableLiveData<List<AppItem>> = MutableLiveData()
@@ -66,7 +70,7 @@ class ExplorerViewModel constructor(
     private val currentDirectoryObserver = Observer<File> { dir ->
         currentSubDirectories.updateValue(listOf())
 
-        val fileList = dir.listFiles()?.toMutableList() ?: mutableListOf()
+        val fileList: MutableList<File> = dir.listFiles()?.toMutableList() ?: mutableListOf()
         val startDirParent = File(startDirectory.getRootOfStorage()).parentDir
 
         if (dir == startDirParent) {
@@ -116,13 +120,58 @@ class ExplorerViewModel constructor(
 
     init {
         systemApps.observeForever(systemAppsObserver)
-        currentDirectory.observeForever(currentDirectoryObserver)
         selectedItems.observeForever(selectedItemsObserver)
+
+        if (explorerFragmentArgs.storage.mimeTypeFilter == null) {
+            currentDirectory.observeForever(currentDirectoryObserver)
+            isObservingCurrentDirectory = true
+        } else {
+            getFilesByMimeTypeFilter(explorerFragmentArgs.storage.mimeTypeFilter)
+        }
     }
 
     private fun getStartDirectory(args: ExplorerFragmentArgs = explorerFragmentArgs): File {
         val file = File(args.storage.list[args.storage.selected].usage.file.absolutePath)
         return if (file.isDirectory) file else file.parentDir
+    }
+
+    fun switchMimeTypeFilterToNormal() {
+        if (!isObservingCurrentDirectory) {
+            currentDirectory.observeForever(currentDirectoryObserver)
+        }
+        currentDirectory.value = currentDirectory.value
+    }
+
+    private fun getFilesByMimeTypeFilter(filter: MimeTypeFilter) = viewModelScope.launch(Dispatchers.IO) {
+        val fileList: MutableList<File> = mutableListOf()
+        for (location in explorerFragmentArgs.storage.list) {
+            location.usage.file.walkTopDown().fold(
+                true,
+                {
+                    _, file ->
+                    if (!file.isDirectory) {
+                        val fileMime = file.getMimeData(context)
+                        val accept = when {
+                            filter.acceptApplication && fileMime.isApplication -> true
+                            filter.acceptArchive && fileMime.isArchive -> true
+                            filter.acceptAudio && fileMime.isAudio -> true
+                            filter.acceptDocument && fileMime.isDocument -> true
+                            filter.acceptFont && fileMime.isFont -> true
+                            filter.acceptImage && fileMime.isImage -> true
+                            filter.acceptText && fileMime.isText -> true
+                            filter.acceptVideo && fileMime.isVideo -> true
+                            else -> false
+                        }
+                        if (accept) {
+                            fileList.add(file)
+                        }
+                    }
+                    file.exists()
+                }
+            )
+        }
+
+        createSubDirectories(fileList)
     }
 
     private fun createSubDirectories(fileList: MutableList<File>) =
@@ -337,16 +386,16 @@ class ExplorerViewModel constructor(
         return possible
     }
 
-    fun backupSelectedItems(context: Context, done: () -> Unit) {
+    fun backupSelectedItems(done: () -> Unit) {
         val items: List<ExplorerItem> = selectedItems.value ?: listOf()
 
         for (item in items) {
-            backupItem(context, item.fileItem.file, done)
+            backupItem(item.fileItem.file, done)
         }
     }
 
-    private fun backupItem(context: Context, file: File, done: (() -> Unit)) {
-        backupViewModel.createBackup(context, file) {
+    private fun backupItem(file: File, done: (() -> Unit)) {
+        backupViewModel.createBackup(file) {
             backupViewModel.insertBackup(it, done)
         }
     }
@@ -359,7 +408,9 @@ class ExplorerViewModel constructor(
     override fun onCleared() {
         super.onCleared()
         systemApps.removeObserver(systemAppsObserver)
-        currentDirectory.removeObserver(currentDirectoryObserver)
+        if (isObservingCurrentDirectory) {
+            currentDirectory.removeObserver(currentDirectoryObserver)
+        }
         selectedItems.removeObserver(selectedItemsObserver)
     }
 }

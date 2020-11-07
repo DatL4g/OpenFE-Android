@@ -1,7 +1,6 @@
 @file:Obfuscate
 package de.datlag.openfe.commons
 
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import de.datlag.mimemagic.commons.getMimeData
 import de.datlag.openfe.R
 import de.datlag.openfe.models.FilePermission
 import de.datlag.openfe.models.Usage
@@ -27,9 +27,6 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
-import java.net.URLConnection
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import kotlin.contracts.ExperimentalContracts
@@ -67,41 +64,6 @@ fun File.getProviderUri(context: Context): Uri? = FileProvider.getUriForFile(
     "${context.applicationContext.packageName}.fileprovider",
     this
 )
-
-fun File.getMimeType(context: Context): String? {
-    if (this.isDirectory) {
-        return null
-    }
-
-    fun fallbackMimeType(uri: Uri): String? {
-        return if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
-            context.contentResolver.getType(uri)
-        } else {
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(this.extension?.toLower())
-        }
-    }
-
-    fun catchUrlMimeType(): String? {
-        val fileUri = this.uri
-
-        return if (androidGreaterOr(Build.VERSION_CODES.O)) {
-            val path = Paths.get(fileUri.toString())
-            try {
-                Files.probeContentType(path) ?: fallbackMimeType(fileUri)
-            } catch (ignored: Exception) {
-                fallbackMimeType(fileUri)
-            }
-        } else {
-            fallbackMimeType(fileUri)
-        }
-    }
-
-    return try {
-        URLConnection.guessContentTypeFromStream(this.inputStream()) ?: catchUrlMimeType()
-    } catch (ignored: Exception) {
-        catchUrlMimeType()
-    }
-}
 
 fun File.getDisplayName(context: Context): String {
     val rootFile = File(this.getRootOfStorage())
@@ -293,7 +255,7 @@ fun File.renameTo(newName: String): Boolean {
 fun File.intentChooser(context: Context): Intent {
     val intent = Intent(Intent.ACTION_VIEW)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    intent.setDataAndType(this.getProviderUri(context) ?: this.uri, this.getMimeType(context))
+    intent.setDataAndType(this.getProviderUri(context) ?: this.uri, this.getMimeData(context).mimeType)
     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 

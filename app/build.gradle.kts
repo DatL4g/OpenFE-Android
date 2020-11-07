@@ -147,6 +147,7 @@ dependencies {
     implementation("com.google.protobuf:protobuf-javalite:${Versions.protobuf}")
 
     implementation("me.jahnen:libaums:${Versions.libaums}")
+    implementation("com.github.DatL4g:MimeMagic-Android:${Versions.mimeMagic}")
 }
 
 protobuf.protobuf.run {

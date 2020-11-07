@@ -2,6 +2,7 @@ package de.datlag.openfe
 
 import android.os.Bundle
 import dagger.hilt.android.AndroidEntryPoint
+import de.datlag.mimemagic.MimePrefix
 import de.datlag.openfe.extend.AdvancedActivity
 import de.datlag.openfe.fragments.view.ImageFragment
 import de.datlag.openfe.fragments.view.VideoFragment
@@ -20,8 +21,8 @@ class ViewActivity : AdvancedActivity(R.layout.activity_view) {
         setTheme(R.style.ViewerAppTheme)
 
         val fragment = when {
-            intent?.type?.startsWith("image/") == true -> ImageFragment(intent)
-            intent?.type?.startsWith("video/") == true -> VideoFragment(intent)
+            intent?.type?.startsWith(MimePrefix.IMAGE) == true -> ImageFragment(intent)
+            intent?.type?.startsWith(MimePrefix.VIDEO) == true -> VideoFragment(intent)
             else -> null
         }
 

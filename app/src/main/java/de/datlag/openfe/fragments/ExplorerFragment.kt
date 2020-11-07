@@ -50,6 +50,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
     private val backupViewModel: BackupViewModel by viewModels()
     private val explorerViewModel: ExplorerViewModel by viewModels {
         ExplorerViewModelFactory(
+            safeContext,
             args,
             backupViewModel
         )
@@ -79,9 +80,14 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                 updateFAB(false)
                 bottomNavigation?.menu?.getItem(2)?.isVisible = false
             } else {
-                val permission = dir.permissions.writeable
-                updateFAB(permission)
-                bottomNavigation?.menu?.getItem(2)?.isVisible = permission
+                if (explorerViewModel.isObservingCurrentDirectory) {
+                    val permission = dir.permissions.writeable
+                    updateFAB(permission)
+                    bottomNavigation?.menu?.getItem(2)?.isVisible = permission
+                } else {
+                    updateFAB(false)
+                    bottomNavigation?.menu?.getItem(2)?.isVisible = false
+                }
             }
         }
 
@@ -90,9 +96,15 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                 updateFAB(false)
                 bottomNavigation?.menu?.getItem(2)?.isVisible = false
             } else {
-                val permission = explorerViewModel.currentDirectory.value?.permissions?.writeable ?: false
-                updateFAB(permission)
-                bottomNavigation?.menu?.getItem(2)?.isVisible = permission
+                if (explorerViewModel.isObservingCurrentDirectory) {
+                    val permission =
+                        explorerViewModel.currentDirectory.value?.permissions?.writeable ?: false
+                    updateFAB(permission)
+                    bottomNavigation?.menu?.getItem(2)?.isVisible = permission
+                } else {
+                    updateFAB(false)
+                    bottomNavigation?.menu?.getItem(2)?.isVisible = false
+                }
             }
         }
 
@@ -146,6 +158,12 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                     backupBeforeDelete()
                     true
                 }
+                R.id.explorerBottomMove -> {
+                    if (args.storage.mimeTypeFilter != null) {
+                        explorerViewModel.switchMimeTypeFilterToNormal()
+                    }
+                    true
+                }
                 R.id.explorerBottomExtendMenu -> {
                     moreAction(it.actionView ?: requireView().rootView.findViewById(it.itemId))
                     true
@@ -169,7 +187,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         }
 
         updateBottom(false)
-        updateFAB(true)
+        updateFAB(false)
     }
 
     private fun initRecyclerView() = with(binding) {
@@ -271,7 +289,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
 
         backupConfirmSheet.setRightButtonClickListener {
             if (backupPossible) {
-                explorerViewModel.backupSelectedItems(safeContext) {
+                explorerViewModel.backupSelectedItems {
                     deleteAction(true)
                 }
             } else {

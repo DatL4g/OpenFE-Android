@@ -40,6 +40,7 @@ import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
+import de.datlag.openfe.filter.MimeTypeFilter
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentNoAdPermission
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
@@ -220,34 +221,42 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         actionList.add(
             ActionItem(
                 getDrawable(R.drawable.ic_music_note_24dp, iconTint),
-                "Music", appFragmentUnit()
-            )
+                "Music"
+            ) {
+                checkReadPermission(0, MimeTypeFilter(acceptAudio = true))
+            }
         )
         actionList.add(
             ActionItem(
                 getDrawable(R.drawable.ic_image_24dp, iconTint),
-                "Images",
-                appFragmentUnit()
-            )
+                "Images"
+            ) {
+                checkReadPermission(0, MimeTypeFilter(acceptImage = true))
+            }
         )
         actionList.add(
             ActionItem(
                 getDrawable(R.drawable.ic_local_movies_24dp, iconTint),
-                "Videos", appFragmentUnit()
-            )
+                "Videos"
+            ) {
+                checkReadPermission(0, MimeTypeFilter(acceptVideo = true))
+            }
         )
         actionList.add(
             ActionItem(
                 getDrawable(R.drawable.ic_insert_drive_file_24dp, iconTint),
-                "Documents", appFragmentUnit()
-            )
+                "Documents"
+            ) {
+                checkReadPermission(0, MimeTypeFilter(acceptDocument = true))
+            }
         )
         actionList.add(
             ActionItem(
                 getDrawable(R.drawable.ic_archive_24dp, iconTint),
-                "Archives",
-                appFragmentUnit()
-            )
+                "Archives"
+            ) {
+                checkReadPermission(0, MimeTypeFilter(acceptArchive = true))
+            }
         )
         actionList.add(
             ActionItem(
@@ -317,14 +326,14 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         }
     }
 
-    private fun checkReadPermission(position: Int) {
+    private fun checkReadPermission(position: Int, filter: MimeTypeFilter? = null) {
         PermissionChecker.checkReadStorage(
             safeContext,
             object : PermissionListener {
                 override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
                     val action =
                         OverviewFragmentDirections.actionOverviewFragmentToExplorerFragment(
-                            StorageArgs(locationList, position)
+                            StorageArgs(locationList, position, filter)
                         )
                     findNavController().navigate(action)
                 }

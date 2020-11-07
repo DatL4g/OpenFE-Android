@@ -1,5 +1,6 @@
 package de.datlag.openfe.factory
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
@@ -11,6 +12,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @Obfuscate
 class ExplorerViewModelFactory(
+    private val context: Context,
     private val explorerArgs: ExplorerFragmentArgs,
     private val backupViewModel: BackupViewModel
 ) : ViewModelProvider.NewInstanceFactory() {
@@ -18,5 +20,5 @@ class ExplorerViewModelFactory(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(
         modelClass: Class<T>
-    ) = ExplorerViewModel(explorerArgs, backupViewModel) as T
+    ) = ExplorerViewModel(context, explorerArgs, backupViewModel) as T
 }
