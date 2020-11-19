@@ -27,7 +27,7 @@ object Versions {
     const val libaums = "0.7.6"
     const val lifecycle = "2.2.0"
     const val material = "1.2.1"
-    const val mimeMagic = "1.0.1"
+    const val mimeMagic = "1.0.2"
     const val multidex = "2.0.1"
     const val navigation = "2.3.0"
     const val paranoid = "0.3.2"

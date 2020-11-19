@@ -1,12 +1,14 @@
 package de.datlag.openfe.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.datlag.mimemagic.commons.getMimeData
 import de.datlag.openfe.commons.copyOf
+import de.datlag.openfe.commons.copyTo
 import de.datlag.openfe.commons.countRecursively
 import de.datlag.openfe.commons.deleteRecursively
 import de.datlag.openfe.commons.getRootOfStorage
@@ -27,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
 
@@ -47,6 +50,7 @@ class ExplorerViewModel constructor(
     val systemApps: MutableLiveData<List<AppItem>> = MutableLiveData()
 
     val selectedItems = MutableLiveData<List<ExplorerItem>>()
+    var reservedItems = listOf<ExplorerItem>()
 
     val searchShown: MutableLiveData<Boolean> = MutableLiveData(false)
     var searched: Boolean = false
@@ -197,7 +201,7 @@ class ExplorerViewModel constructor(
             }
         }
 
-    fun moveToPath(path: File, force: Boolean = false) {
+    fun switchToPath(path: File, force: Boolean = false) {
         val newPath = if (path.isInternal() && !force) startDirectory else path
 
         currentDirectory.updateValue(
@@ -405,6 +409,24 @@ class ExplorerViewModel constructor(
     fun afterDeleteItems() {
         currentDirectory.value = currentDirectory.value
         clearAllSelectedItems()
+    }
+
+    fun reserveSelectedItems() {
+        reservedItems = selectedItems.value ?: listOf()
+    }
+
+    fun moveReversedItemsHere() {
+
+    }
+
+    fun pasteReservedItemsHere() {
+        for (item in reservedItems) {
+            currentDirectory.value?.let {
+                item.fileItem.file.copyTo(it, false) {
+                    Timber.e("Done: $it")
+                }
+            }
+        }
     }
 
     override fun onCleared() {

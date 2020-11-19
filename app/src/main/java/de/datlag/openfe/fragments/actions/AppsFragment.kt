@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
 import androidx.core.view.iterator
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -44,13 +45,13 @@ import de.datlag.openfe.commons.supportActionBar
 import de.datlag.openfe.databinding.FragmentAppsActionBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.AppsActionViewModelFactory
-import de.datlag.openfe.interfaces.FragmentAppsLoaded
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.other.AppsSortType
 import de.datlag.openfe.recycler.adapter.AppsActionRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.util.PermissionChecker
 import de.datlag.openfe.viewmodel.AppsActionViewModel
+import de.datlag.openfe.viewmodel.AppsViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,9 +66,10 @@ import kotlin.contracts.contract
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
-class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBackPressed, PopupMenu.OnMenuItemClickListener, FragmentAppsLoaded {
+class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBackPressed, PopupMenu.OnMenuItemClickListener {
 
     private val args: AppsFragmentArgs by navArgs()
+    private val appsViewModel: AppsViewModel by activityViewModels()
     private val viewModel: AppsActionViewModel by viewModels { AppsActionViewModelFactory(args) }
     private val binding: FragmentAppsActionBinding by viewBinding()
 
@@ -89,6 +91,10 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
         initEditText()
         initBottomNavigation()
         loadApps()
+
+        appsViewModel.apps.observe(viewLifecycleOwner) { list ->
+            loadApps(list)
+        }
     }
 
     override fun onResume() {
@@ -96,7 +102,7 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
         statusBarColor(getColor(R.color.defaultStatusBarColor))
     }
 
-    private fun loadApps(list: List<AppItem> = appsViewModel?.apps?.value ?: listOf()) = with(binding) {
+    private fun loadApps(list: List<AppItem> = appsViewModel.apps.value ?: listOf()) = with(binding) {
         if (list.isNotEmpty()) {
             adapter.submitList(list)
             copiedList = list.mutableCopyOf()
@@ -397,19 +403,15 @@ class AppsFragment : AdvancedFragment(R.layout.fragment_apps_action), FragmentBa
     override fun onMenuItemClick(p0: MenuItem?): Boolean {
         p0?.let {
             when (it.itemId) {
-                R.id.appsActionPopupFilterName -> appsViewModel?.sortType = AppsSortType.NAME
+                R.id.appsActionPopupFilterName -> appsViewModel.sortType = AppsSortType.NAME
                 R.id.appsActionPopupFilterInstalled ->
-                    appsViewModel?.sortType =
+                    appsViewModel.sortType =
                         AppsSortType.INSTALLED
-                R.id.appsActionPopupFilterUpdated -> appsViewModel?.sortType = AppsSortType.UPDATED
-                else -> appsViewModel?.sortType = AppsSortType.NAME
+                R.id.appsActionPopupFilterUpdated -> appsViewModel.sortType = AppsSortType.UPDATED
+                else -> appsViewModel.sortType = AppsSortType.NAME
             }
         }
         return false
-    }
-
-    override fun onAppsLoaded(apps: List<AppItem>) {
-        loadApps(apps)
     }
 
     override fun onBackPressed(): Boolean {

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,6 +19,7 @@ import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.interfaces.FragmentBackPressed
 import de.datlag.openfe.interfaces.FragmentOAuthCallback
 import de.datlag.openfe.models.GitHubUser
+import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlin.contracts.ExperimentalContracts
@@ -29,6 +31,7 @@ import kotlin.contracts.ExperimentalContracts
 class SettingsFragment : AdvancedFragment(R.layout.fragment_settings), FragmentBackPressed, FragmentOAuthCallback {
 
     private val binding: FragmentSettingsBinding by viewBinding()
+    private val githubViewModel: GitHubViewModel by activityViewModels()
 
     private val navigationListener = View.OnClickListener {
         findNavController().navigate(SettingsFragmentDirections.actionSettingsFragmentToOverviewFragment())
@@ -41,13 +44,13 @@ class SettingsFragment : AdvancedFragment(R.layout.fragment_settings), FragmentB
         updateBottom(false)
         updateFAB(false)
 
-        updateGitHubViews(githubViewModel?.authenticatedGitHubUser?.value)
+        updateGitHubViews(githubViewModel.authenticatedGitHubUser.value)
 
         binding.githubAccountRevoke.setOnClickListener {
             revokeGitHubAccess()
         }
 
-        githubViewModel?.authenticatedGitHubUser?.observe(viewLifecycleOwner) {
+        githubViewModel.authenticatedGitHubUser.observe(viewLifecycleOwner) {
             updateGitHubViews(it)
         }
     }
@@ -73,7 +76,7 @@ class SettingsFragment : AdvancedFragment(R.layout.fragment_settings), FragmentB
             githubAccountLogin.setOnClickListener {
                 val githubLogoutSheet = ConfirmActionSheet.githubLogoutInstance()
                 githubLogoutSheet.setRightButtonClickListener {
-                    githubViewModel?.logout()
+                    githubViewModel.logout()
                     revokeGitHubAccess()
                 }
                 showBottomSheetFragment(githubLogoutSheet)

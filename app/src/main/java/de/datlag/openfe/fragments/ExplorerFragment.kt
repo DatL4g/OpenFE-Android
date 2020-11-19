@@ -3,6 +3,7 @@ package de.datlag.openfe.fragments
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -26,15 +27,16 @@ import de.datlag.openfe.commons.show
 import de.datlag.openfe.commons.showBottomSheetFragment
 import de.datlag.openfe.commons.statusBarColor
 import de.datlag.openfe.commons.supportActionBar
+import de.datlag.openfe.commons.updateValue
 import de.datlag.openfe.databinding.FragmentExplorerBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.factory.ExplorerViewModelFactory
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.FragmentSystemAppsLoaded
 import de.datlag.openfe.recycler.LinearLayoutManagerWrapper
 import de.datlag.openfe.recycler.adapter.ExplorerRecyclerAdapter
 import de.datlag.openfe.recycler.data.AppItem
 import de.datlag.openfe.recycler.data.ExplorerItem
+import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.BackupViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
 import io.michaelrocks.paranoid.Obfuscate
@@ -46,13 +48,14 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @AndroidEntryPoint
 @Obfuscate
-class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentBackPressed, FragmentSystemAppsLoaded {
+class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentBackPressed {
 
     private val args: ExplorerFragmentArgs by navArgs()
+    private val appsViewModel: AppsViewModel by activityViewModels()
     private val backupViewModel: BackupViewModel by viewModels()
     private val explorerViewModel: ExplorerViewModel by viewModels {
         ExplorerViewModelFactory(
-            safeContext,
+            safeContext.applicationContext,
             args,
             backupViewModel
         )
@@ -76,8 +79,9 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         initRecyclerView()
         initSearchView()
         loadingView.startAnimation()
+        Timber.e(args.storage.toString())
 
-        explorerViewModel.systemApps.value = appsViewModel?.systemApps?.value ?: listOf()
+        explorerViewModel.systemApps.value = appsViewModel.systemApps.value ?: listOf()
 
         explorerViewModel.currentDirectory.observe(viewLifecycleOwner) { dir ->
             if (explorerViewModel.searchShown.value == true) {
@@ -92,6 +96,9 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                     updateFAB(false)
                     bottomNavigation?.menu?.getItem(2)?.isVisible = false
                 }
+            }
+            if (explorerViewModel.reservedItems.isNotEmpty()) {
+                Timber.e("Reserved Items: ${explorerViewModel.reservedItems.size}")
             }
         }
 
@@ -122,6 +129,10 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         explorerViewModel.selectedItems.observe(viewLifecycleOwner) { list ->
             updateBottom(list.isNotEmpty())
             updateToolbar(list)
+        }
+
+        appsViewModel.systemApps.observe(viewLifecycleOwner) { list ->
+            explorerViewModel.systemApps.updateValue(list)
         }
     }
 
@@ -169,6 +180,11 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                     if (args.storage.mimeTypeFilter != null) {
                         explorerViewModel.switchMimeTypeFilterToNormal()
                     }
+                    true
+                }
+                R.id.explorerBottomCopy -> {
+                    explorerViewModel.reserveSelectedItems()
+                    explorerViewModel.clearAllSelectedItems()
                     true
                 }
                 R.id.explorerBottomExtendMenu -> {
@@ -274,7 +290,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
         val file = fileItem.file
 
         if (file.isDirectory) {
-            explorerViewModel.moveToPath(file, (fileItem.name != null && fileItem.name == ".."))
+            explorerViewModel.switchToPath(file, (fileItem.name != null && fileItem.name == ".."))
         } else {
             try {
                 startActivity(file.intentChooser(safeContext))
@@ -340,6 +356,17 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
     private fun moreAction(anchor: View) {
         val popupMenu = PopupMenu(safeContext, anchor)
         popupMenu.inflate(R.menu.explorer_bottom_extended_menu)
+        popupMenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.explorerBottomExtendedInfo -> {
+                    for (item in explorerViewModel.selectedItems.value ?: listOf()) {
+                        Timber.e(item.fileItem.file.absolutePath)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
         popupMenu.show()
     }
 
@@ -351,7 +378,7 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
                     explorerViewModel.currentDirectory.value?.absolutePath == "/" -> true
                     explorerViewModel.currentDirectory.value != explorerViewModel.startDirectory -> {
                         explorerViewModel.currentDirectory.value?.let {
-                            explorerViewModel.moveToPath(it.parentDir)
+                            explorerViewModel.switchToPath(it.parentDir)
                         }
                         false
                     }
@@ -375,10 +402,6 @@ class ExplorerFragment : AdvancedFragment(R.layout.fragment_explorer), FragmentB
     }
 
     override fun onBackPressed(): Boolean = onBackPressedCheck()
-
-    override fun onSystemAppsLoaded(apps: List<AppItem>) {
-        explorerViewModel.systemApps.value = apps
-    }
 
     companion object {
         fun newInstance() = ExplorerFragment()

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import de.datlag.openfe.fragments.ExplorerFragmentArgs
+import de.datlag.openfe.viewmodel.AppsViewModel
 import de.datlag.openfe.viewmodel.BackupViewModel
 import de.datlag.openfe.viewmodel.ExplorerViewModel
 import io.michaelrocks.paranoid.Obfuscate

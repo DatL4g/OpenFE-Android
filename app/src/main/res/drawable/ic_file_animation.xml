@@ -11,7 +11,7 @@
           android:fillColor="#A2000F"/>
       <group
           android:name="documentGroup"
-          android:translateY="-100">
+          android:translateY="-80">
         <path
             android:name="documentPath"
             android:fillColor="@color/defaultContentColor"
@@ -38,7 +38,7 @@
       <objectAnimator
           android:duration="2500"
           android:propertyName="translateY"
-          android:valueFrom="-100"
+          android:valueFrom="-80"
           android:valueTo="0"/>
     </aapt:attr>
   </target>

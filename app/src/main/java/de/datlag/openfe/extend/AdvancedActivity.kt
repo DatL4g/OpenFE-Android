@@ -22,8 +22,6 @@ abstract class AdvancedActivity : AppCompatActivity {
     constructor() : super() { }
     constructor(@LayoutRes contentLayoutId: Int) : super(contentLayoutId) { }
 
-    val gitHubViewModel: GitHubViewModel by viewModels()
-
     companion object {
         init {
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)

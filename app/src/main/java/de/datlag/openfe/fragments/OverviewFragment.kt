@@ -1,23 +1,16 @@
 package de.datlag.openfe.fragments
 
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.hardware.usb.UsbDevice
-import android.hardware.usb.UsbManager
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.iterator
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.github.mjdev.libaums.UsbMassStorageDevice
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -27,6 +20,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
 import dagger.hilt.android.AndroidEntryPoint
+import de.datlag.openfe.MainActivity
 import de.datlag.openfe.R
 import de.datlag.openfe.commons.getColor
 import de.datlag.openfe.commons.getDisplayName
@@ -42,13 +36,13 @@ import de.datlag.openfe.databinding.FragmentOverviewBinding
 import de.datlag.openfe.extend.AdvancedFragment
 import de.datlag.openfe.filter.MimeTypeFilter
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.FragmentNoAdPermission
 import de.datlag.openfe.recycler.adapter.ActionRecyclerAdapter
 import de.datlag.openfe.recycler.adapter.LocationRecyclerAdapter
 import de.datlag.openfe.recycler.data.ActionItem
 import de.datlag.openfe.recycler.data.LocationItem
 import de.datlag.openfe.safeargs.StorageArgs
 import de.datlag.openfe.util.PermissionChecker
+import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -63,12 +57,13 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 @Obfuscate
 @AndroidEntryPoint
-class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentBackPressed, FragmentNoAdPermission {
+class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentBackPressed {
 
     lateinit var locationList: List<LocationItem>
     lateinit var actionList: List<ActionItem>
 
     private val binding: FragmentOverviewBinding by viewBinding()
+    private val githubViewModel: GitHubViewModel by activityViewModels()
 
     private var toolbarMenuJob: Job? = null
 
@@ -101,6 +96,12 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
 
         initLocationRecycler()
         initActionRecycler()
+
+        githubViewModel.isNoAdsPermitted.observe(viewLifecycleOwner) { permitted ->
+            if (githubViewModel.reposContributorListLoaded && githubViewModel.authenticatedUserLoaded) {
+                onNoAdPermissionChanged(permitted)
+            }
+        }
     }
 
     override fun onResume() {
@@ -127,7 +128,7 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         locationRecycler.layoutManager = LinearLayoutManager(safeContext)
         locationRecycler.adapter = LocationRecyclerAdapter().apply {
             setOnClickListener { _, position ->
-                checkReadPermission(position)
+                checkReadPermission(position, null)
             }
             submitList(locationList)
         }
@@ -170,48 +171,11 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
             }
         }
 
-        discoverUSBDevices()
+        if (activity is MainActivity) {
+            (activity as MainActivity).discoverUSBDevices()
+        }
 
         return locationList.toList()
-    }
-
-    private fun discoverUSBDevices() {
-        val usbManager = safeContext.getSystemService(Context.USB_SERVICE) as UsbManager
-        val massStorageDevices = UsbMassStorageDevice.getMassStorageDevices(safeContext)
-
-        if (massStorageDevices.isEmpty()) {
-            Timber.e("no device")
-            return
-        }
-
-        val usbDevice =
-            activity?.intent?.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as? UsbDevice?
-
-        if (usbDevice != null && usbManager.hasPermission(usbDevice)) {
-            Timber.e("permission")
-
-            for (device in massStorageDevices) {
-                device.init()
-
-                for (partition in device.partitions) {
-                    partition.fileSystem.also {
-                        Toast.makeText(safeContext, it.volumeLabel, Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        } else {
-            Timber.e("no permission")
-
-            val permissionIntent = PendingIntent.getBroadcast(
-                safeContext,
-                1337,
-                Intent("${safeContext.packageName}.USB_PERMISSION"),
-                0
-            )
-            for (device in massStorageDevices) {
-                usbManager.requestPermission(device.usbDevice, permissionIntent)
-            }
-        }
     }
 
     private fun getActionItems(): List<ActionItem> {
@@ -356,7 +320,7 @@ class OverviewFragment : AdvancedFragment(R.layout.fragment_overview), FragmentB
         )
     }
 
-    override fun onNoAdPermissionChanged(permitted: Boolean) = with(binding) {
+    fun onNoAdPermissionChanged(permitted: Boolean) = with(binding) {
         if (permitted) {
             adView.hide()
         } else {

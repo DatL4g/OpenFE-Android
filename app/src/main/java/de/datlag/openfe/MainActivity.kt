@@ -1,27 +1,31 @@
 package de.datlag.openfe
 
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.Menu
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.ferfalk.simplesearchview.SimpleSearchView
+import com.github.mjdev.libaums.UsbMassStorageDevice
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import de.datlag.openfe.databinding.ActivityMainBinding
 import de.datlag.openfe.extend.AdvancedActivity
-import de.datlag.openfe.interfaces.FragmentAppsLoaded
 import de.datlag.openfe.interfaces.FragmentBackPressed
-import de.datlag.openfe.interfaces.FragmentNoAdPermission
 import de.datlag.openfe.interfaces.FragmentOptionsMenu
-import de.datlag.openfe.interfaces.FragmentSystemAppsLoaded
-import de.datlag.openfe.viewmodel.AppsViewModel
+import de.datlag.openfe.viewmodel.GitHubViewModel
 import io.michaelrocks.paranoid.Obfuscate
 import kotlinx.serialization.ExperimentalSerializationApi
 import timber.log.Timber
@@ -34,8 +38,7 @@ import kotlin.contracts.ExperimentalContracts
 class MainActivity : AdvancedActivity(R.layout.activity_main) {
 
     private val binding: ActivityMainBinding by viewBinding(R.id.container)
-
-    val appsViewModel: AppsViewModel by viewModels()
+    private val gitHubViewModel: GitHubViewModel by viewModels()
 
     val toolbar: Toolbar
         get() = binding.toolBar
@@ -58,20 +61,6 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
         setContentView(binding.root)
 
         initViews()
-
-        gitHubViewModel.isNoAdsPermitted.observe(this) { permitted ->
-            if (gitHubViewModel.reposContributorListLoaded && gitHubViewModel.authenticatedUserLoaded) {
-                (getCurrentNavFragment() as? FragmentNoAdPermission?)?.onNoAdPermissionChanged(permitted)
-            }
-        }
-
-        appsViewModel.apps.observe(this) {
-            (getCurrentNavFragment() as? FragmentAppsLoaded?)?.onAppsLoaded(it)
-        }
-
-        appsViewModel.systemApps.observe(this) {
-            (getCurrentNavFragment() as? FragmentSystemAppsLoaded?)?.onSystemAppsLoaded(it)
-        }
     }
 
     private fun initViews() = with(binding) {
@@ -97,6 +86,45 @@ class MainActivity : AdvancedActivity(R.layout.activity_main) {
             .appendQueryParameter("scope", "user:read")
             .build()
         startActivity(intent)
+    }
+
+    fun discoverUSBDevices() {
+        val usbManager = this.getSystemService(Context.USB_SERVICE) as UsbManager
+        val massStorageDevices = UsbMassStorageDevice.getMassStorageDevices(this)
+
+        if (massStorageDevices.isEmpty()) {
+            Timber.e("no device")
+            return
+        }
+
+        val usbDevice = intent?.getParcelableExtra<Parcelable>(UsbManager.EXTRA_DEVICE) as? UsbDevice?
+
+        if (usbDevice != null && usbManager.hasPermission(usbDevice)) {
+            Timber.e("permission")
+
+            for (device in massStorageDevices) {
+                device.init()
+
+                for (partition in device.partitions) {
+                    partition.fileSystem.also {
+                        Toast.makeText(this, it.volumeLabel, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        } else {
+            Timber.e("no permission")
+
+            val permissionIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                Intent("${this.packageName}.USB_PERMISSION"),
+                0
+            )
+            for (device in massStorageDevices) {
+                Timber.e("requesting: ${device.usbDevice.deviceName}")
+                usbManager.requestPermission(device.usbDevice, permissionIntent)
+            }
+        }
     }
 
     override fun onNewIntent(newIntent: Intent?) {

@@ -142,23 +142,6 @@ abstract class AdvancedFragment : Fragment {
         }
     }
 
-    protected val githubViewModel: GitHubViewModel?
-        get() {
-            return if (activity is AdvancedActivity) {
-                (activity as AdvancedActivity).gitHubViewModel
-            } else {
-                null
-            }
-        }
-
-    protected val appsViewModel: AppsViewModel?
-        get() {
-            return if (activity is MainActivity) {
-                (activity as MainActivity).appsViewModel
-            } else {
-                null
-            }
-        }
 
     abstract fun initToolbar()
 }
