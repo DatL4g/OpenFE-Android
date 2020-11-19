@@ -21,6 +21,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}")
         classpath("com.likethesalad.android:string-reference:${Versions.stringReference}")
         classpath("com.google.protobuf:protobuf-gradle-plugin:${Versions.protobufGradle}")
+        classpath("name.remal:gradle-plugins:${Versions.checkUpdates}")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

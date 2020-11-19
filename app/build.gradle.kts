@@ -1,7 +1,5 @@
 import com.google.protobuf.gradle.builtins
 import com.google.protobuf.gradle.generateProtoTasks
-import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.plugins
 import com.google.protobuf.gradle.protoc
 
 plugins {
@@ -16,6 +14,7 @@ plugins {
     id("io.michaelrocks.paranoid")
     id("placeholder-resolver")
     id("com.google.protobuf")
+    id("name.remal.check-updates")
 }
 
 android {
